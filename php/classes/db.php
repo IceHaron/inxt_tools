@@ -24,9 +24,9 @@ class db {
 		global $GAMINAS;
 		
 		$host = 'localhost';
-		$user = 'srv44030_gaminas';
+		$user = 'srv44030_tools';
 		$pw = '230105';
-		$base = 'srv44030_gaminas';
+		$base = 'srv44030_tools';
 		
 // Подключаемся к базе, устанавливаем чарсет, ловим ошибки и формируем бэктрейс
 

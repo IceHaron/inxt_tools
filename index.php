@@ -200,7 +200,7 @@ if (!$GAMINAS['isfile']) {																											// Если обращае�
 		}
 	} else $page = $GAMINAS['maincontent'];
 	
-	fb($GAMINAS, 'GAMINAS');
+	// fb($GAMINAS, 'GAMINAS');
 	if (!isset($GAMINAS['notemplate'])) INCLUDE_ONCE('html/index.html');					// Ну и подгружаем макет, конечно же
 	
 } else {																																				// Если же обращение идет непосредственно к файлу

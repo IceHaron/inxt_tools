@@ -18,8 +18,9 @@ img {
   margin: 2px;
 }
 body {
-  color: #555;
+  color: #ccc;
 	font-family: sans-serif;
+	background: url(/source/img/bg.jpg) no-repeat black;
 }
 a.nodeco {
 	text-decoration: none;
@@ -42,7 +43,6 @@ a.nodeco {
 #main {
   width: 90%;
   margin: auto;
-  border: 1px solid black
 }
 
 /* Шапка */
@@ -55,14 +55,12 @@ a.nodeco {
   width: 50%;
   height: 100%;
   float: left;
-  background-color: green;
 }
 #righthead {
   width: 200px;
   height: 80px;
   float: right;
   padding: 10px;
-  background-color: yellowgreen;
 }
 #loginholder {
   max-width: 200px;
@@ -74,6 +72,7 @@ a.nodeco {
   margin-top: 5px;
   margin-right: 10px;
   float: left;
+	color: white;
 }
 #logoff { width: 90%; }
 #head_ava { float: right; }
@@ -82,7 +81,6 @@ a.nodeco {
 
 #body {
   padding: 5px;
-  background-color: #fdd;
 }
 #topmenu {
   width: 90%;
@@ -94,18 +92,17 @@ a.nodeco {
   padding: 5px;
   margin: 5px;
   float: left;
-  background-color: #ccc;
   text-decoration: none;
+	color: white;
 }
 .topmenunode:hover {
-  background-color: grey;
+	color: yellow;
 }
 #maincaption {
   height: 30px;
   margin: 5px;
   text-align: center;
   font-size: 20px;
-  background-color: #dfd;
   cursor: pointer;
 }
 #mainsupport {
@@ -170,6 +167,7 @@ a.nodeco {
 
 #todo {
 	width: 100%;
+	color: #555;
 }
 #todo tbody tr td.left {
 	text-align: center;
