@@ -1,0 +1,41 @@
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+<script type="text/javascript">
+	google.load("visualization", "1", {packages:["corechart"]});
+</script>
+<div id="loading" data-why="sysfilters">
+	<span>Подождите, загружаемся</span>
+	<div id="annotation"></div>
+	<div id="progressbar"><div></div></div>
+</div>
+<div id="maincaption">{maincaption}</div>
+<div id="mainsupport">
+	<div class="graphfilter" id="time">
+		<form onsubmit="return false;">
+			<label><input type="radio" name="time" data-time="daily" checked>Часы (последние 48)</label>
+			<label><input type="radio" name="time" data-time="monthly">Дни (последние 60)</label>
+			<label><input type="radio" name="time" data-time="lifetime">Месяцы</label>
+		</form>
+	</div>
+	<div class="graphfilter" id="region">
+		<label><input type="checkbox" class="all">Все</label>
+		<form onsubmit="return false;">
+			{regcheckboxes}
+		</form>
+	</div>
+	<div class="graphfilter" id="system">
+		<label><input type="checkbox" class="all">Все</label>
+		<form onsubmit="return false;">
+			{syscheckboxes}
+		</form>
+	</div>
+	<input type="text" id="systemSearch" placeholder="Найти систему">
+	<div id="systemSearchVariants"><div class="ssVariant"><span id="ssVariantsSS">1.0</span> <span id="ssVariantsStar">Amarr</span> <span id="ssVariantsReg">Domain</span></div></div>
+	<button name="draw" onclick="drawGraph();">Нарисовать</button>
+	{mainsupport}
+	<div class="clear"></div>
+</div>
+<div id="maincontent">
+	<div id="chart_div" style="width: 100%;"></div>
+	{maincontent}
+	<div class="clear"></div>
+</div>

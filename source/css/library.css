@@ -1,0 +1,15 @@
+/**
+*	
+*	Стили для библиотеки игр
+*	
+**/
+
+.gamefield {
+  height: 100px;
+  width: 200px;
+  float: left;
+  text-align: center;
+}
+.gamename {
+  font-size: 12px;
+}

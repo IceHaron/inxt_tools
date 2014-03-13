@@ -1,0 +1,4 @@
+#AuthName "To view logs you have to login"
+#AuthType Basic
+#AuthUserFile C:/www/gaminas/logs/.htpasswd
+#require valid-user

@@ -1,0 +1,32 @@
+/* Для графика активности */
+
+.graphfilter {
+	height: 200px;
+	width: 220px;
+	float: left;
+	margin: 10px;
+	border: 1px solid grey;
+	background-color: #002;
+	color: #bbb;
+	overflow-y: scroll;
+}
+.graphfilter form label {
+	display: block;
+	margin-left: 10px;
+}
+.ss {
+	width:28px;
+	float: left;
+}
+#strForChart { display: none; }
+#systemSearch {
+	width: 200px;
+}
+#systemSearchVariants {
+	min-width: 200px;
+	min-height: 30px;
+	left: 825px;
+	position: absolute;
+	background-color: white;
+	font-size: 12px;
+}
