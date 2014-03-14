@@ -65,14 +65,13 @@ class systemstats_index {
 		global $GAMINAS;
 		self::init();
 		
-		$time = isset($_GET['time']) ? urldecode($_GET['time']) : 'daily';
+		$time = isset($_GET['time']) ? urldecode($_GET['time']) : 'hourly';
 		$mode = isset($_GET['mode']) ? urldecode($_GET['mode']) : 'system';
-		$regions = isset($_GET['region']) ? explode(',', urldecode($_GET['region'])) : 'default';
-		$stars = isset($_GET['star']) ? self::parseStarList(urldecode($_GET['star'])) : 'default';
+		$subject = isset($_GET['subject']) ? self::parseStarList(urldecode($_GET['subject'])) : 'default';
 		
 		$maincaption = 'График активности в системах';
 		$mainsupport = '<label>Ссылка на график<input type="text" name="link" id="graphLink" value="' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . '"></label>';
-		$maincontent = '<div id="strForChart">' . self::getStringForGraph($time, $mode, $regions, $stars) . '</div>';
+		$maincontent = '<div id="strForChart">' . self::getStringForGraph($time, $mode, $subject) . '</div>';
 		
 		$regions = self::$regions;
 		$regCheckBoxes = '';
@@ -126,25 +125,18 @@ class systemstats_index {
 	}
 	
 	private static function parseStarList($string) {
-		$array['starNames'] = explode(',', preg_replace('/\s*\_\-*\d+/', '', $string));
+		$array['names'] = explode(',', preg_replace('/\s*\_\-*\d+/', '', $string));
 		$array['secures'] = explode(',', preg_replace('/(\D|\A)(\-?\d)/', '$1$2.', preg_replace('/[a-zA-Z0-9\s\-]+_/', '', $string)));
 		
 		return $array;
 	}
 	
-	public static function getStringForGraph($time = 'daily', $mode = 'system', $regions = 'default', $stars = 'default') {
+	public static function getStringForGraph($time = 'hourly', $mode = 'system', $subject = 'default') {
 		global $GAMINAS;
 		self::init();
-		if ($regions === 'default')
-			$regions = array(
-					'Domain'
-				, 'The Forge'
-				, 'Sinq Laison'
-				, 'Heimatar'
-			);
-		if ($stars === 'default')
-			$stars = array(
-				'starNames' => array(
+		if ($subject === 'default')
+			$subject = array(
+				'names' => array(
 						'Amarr'
 					, 'Jita'
 					, 'Dodixie'
@@ -157,32 +149,20 @@ class systemstats_index {
 					, '0.9'
 				)
 			);
-		$regionQuery = implode("','", $regions);
-		
-		$str = "SELECT SQL_CACHE * FROM `activity_$time` WHERE `region` IN ('$regionQuery')";
+		$query = implode("','", $subject['names']);
+		if ($mode == 'system')
+			$str = "SELECT unix_timestamp(`act`.`ts`) `ts`, `sys`.`name` `system`, `jumps` FROM `activity_$time` `act` JOIN `systems` `sys` ON (`act`.`system` = `sys`.`id`) WHERE `sys`.`name` IN ('$query');";
+		else
+			$str = "SELECT unix_timestamp(`act`.`ts`) `ts`, `sys`.`name` `system`, `jumps` FROM `activity_hourly` `act` JOIN `systems` `sys` ON (`act`.`system` = `sys`.`id`) WHERE `sys`.`name` IN ('Amarr', 'Jita', 'Rens');";
  		$q = db::query($str);
 		// var_dump($q);
-		$activity = array();
 		
-		foreach ($q as $s) {
-			$activity[ $s['region'] ] = json_decode($s['activity']);
-		}
-		foreach ($activity as $region => $systemset) {
-			foreach ($systemset as $system => $act) {
-				if (array_search($system, $stars['starNames']) !== FALSE) {
-					if ($time == 'daily') {
-						foreach ($act as $ts => $jumps) {
-							$arr[ $ts ][ $system ] = $jumps;
-							$resHead[ $system ] = $system . '(' . number_format($stars['secures'][ array_search($system, $stars['starNames']) ], 1, '.', '') . ')';
-						}
-					} else if ($time == 'monthly') {
-						foreach ($act as $ts => $jumps) {
-							$arr[ $ts ][ $system ] = $jumps;
-							$resHead[ $system ] = $system . '(' . number_format($stars['secures'][ array_search($system, $stars['starNames']) ], 1, '.', '') . ')';
-						}
-					}
-				}
-			}
+		foreach ($q as $sysinfo) {
+			$arr[ $sysinfo['ts'] ][ $sysinfo['system'] ] = $sysinfo['jumps'];
+			if ($time == 'hourly')
+				$resHead[ $sysinfo['system'] ] = $sysinfo['system'] . '(' . number_format($subject['secures'][ array_search($sysinfo['system'], $subject['names']) ], 1, '.', '') . ')';
+			else
+				$resHead[ $sysinfo['system'] ] = $sysinfo['system'] . '(' . number_format($subject['secures'][ array_search($sysinfo['system'], $subject['names']) ], 1, '.', '') . ')';
 		}
 		
 		$res = '{"head":["' . implode('","', $resHead) . '"],"content":[';
