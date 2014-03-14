@@ -6,6 +6,12 @@
 **/
 $(document).ready(function() {
 
+/* При клике на тень скрываем ее и все модальные окна */
+$('#shadow').click(function() {
+	$(this).hide();
+	$('.modal').hide();
+});
+
 /**
 *	
 *	Клик на заголовке скрывает/раскрывает фильтр и что-то еще делает, пока не придумал
@@ -60,53 +66,6 @@ $('#namesearch').keyup(function(key) {
 		else $(this).children('td').animate({'opacity': '0.3'}, 100);
 	});
 	
-	
-	/* Фильтрация для графика: при клике на "все" ставить/снимать галки у всех детей */
-	$('input.all').on('click', function() {
-		chk = this.checked;
-		$(this).parent().next().children().children('input').each(function() {
-			this.checked = chk;
-			if ($(this).attr('name') == 'region') toggleStars($(this).attr('data-id'), chk);
-		});
-	});
-	
-	/* Фильтрация систем по региону */
-	$('#region input[name="region"]').on('click', function() {
-		var regid = $(this).attr('data-id');
-		var condition = this.checked;
-		toggleStars(regid, condition);
-		if (!condition) {
-			checkStars(regid, condition);
-			$('#system [data-regid="' + regid + '"]').each(function() {this.checked = false;});
-		}
-/*	Составление строки из айдишников нужных регионов, осталось для фильтрации через AJAX */
-	});
-	
-	/* Выделение всех систем региона */
-	$('#system input[name="region"]').on('click', function() {
-		var regid = $(this).attr('data-regid');
-		var condition = this.checked;
-		checkStars(regid, condition);
-	});
-	
-	/* Прогрузка систем после загрузки страницы */
-	if ($('#loading').attr('data-why') == 'sysfilters') {
-		$('#shadow').show();
-		$('#loading').show();
-		$('#annotation').text('Загружаем системы из txt-файлов');
-		$('#progressbar div').css('width', '3%');
-		var regionset = '';
-		var r = '';
-		
-		$('#system input[name="region"]').each(function() {													// Собираем список регионов в строку
-			var regID = $(this).attr('data-regid');
-			r += ',' + regID;
-		});
-		
-		regionset = escape(r.substr(1));																						// Убираем ненужную запятую в начале строки
-		writeSystemList(regionset);																									// Пишем в документ чекбоксы систем выбранных регионов
-	}
-
 	/* Получаем из блока JSON-строку чтобы нарисовать по ней график */
 	if (document.getElementById('strForChart') !== null) {
 		eval("array = " + $('#strForChart').text());
@@ -116,6 +75,13 @@ $('#namesearch').keyup(function(key) {
 	/* При клике в поле "Ссылка на график" выделяем весь текст в нем */
 	$('#graphLink').click(function() {
 		this.select();
+	});
+	
+	/* При клике на регион выводим модальное окно с его системами */
+	$('.regButton').click(function() {
+		var regID = $(this).attr('data-id');
+		$('#shadow').show();
+		getSystems(regID);
 	});
 	
 /* End of READY() */
@@ -148,7 +114,7 @@ function login(token){
 *	
 **/
 	
-function writeSystemList(regions) {
+function getSystems(regions) {
 	var sysinputs = {};
 	/* Первым делом получаем список систем для указанных в параметре регионов */
 	$.ajax({
@@ -157,11 +123,12 @@ function writeSystemList(regions) {
 		data: {'regions' : regions},
 		dataType: 'json',
 		success: function(data) {
-		
-		// Склеиваем чекбоксы
+
+		// Делаем модальное окно
 			for (sysid in data) {
 				var sysinfo = data[sysid];
-				var ss = parseFloat(sysinfo.security.toFixed(1));												// Нам нужен СС системы чтобы раскрасить его в нужный цвет
+				var ss = parseFloat(sysinfo.security).toFixed(1);												// Нам нужен СС системы чтобы раскрасить его в нужный цвет
+				if (!sysinputs.hasOwnProperty(sysinfo['regname'])) sysinputs[ sysinfo['regname'] ] = '';
 				
 				if (ss === 1.0) color = 'skyblue';
 				if (ss <= 0.9 && ss > 0.6) color = 'green';
@@ -174,19 +141,16 @@ function writeSystemList(regions) {
 				else sysname = sysinfo['name'];
 				
 				// Формируем массив HTML-строк, по строке на каждый регион из входящего списка
-				sysinputs[ sysinfo['regionID'] ] += '<label style="display: none;"><input type="checkbox" name="system" data-name="' + sysname + '" data-id="' + sysid + '" data-regid="' + sysinfo['regionID'] + '"><div class="ss" style="color:' + color + '">' + ss + '</div><span>' + sysname + '</span></label>';
+				sysinputs[ sysinfo['regname'] ] += '<div class="systemHolder"><label><input type="checkbox" name="system" data-name="' + sysname + '" data-id="' + sysid + '" data-regid="' + sysinfo['regionID'] + '"><div class="ss" style="color:' + color + '">' + ss + '</div><span>' + sysname + '</span></label></div>';
 			}
+			var fullModalContent = '';
+			for (i in sysinputs) {
+				var content = sysinputs[i];
+				var regionHolder = '<div class="regionHolder"><div><span class="caption">' + i + '</span></div>' + content + '</div>';
+				fullModalContent += regionHolder;
+			}
+			$('#systemSetHolder').append(fullModalContent).show();
 			
-			// Записываем системы для каждого региона
-			var width = 3;
-			$('#system input[name="region"]').each(function() {
-				var regID = $(this).attr('data-regid');
-				var regName = $(this).parent().text();
-				var inputs = sysinputs[regID].replace(/^undefined/, '');
-				$(this).parent().after(inputs);
-				$('#progressbar div').css('width', ++width + '%');											// Прибавляем прогрессбар
-				$('#annotation').text('Загружаем системы для региона ' + regName);
-			});
 			
 			/* Устанавливаем состояние всех чекбоксов в зависимости от GET`а */
 			var get = unescape(window.location.search.substring(1)).replace('+', ' ').split('&');
@@ -213,7 +177,7 @@ function writeSystemList(regions) {
 								if ($(this).attr('name') == 'region') {
 									regid = $(this).attr('data-id');
 									// Все системы упомянутых регионов нужно показать
-									$('#system input[data-regid="' + regid + '"]').parent().show();
+									// $('#system input[data-regid="' + regid + '"]').parent().show();
 								}
 								
 								this.checked = true;																						// Расставляем нужные галочки

@@ -18,6 +18,7 @@ img {
   margin: 2px;
 }
 body {
+	margin: 0;
   color: #ccc;
 	font-family: sans-serif;
 	background: url(/source/img/bg.jpg) no-repeat black;
@@ -37,11 +38,29 @@ a.nodeco {
 	background-color: black;
 	opacity: 0.5;
 }
+.modal {
+  top: 100px;
+	left: 100px;
+	right: 100px;
+	display: none;
+  margin: auto;
+	padding: 25px;
+  position: absolute;
+	background-color: white;
+	border-radius: 10px;
+	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
+	color: black;
+}
+.modal.fixed {
+	position: fixed;
+}
 
 /* Основная разметка, макет ================================================= */
 
 #main {
   width: 90%;
+	min-width: 900px;
   margin: auto;
 }
 

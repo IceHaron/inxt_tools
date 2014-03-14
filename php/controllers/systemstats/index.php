@@ -23,9 +23,12 @@ class systemstats_index {
 	
 	private function systemstats_index() {
 		global $GAMINAS;
-		self::$regions = json_decode(file_get_contents(root::$rootfolder . '/source/txt/regions.txt'), TRUE);
-		self::$stars = json_decode(file_get_contents(root::$rootfolder . '/source/txt/systems.txt'), TRUE);
-		$GAMINAS['backtrace'][] = 'Took region set and star set from files';
+		
+		foreach (db::query('SELECT SQL_CACHE * FROM `regions`') as $region) $regions[ $region['id'] ] = $region['name'];
+		self::$regions = $regions;
+		foreach (db::query('SELECT `sys`.*, `reg`.`name` `regname` FROM `systems` `sys` JOIN `regions` `reg` ON (`sys`.`regionID` = `reg`.`id`)') as $system) $systems[ $system['id'] ] = $system;
+		self::$stars = $systems;
+		$GAMINAS['backtrace'][] = 'Took region set and star set from DataBase';
 	}
 	
 /**
@@ -70,44 +73,27 @@ class systemstats_index {
 		$subject = isset($_GET['subject']) ? self::parseStarList(urldecode($_GET['subject'])) : 'default';
 		
 		$maincaption = 'График активности в системах';
-		$mainsupport = '<label>Ссылка на график<input type="text" name="link" id="graphLink" value="' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . '"></label>';
+		$mainsupport = '<label>Ссылка на график: <input type="text" name="link" id="graphLink" value="' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . '"></label>';
 		$maincontent = '<div id="strForChart">' . self::getStringForGraph($time, $mode, $subject) . '</div>';
 		
-		$regions = self::$regions;
-		$regCheckBoxes = '';
+		foreach (self::$regions as $id => $name) $regions[$name] = $id;
+		ksort($regions, SORT_STRING);
+		$regionButtons = '';
 		
-		foreach ($regions as $regID => $regName) {
-			if (preg_match('/\w-\w\d{5}/', $regName) !== 0) $newname = '&lt;WH&gt; ' . $regName;
-			else $newname = $regName;
-			$regCheckBoxes .= '<label><input type="checkbox" name="region" data-name="' . $regName . '" data-id="' . $regID . '">' . $newname . '</label>';
-			$sysChecksPart[ $regID ] = '<label style="display: none;"><input type="checkbox" name="region" data-regid="' . $regID . '">' . $newname . '</label>';
+		foreach ($regions as $regName => $regID) {
+			$subclass = '';
+			$newname = $regName;
+			if (preg_match('/\w-\w\d{5}/', $regName) !== 0) {
+				$subclass = ' wh';
+				$newname = '&lt;WH&gt; ' . $regName;
+			}
+			$regionButtons .= '<div class="regButton' . $subclass . '" data-name="' . $regName . '" data-id="' . $regID . '">' . $newname . '</div>';
 		}
-		
-		$stars = self::$stars;
-		$sysCheckBoxes = '';
-		
-		foreach ($stars as $sysID => $sysInfo) {
-			$ss = round($sysInfo['security'], 1);
-			$thisSystemRegID = $sysInfo['regionID'];
-			if ($ss === 1.0) $color = 'skyblue';
-			if ($ss <= 0.9 && $ss > 0.6) $color = 'green';
-			if ($ss <= 0.6 && $ss > 0.4) $color = 'yellow';
-			if ($ss <= 0.4 && $ss > 0.0) $color = 'orange';
-			if ($ss <= 0.0) $color = 'red';
-			if (preg_match('/J\d{6}/', $sysInfo['name']) !== 0) $sysName = '&lt;WH&gt; ' . $sysInfo['name'];
-			else $sysName = $sysInfo['name'];
-			// $sysChecksPart[ $thisSystemRegID ] .= '<label style="display: none;"><input type="checkbox" name="system" data-name="' . $sysName . '" data-id="' . $sysID . '" data-regid="' . $sysInfo['regionID'] . '"><div style="width:28px; float: left; color:' . $color . '">' . number_format($ss, 1) . '</div>' . $sysName . '</label>';
-		}
-		
-		foreach ($sysChecksPart as $part) $sysCheckBoxes .= $part;
-		
-		// $sysCheckBoxes .= 'Выберите один или несколько регионов';
 		
 		$GAMINAS['maincaption'] = $maincaption;
 		$GAMINAS['mainsupport'] = $mainsupport;
 		$GAMINAS['maincontent'] = $maincontent;
-		$GAMINAS['regcheckboxes'] = $regCheckBoxes;
-		$GAMINAS['syscheckboxes'] = $sysCheckBoxes;
+		$GAMINAS['regionbuttons'] = $regionButtons;
 	}
 	
 	public static function drawGraph() {

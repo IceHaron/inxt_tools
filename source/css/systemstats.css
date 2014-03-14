@@ -1,22 +1,12 @@
 /* Для графика активности */
 
-.graphfilter {
-	height: 200px;
-	width: 220px;
-	float: left;
+#timeSelector {
 	margin: 10px;
-	border: 1px solid grey;
-	background-color: #002;
-	color: #bbb;
-	overflow-y: scroll;
-}
-.graphfilter form label {
-	display: block;
-	margin-left: 10px;
-}
-.ss {
-	width:28px;
 	float: left;
+}
+#graphTools {
+	float: right;
+	margin: 10px;
 }
 #strForChart { display: none; }
 #systemSearch {
@@ -30,3 +20,46 @@
 	background-color: white;
 	font-size: 12px;
 }
+#regionCloud {
+	width: 80%;
+	float: left;
+	padding: 10px 0;
+}
+.hideRegs {
+	padding: 5px;
+	background-color: grey;
+	color: white;
+	text-align: center;
+	cursor: pointer;
+}
+.regButton {
+	display: inline-block;
+	width: 163px; /* Подогнал под ширину The Kalevala Expanse */
+	margin: 3px;
+	padding: 2px;
+	color: white;
+	text-align: center;
+	cursor: pointer;
+}
+.regButton.wh { color: #aaa;}
+.regButton:hover {
+	margin: 2px;
+	border: 1px solid white;
+}
+#selectedStars {
+	width: 17%;
+	height: 500px;
+	float: right;
+	padding: 10px;
+	overflow-y: scroll;
+}
+#systemSetHolder {
+	width: 500px;
+	color: white;
+	background-color: #555;
+}
+.systemHolder {
+	display: inline-block;
+	margin: 5px;
+}
+.ss { display: inline-block; }
