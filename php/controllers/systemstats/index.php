@@ -20,7 +20,6 @@ class systemstats_index {
 *	Конструктор: здесь мы собираем из файлов инфу о системах и регионах
 *	
 **/
-	
 	private function systemstats_index() {
 		global $GAMINAS;
 		
@@ -38,7 +37,6 @@ class systemstats_index {
 *	@return JSON-строка с информацией о системах
 *	
 **/
-	
 	public static function getSystems($regions = '') {
 		global $GAMINAS;
 		self::init();
@@ -60,22 +58,24 @@ class systemstats_index {
 *	
 *	Метод, отображающий фильтры и график
 *	@param	what - фильтр по регионам (не уверен, что пригодится, хотя посмотрим, лишним не будет)
-*	@return	строки с HTML-кодом чекбоксов регионов и систем
+*	@return void
 *	
 **/
-	
 	public static function show($what = '') {
 		global $GAMINAS;
 		self::init();
 		
+		// Определяем параметры
 		$time = isset($_GET['time']) ? urldecode($_GET['time']) : 'hourly';
 		$mode = isset($_GET['mode']) ? urldecode($_GET['mode']) : 'system';
 		$subject = isset($_GET['subject']) ? self::parseStarList(urldecode($_GET['subject'])) : 'default';
 		
+		// Формируем строки для отображения на странице
 		$maincaption = 'График активности в системах';
-		$mainsupport = '<label>Ссылка на график: <input type="text" name="link" id="graphLink" value="' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . '"></label>';
+		$mainsupport = '<label>Ссылка на график: <input type="text" readonly name="link" id="graphLink" value="' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . '"></label>';
 		$maincontent = '<div id="strForChart">' . self::getStringForGraph($time, $mode, $subject) . '</div>';
 		
+		// Формируем облако регионов
 		foreach (self::$regions as $id => $name) $regions[$name] = $id;
 		ksort($regions, SORT_STRING);
 		$regionButtons = '';
@@ -83,33 +83,88 @@ class systemstats_index {
 		foreach ($regions as $regName => $regID) {
 			$subclass = '';
 			$newname = $regName;
+			
+			// Помечаем ВХ
 			if (preg_match('/\w-\w\d{5}/', $regName) !== 0) {
 				$subclass = ' wh';
 				$newname = '&lt;WH&gt; ' . $regName;
 			}
+			
 			$regionButtons .= '<div class="regButton' . $subclass . '" data-name="' . $regName . '" data-id="' . $regID . '">' . $newname . '</div>';
 		}
 		
+		// Выбранные системы
+		if ($subject != 'default') {
+			$selectedStars = '';
+			foreach ($subject['names'] as $i => $unit) {
+				$q = "SELECT `id`, `regionID` FROM `systems` WHERE `name`='$unit';";
+				$r = db::query($q);
+				$ss = (float)$subject['secures'][$i];
+				
+				// Определяем цвет СС
+				if ($ss == 1) $color = 'skyblue';
+				if ($ss <= 0.9 && $ss > 0.6) $color = 'green';
+				if ($ss <= 0.6 && $ss > 0.4) $color = 'yellow';
+				if ($ss <= 0.4 && $ss > 0.0) $color = 'orange';
+				if ($ss <= 0.0) $color = 'red';
+				
+				$selectedStars .= '<div data-name="' . $unit . '" data-id="' . $r[0]['id'] . '" data-regid="' . $r[0]['regionID'] . '" class="selectedStar"><div style="color:' . $color . '" class="ss">' . $subject['secures'][$i] . '</div>' . $unit . '<img src="/source/img/delete.png" class="deselectStar"></div>';
+			}
+		} else {
+			$selectedStars = '<div data-name="Amarr" data-id="30002187" data-regid="10000043" class="selectedStar"><div style="color:skyblue" class="ss">1.0</div>Amarr<img src="/source/img/delete.png" class="deselectStar"></div><div data-name="Jita" data-id="30000142" data-regid="10000002" class="selectedStar"><div style="color:green" class="ss">0.9</div>Jita<img src="/source/img/delete.png" class="deselectStar"></div><div data-name="Dodixie" data-id="30002659" data-regid="10000032" class="selectedStar"><div style="color:green" class="ss">0.9</div>Dodixie<img src="/source/img/delete.png" class="deselectStar"></div><div data-name="Rens" data-id="30002510" data-regid="10000030" class="selectedStar"><div style="color:green" class="ss">0.9</div>Rens<img src="/source/img/delete.png" class="deselectStar"></div>';
+		}
+		
+		// Запихиваем результаты в глобальную переменную
 		$GAMINAS['maincaption'] = $maincaption;
 		$GAMINAS['mainsupport'] = $mainsupport;
 		$GAMINAS['maincontent'] = $maincontent;
 		$GAMINAS['regionbuttons'] = $regionButtons;
+		$GAMINAS['selectedstars'] = $selectedStars;
 	}
 	
+/**
+*	
+*	Метод, выводящий на экран строку с параметрами для графика (только AJAX)
+*	@return void
+*	
+**/
 	public static function drawGraph() {
 		global $GAMINAS;
 		self::init();
-		$GAMINAS['notemplate'] = TRUE;
-		$time = isset($_GET['time']) ? urldecode($_GET['time']) : 'daily';
+		$GAMINAS['notemplate'] = TRUE;																							// Выключаем отображение макета
+		
+		// Определяем параметры
+		$time = isset($_GET['time']) ? urldecode($_GET['time']) : 'hourly';
 		$mode = isset($_GET['mode']) ? urldecode($_GET['mode']) : 'system';
-		$regions = $_GET['region'] ? explode(',', urldecode($_GET['region'])) : 'default';
-		$stars = $_GET['star'] ? self::parseStarList(urldecode($_GET['star'])) : 'default';
+		$subject = isset($_GET['subject']) ? self::parseStarList(urldecode($_GET['subject'])) : 'default';
 
-		$res = self::getStringForGraph($time, $mode, $regions, $stars);
+		// Формируем строку в зависимости от параметров
+		$res = self::getStringForGraph($time, $mode, $subject);
 		
 		echo $res;
 	}
 	
+/**
+*	
+*	Метод разбора названий систем из форматной строки в годный массив
+*	@param	string - форматная строка типа "Amarr_10,Jita_09,Dodixie_09,Rens_09"
+*	@return array  - массив типа 
+		array(2) {
+			["names"]=>
+			array(3) {
+				[0]=>string(6) "5E6I-W"
+				[1]=>string(6) "E-BYOS"
+				[2]=>string(6) "5ED-4E"
+			}
+			["secures"]=>
+			array(3) {
+				[0]=>string(4) "-0.4"
+				[1]=>string(4) "-0.3"
+				[2]=>string(4) "-0.9"
+			}
+		}
+*	
+**/
 	private static function parseStarList($string) {
 		$array['names'] = explode(',', preg_replace('/\s*\_\-*\d+/', '', $string));
 		$array['secures'] = explode(',', preg_replace('/(\D|\A)(\-?\d)/', '$1$2.', preg_replace('/[a-zA-Z0-9\s\-]+_/', '', $string)));
@@ -117,9 +172,20 @@ class systemstats_index {
 		return $array;
 	}
 	
+/**
+*	
+*	Метод, формирующий форматную строку для графика
+*	@param	time - временной типа графика (ежечасный/ежедневный/ежемесячный)
+*	@param	mode - тип графика система/регион
+*	@param	subject - массив элементов, отформатированный в parseStarList()
+*	@return string - форматная строка с информацией для графика
+*	
+**/	
 	public static function getStringForGraph($time = 'hourly', $mode = 'system', $subject = 'default') {
 		global $GAMINAS;
 		self::init();
+		
+		// Определяем параметры
 		if ($subject === 'default')
 			$subject = array(
 				'names' => array(
@@ -135,22 +201,29 @@ class systemstats_index {
 					, '0.9'
 				)
 			);
+			
+		// Собираем строку элементов
 		$query = implode("','", $subject['names']);
+		
+		// Формируем запрос в БД
 		if ($mode == 'system')
 			$str = "SELECT unix_timestamp(`act`.`ts`) `ts`, `sys`.`name` `system`, `jumps` FROM `activity_$time` `act` JOIN `systems` `sys` ON (`act`.`system` = `sys`.`id`) WHERE `sys`.`name` IN ('$query');";
-		else
+		else																																				// Запрос для регионального графика еще не готов, тут просто заглушка
 			$str = "SELECT unix_timestamp(`act`.`ts`) `ts`, `sys`.`name` `system`, `jumps` FROM `activity_hourly` `act` JOIN `systems` `sys` ON (`act`.`system` = `sys`.`id`) WHERE `sys`.`name` IN ('Amarr', 'Jita', 'Rens');";
+			
+		// Отправляем запрос в БД
  		$q = db::query($str);
-		// var_dump($q);
 		
+		// Разбираем запрос
 		foreach ($q as $sysinfo) {
 			$arr[ $sysinfo['ts'] ][ $sysinfo['system'] ] = $sysinfo['jumps'];
 			if ($time == 'hourly')
 				$resHead[ $sysinfo['system'] ] = $sysinfo['system'] . '(' . number_format($subject['secures'][ array_search($sysinfo['system'], $subject['names']) ], 1, '.', '') . ')';
-			else
+			else																																			// Формат массива для регионального графика не готов, тут просто заглушка
 				$resHead[ $sysinfo['system'] ] = $sysinfo['system'] . '(' . number_format($subject['secures'][ array_search($sysinfo['system'], $subject['names']) ], 1, '.', '') . ')';
 		}
 		
+		// Формируем и возвращаем строку
 		$res = '{"head":["' . implode('","', $resHead) . '"],"content":[';
 		ksort($arr);
 		

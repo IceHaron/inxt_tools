@@ -12,11 +12,7 @@ $('#shadow').click(function() {
 	$('.modal').hide();
 });
 
-/**
-*	
-*	Клик на заголовке скрывает/раскрывает фильтр и что-то еще делает, пока не придумал
-*	
-**/
+/* Клик на заголовке скрывает/раскрывает фильтр и что-то еще делает, пока не придумал */
 $('#namesearch').keyup(function(key) {
 	if (key.keyCode != '16' && $(this).val().length > 0) {												// Не буду отслеживать Шифт
 		what = $(this).val().toLowerCase();
@@ -31,30 +27,17 @@ $('#namesearch').keyup(function(key) {
 	} else if ($(this).val().length == 0) $('#filtercomment').text('');
 });
 
-/**
-*	
-*	Клик на заголовке скрывает/раскрывает фильтр и что-то еще делает, пока не придумал
-*	
-**/
+/* Клик на заголовке скрывает/раскрывает фильтр и что-то еще делает, пока не придумал */
   $('#maincaption').click(function() {
     $('#mainsupport').toggle();																									// Фильтр пока существует только в библиотеке, в этот блок думаю напихать всяких разных удобных штук
   });
   
-/**
-*	
-*	Перехватчик клика на логофф, кнопка должна что-то делать хитрое,
-*	пока просто перенаправляет на страничку логоффа
-*	
-**/
+/* Перехватчик клика на логофф, кнопка должна что-то делать хитрое, пока просто перенаправляет на страничку логоффа */
   $('#logoff').click(function() {
     window.location = '/auth/logoff';
   });
 	
-/**
-*	
-*	Работа с табличкой TODO
-*	
-**/
+/* Работа с табличкой TODO */
 
 	$('.DONE').parent().hide();																										// Скрываем то, что я уже сделал, чтоб не мешались
 	
@@ -69,7 +52,7 @@ $('#namesearch').keyup(function(key) {
 	/* Получаем из блока JSON-строку чтобы нарисовать по ней график */
 	if (document.getElementById('strForChart') !== null) {
 		eval("array = " + $('#strForChart').text());
-		customChart(array, 'daily');
+		customChart(array, 'hourly');
 	}
 	
 	/* При клике в поле "Ссылка на график" выделяем весь текст в нем */
@@ -80,7 +63,29 @@ $('#namesearch').keyup(function(key) {
 	/* При клике на регион выводим модальное окно с его системами */
 	$('.regButton').click(function() {
 		var regID = $(this).attr('data-id');
+		$('#shadow').show();
+		$('#loading').show();
 		getSystems(regID);
+	});
+	
+	/* При выборе системы в модальном окне заносим ее в блок выбранных систем, при снятии галки убираем систему из списка выбранных */
+	$(document).on('change', '.systemHolder input', function() {
+		var name = $(this).attr('data-name');
+		var id = $(this).attr('data-id');
+		var regid = $(this).attr('data-regid');
+		var ss =  $(this).next()[0].outerHTML;
+		if (this.checked) $('#selectedStars').append('<div class="selectedStar" data-regid="' + regid + '" data-id="' + id + '" data-name="' + name + '">' + ss + name + '<img class="deselectStar" src="/source/img/delete.png"></div>');
+		else $('#selectedStars .selectedStar[data-name="' + name + '"]').remove();
+	});
+	
+	/* Убираем систему из списка при клике на крестик около нее */
+	$(document).on('click', '.deselectStar', function() {
+		$(this).parent().remove();
+	});
+	
+	$('.hideRegs').click(function() {
+		$('#regionCloud').toggle();
+		$('#selectedStars').toggle();
 	});
 	
 /* End of READY() */
@@ -92,7 +97,6 @@ $('#namesearch').keyup(function(key) {
 *	Функция логина от uLogin
 *	
 **/
-
 function login(token){
 	// Отправляем AJAX-запрос к ним
 	$.getJSON("//ulogin.ru/token.php?host=" + encodeURIComponent(location.toString()) + "&token=" + token + "&callback=?",
@@ -112,7 +116,6 @@ function login(token){
 *	@return void
 *	
 **/
-	
 function getSystems(regions) {
 	var sysinputs = {};
 	/* Первым делом получаем список систем для указанных в параметре регионов */
@@ -149,7 +152,7 @@ function getSystems(regions) {
 				var regionHolder = '<div class="regionHolder"><div><span class="caption">' + i + '</span></div>' + content + '</div>';
 				fullModalContent += regionHolder;
 			}
-			$('#shadow').show();
+			$('#loading').hide();
 			$('#systemSetHolder').append(fullModalContent).show();
 			
 			
@@ -216,36 +219,44 @@ function toggleStars(regid, state) {
 
 /**
 *	
-*	Отрисовка графика по входным параметрам
-* @param time - тип графика часовой/дневной/месячный
-* @param mode - тип графика система/регион
-* @param region - регионы
-* @param star - системы
+*	Отрисовка графика
 *	@return void
 *	
 **/
+function drawGraph() {
+	var info = getInfo();
+	makeChart(info.time, info.mode, info.subject);
+}
 
-function drawGraph(time, mode, region, star) {			// На время разработки определю дефолтную отрисовку систем, регионы появятся много позже
-	var time = $('input[name="time"]:checked').attr('data-time') ? $('input[name="time"]:checked').attr('data-time') : 'daily';
+/**
+*	
+*	Сбор информации для отрисовки графика
+*	@return object - объект с нужной для графика информацией
+*	
+**/
+function getInfo() {
+	var time = $('input[name="time"]:checked').attr('data-time') ? $('input[name="time"]:checked').attr('data-time') : 'hourly';
 	var mode = 'system';
-	var regions = {};
-	var stars = {};
-	var region = '';
-	var star = '';
-	var link = $('#graphLink').val().replace(/\?.+/,'');
-	var checked = $('input[name="system"]:checked');
-	
-	// В зависимости от расставленных галочек, составляем массивы выбранных систем и регионов Ключи - видимое название, Значения - фактическое
-	checked.each(function() {
-		stars[ $(this).attr('data-name') + '_' + $(this).parent().children('.ss').text().replace('.', '') ] = $(this).attr('data-name');
-		regions[ $('input[name="region"][data-id="' + $(this).attr('data-regid') + '"]').attr('data-name') ] = $('input[name="region"][data-id="' + $(this).attr('data-regid') + '"]').attr('data-name');
+	var subject = '';
+	$('.selectedStar').each(function() {
+		subject += ',' + $(this).attr('data-name') + '_' + $(this).children('.ss').text().replace('.', '');
 	});
+	subject = subject.substr(1);
 	
-	// Составляем строки видимых названий регионов и систем
-	for (i in stars) { star += ',' + i; }
-	for (i in regions) { region += ',' + i; }
-	star = star.substr(1);
-	region = region.substr(1);
+	return {'time' : time, 'mode' : mode, 'subject' : subject}
+}
+
+/**
+*	
+*	Отрисовка графика по входным параметрам
+* @param time - тип графика часовой/дневной/месячный
+* @param mode - тип графика система/регион
+* @param subject - системы/регионы
+*	@return void
+*	
+**/
+function makeChart(time, mode, subject) {			// На время разработки определю дефолтную отрисовку систем, регионы появятся много позже
+	var link = $('#graphLink').val().replace(/\?.+/,'');
 	
 	$('#shadow').show();																													// Показываем прогресс-бар
 	$('#loading').show();
@@ -255,12 +266,13 @@ function drawGraph(time, mode, region, star) {			// На время разраб
 	$.ajax({																																			// Получаем из пхп форматированную строку для графика
 		type: 'GET',
 		url: 'drawGraph',
-		data: {'time': time, 'mode': mode, 'region': region, 'star': star},
+		data: {'time': time, 'mode': mode, 'subject': subject},
 		success: function(data) {
 			eval("array = " + data);																									// Единственный рабочий способ полученную строку без ошибок перевести в массив
+			console.log(array);
 			customChart(array, time);																									// Рисуем график
 			// Составляем и записываем в нужный блок ссылку на график, закрываем прогрессбар
-			link += '?time=' + time + '&mode=' + mode + '&region=' + region + '&star=' + star;
+			link += '?time=' + time + '&mode=' + mode + '&subject=' + subject;
 			$('#graphLink').val(link);
 			$('#shadow').hide();
 			$('#loading').hide();
@@ -277,7 +289,6 @@ function drawGraph(time, mode, region, star) {			// На время разраб
 *	@return void
 *	
 **/
-
 function customChart(array, time) {
 	var tickset = new Array();
 	var i = 0;
@@ -318,7 +329,6 @@ function customChart(array, time) {
 *	Объект для работы с датой
 *	
 **/
-
 var myDate = {
 
 /**
@@ -337,8 +347,8 @@ var myDate = {
 		var hour = this.zerofill(date.getHours().toString(), 2);
 		var min = this.zerofill(date.getMinutes().toString(), 2);
 		var res = '';
-		if (mode == 'daily') res = day + '-' + mon + ' ' + hour + ':' + min;
-		if (mode == 'monthly') res = day + '-' + mon + '-' + year;
+		if (mode == 'hourly') res = day + '-' + mon + ' ' + hour + ':' + min;
+		if (mode == 'daily') res = day + '-' + mon + '-' + year;
 		if (hour == '13') res += ' [DT]';
 		return res;
 	},

@@ -53,14 +53,28 @@
 	padding: 10px;
 	overflow-y: scroll;
 }
+.selectedStar {
+	margin: 5px;
+	padding: 5px;
+	color: white;
+	background-color: #555;
+	border-radius: 3px;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+}
+.deselectStar {
+	width: 15px;
+	height: 15px;
+	float: right;
+	cursor: pointer;
+}
 #systemSetHolder {
 	width: 75%;
 	color: white;
 	background-color: #555;
 }
 .systemHolder {
-	width: 170px; /* Подогнал под Ardishapur Prime */
+	width: 175px; /* Подогнал под Ardishapur Prime */
 	display: inline-block;
 	margin: 5px;
 }
-.ss { display: inline-block; }

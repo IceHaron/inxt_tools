@@ -56,6 +56,7 @@ a.nodeco {
 .modal.fixed {
 	position: fixed;
 }
+.ss { display: inline-block; width: 30px; }
 
 /* Основная разметка, макет ================================================= */
 

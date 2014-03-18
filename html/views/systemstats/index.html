@@ -13,9 +13,9 @@
 	<div>
 		<div id="timeSelector">
 			<form onsubmit="return false;">
-				<label><input type="radio" name="time" data-time="daily" checked>Часы (последние 48)</label>
-				<label><input type="radio" name="time" data-time="monthly">Дни (последние 60)</label>
-				<label><input type="radio" name="time" data-time="lifetime">Месяцы</label>
+				<label><input type="radio" name="time" data-time="hourly" checked>Часы (последние 48)</label>
+				<label><input type="radio" name="time" data-time="daily">Дни (последние 60)</label>
+				<label><input type="radio" name="time" data-time="monthly">Месяцы</label>
 			</form>
 		</div>
 		<div id="graphTools">
@@ -27,11 +27,11 @@
 		<div class="clear"></div>
 	</div>
 	<div>
-		<div class="hideRegs">Скрыть список регионов и выбранных систем</div>
+		<div class="hideRegs">Список регионов и выбранных систем (нажмите чтобы скрыть/показать)</div>
 		<div id="regionCloud">
 			{regionbuttons}
 		</div>
-		<div id="selectedStars">Не выбрано ни одной системы</div>
+		<div id="selectedStars">{selectedstars}</div>
 		<div class="clear"></div>
 	</div>
 	<div class="clear"></div>
