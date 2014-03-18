@@ -54,11 +54,12 @@
 	overflow-y: scroll;
 }
 #systemSetHolder {
-	width: 500px;
+	width: 75%;
 	color: white;
 	background-color: #555;
 }
 .systemHolder {
+	width: 170px; /* Подогнал под Ardishapur Prime */
 	display: inline-block;
 	margin: 5px;
 }

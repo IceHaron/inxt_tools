@@ -80,7 +80,6 @@ $('#namesearch').keyup(function(key) {
 	/* При клике на регион выводим модальное окно с его системами */
 	$('.regButton').click(function() {
 		var regID = $(this).attr('data-id');
-		$('#shadow').show();
 		getSystems(regID);
 	});
 	
@@ -123,19 +122,20 @@ function getSystems(regions) {
 		data: {'regions' : regions},
 		dataType: 'json',
 		success: function(data) {
-
+			$('#systemSetHolder').empty();
 		// Делаем модальное окно
 			for (sysid in data) {
 				var sysinfo = data[sysid];
 				var ss = parseFloat(sysinfo.security).toFixed(1);												// Нам нужен СС системы чтобы раскрасить его в нужный цвет
 				if (!sysinputs.hasOwnProperty(sysinfo['regname'])) sysinputs[ sysinfo['regname'] ] = '';
 				
-				if (ss === 1.0) color = 'skyblue';
-				if (ss <= 0.9 && ss > 0.6) color = 'green';
-				if (ss <= 0.6 && ss > 0.4) color = 'yellow';
-				if (ss <= 0.4 && ss > 0.0) color = 'orange';
-				if (ss <= 0.0) color = 'red';
-				
+				var numSS = parseFloat(ss);
+				if (numSS === 1) color = 'skyblue';
+				if (numSS <= 0.9 && numSS > 0.6) color = 'green';
+				if (numSS <= 0.6 && numSS > 0.4) color = 'yellow';
+				if (numSS <= 0.4 && numSS > 0.0) color = 'orange';
+				if (numSS <= 0.0) color = 'red';
+
 				// Моя придумка: помечаем регионы ВХ
 				if (sysinfo['name'].search('/J\d{6}/') != -1) sysname = '&lt;WH&gt; ' + sysinfo['name'];
 				else sysname = sysinfo['name'];
@@ -149,6 +149,7 @@ function getSystems(regions) {
 				var regionHolder = '<div class="regionHolder"><div><span class="caption">' + i + '</span></div>' + content + '</div>';
 				fullModalContent += regionHolder;
 			}
+			$('#shadow').show();
 			$('#systemSetHolder').append(fullModalContent).show();
 			
 			
@@ -193,7 +194,6 @@ function getSystems(regions) {
 			
 		},
 		complete: function() {																											// После записи систем и расстановки галочек, закрываем прогрессбар
-			$('#shadow').hide();
 			$('#loading').hide();
 		}
 		});

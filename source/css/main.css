@@ -51,6 +51,7 @@ a.nodeco {
 	-moz-border-radius: 10px;
 	-webkit-border-radius: 10px;
 	color: black;
+	z-index: 101;
 }
 .modal.fixed {
 	position: fixed;

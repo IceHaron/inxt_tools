@@ -32,24 +32,24 @@ foreach ($systems as $sysid => $sysjumps) {
 	$str .= "('$cachetime', '$sysid', '$sysjumps'),";
 }
 
-$q = 'INSERT INTO `activity_hourly` (`ts`, `system`, `jumps`) VALUES ' . substr($str, 0, -1) . ' ON DUPLICATE KEY UPDATE `jumps` = `jumps`';
-$e = mysqli_query($link, $q);
+$insert = 'INSERT INTO `activity_hourly` (`ts`, `system`, `jumps`) VALUES ' . substr($str, 0, -1) . ' ON DUPLICATE KEY UPDATE `jumps` = `jumps`';
+$e = mysqli_query($link, $insert);
 if (!$e) echo mysqli_error($link);
 
-$str = '';
+$replace = "REPLACE INTO `activity_daily` (`date`,`system`,`jumps`)
+	SELECT date_format(`ts`, '%Y-%m-%d') `date`, `system`, sum(`jumps`) 
+		FROM `srv44030_tools`.`activity_hourly` 
+		WHERE date_format('$cachetime', '%j') - date_format(`ts`, '%j') = 1 
+			OR date_format('$cachetime', '%j') - date_format(`ts`, '%j') < 0
+		GROUP BY `date`, `system`";
+$r = mysqli_query($link, $replace);
+if (!$r) echo mysqli_error($link);
 
-$q = "SELECT date_format(`ts`, '%Y-%m-%d') date, `system`, sum(`jumps`) day_jumps FROM `activity_hourly` WHERE date_format('$cachetime', '%j') - date_format(ts, '%j') != 0 AND date_format('$cachetime', '%j') - date_format(ts, '%j') !=2 GROUP BY `system`";
-$r = mysqli_query($link, $q);
-echo mysqli_error($link);
-if ($r) while ($arr = mysqli_fetch_assoc($r)) {
-	$str .= "('{$arr['date']}', '{$arr['system']}', '{$arr['day_jumps']}'),";
-}
-
-$q = "INSERT INTO `activity_daily` (`date`, `system`, `jumps`) VALUES " . substr($str, 0, -1) . ' ON DUPLICATE KEY UPDATE `jumps` = `jumps`';
-$e = mysqli_query($link, $q);
-// if (!$e) echo mysqli_error($link);
+$delete = "DELETE FROM `srv44030_tools`.`activity_hourly` WHERE unix_timestamp('$cachetime') - unix_timestamp(`ts`) > 172800;";
+$e = mysqli_query($link, $delete);
+if (!$e) echo mysqli_error($link);
 
 // echo('<pre>');
 // var_dump($q);
 // echo('</pre>');
-// echo 'Memory peak usage in bytes: ' . memory_get_peak_usage();
+echo 'Memory peak usage in bytes: ' . memory_get_peak_usage();
