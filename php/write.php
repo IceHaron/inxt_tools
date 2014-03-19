@@ -36,13 +36,22 @@ $insert = 'INSERT INTO `activity_hourly` (`ts`, `system`, `jumps`) VALUES ' . su
 $e = mysqli_query($link, $insert);
 if (!$e) echo mysqli_error($link);
 
-$replace = "REPLACE INTO `activity_daily` (`date`,`system`,`jumps`)
+$replace_day = "REPLACE INTO `activity_daily` (`date`,`system`,`jumps`)
 	SELECT date_format(`ts`, '%Y-%m-%d') `date`, `system`, sum(`jumps`) 
-		FROM `srv44030_tools`.`activity_hourly` 
+		FROM `activity_hourly` 
 		WHERE date_format('$cachetime', '%j') - date_format(`ts`, '%j') = 1 
 			OR date_format('$cachetime', '%j') - date_format(`ts`, '%j') < 0
 		GROUP BY `date`, `system`";
-$r = mysqli_query($link, $replace);
+$r = mysqli_query($link, $replace_day);
+if (!$r) echo mysqli_error($link);
+
+$replace_month = "REPLACE INTO `activity_monthly` (`date`,`system`,`jumps`)
+	SELECT date_format(`date`, '%Y-%m-01') `month`, `system`, sum(`jumps`)
+		FROM `activity_daily`
+		WHERE date_format('$cachetime', '%c') - date_format(`date`, '%c') != 1
+			OR date_format('$cachetime', '%c') - date_format(`date`, '%c') < 0
+		GROUP BY `month`, `system`";
+$r = mysqli_query($link, $replace_month);
 if (!$r) echo mysqli_error($link);
 
 $delete = "DELETE FROM `srv44030_tools`.`activity_hourly` WHERE unix_timestamp('$cachetime') - unix_timestamp(`ts`) > 172800;";

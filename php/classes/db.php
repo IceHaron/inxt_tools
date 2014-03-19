@@ -55,6 +55,10 @@ class db {
 		return $res;
 	}
 	
+	public static function escape($string) {
+		return mysqli_real_escape_string(self::$con, $string);
+	}
+	
 }
 
 ?>

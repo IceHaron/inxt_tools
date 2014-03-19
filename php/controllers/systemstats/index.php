@@ -23,7 +23,7 @@ class systemstats_index {
 	private function systemstats_index() {
 		global $GAMINAS;
 		
-		foreach (db::query('SELECT SQL_CACHE * FROM `regions`') as $region) $regions[ $region['id'] ] = $region['name'];
+		foreach (db::query('SELECT * FROM `regions`') as $region) $regions[ $region['id'] ] = $region['name'];
 		self::$regions = $regions;
 		foreach (db::query('SELECT `sys`.*, `reg`.`name` `regname` FROM `systems` `sys` JOIN `regions` `reg` ON (`sys`.`regionID` = `reg`.`id`)') as $system) $systems[ $system['id'] ] = $system;
 		self::$stars = $systems;
@@ -66,8 +66,8 @@ class systemstats_index {
 		self::init();
 		
 		// Определяем параметры
-		$time = isset($_GET['time']) ? urldecode($_GET['time']) : 'hourly';
-		$mode = isset($_GET['mode']) ? urldecode($_GET['mode']) : 'system';
+		$time = isset($_GET['time']) ? db::escape(urldecode($_GET['time'])) : 'hourly';
+		$mode = isset($_GET['mode']) ? db::escape(urldecode($_GET['mode'])) : 'system';
 		$subject = isset($_GET['subject']) ? self::parseStarList(urldecode($_GET['subject'])) : 'default';
 		
 		// Формируем строки для отображения на странице
@@ -97,7 +97,8 @@ class systemstats_index {
 		if ($subject != 'default') {
 			$selectedStars = '';
 			foreach ($subject['names'] as $i => $unit) {
-				$q = "SELECT `id`, `regionID` FROM `systems` WHERE `name`='$unit';";
+				$escapedUnit = db::escape($unit);
+				$q = "SELECT `id`, `regionID` FROM `systems` WHERE `name`='$escapedUnit';";
 				$r = db::query($q);
 				$ss = (float)$subject['secures'][$i];
 				
@@ -166,8 +167,9 @@ class systemstats_index {
 *	
 **/
 	private static function parseStarList($string) {
-		$array['names'] = explode(',', preg_replace('/\s*\_\-*\d+/', '', $string));
-		$array['secures'] = explode(',', preg_replace('/(\D|\A)(\-?\d)/', '$1$2.', preg_replace('/[a-zA-Z0-9\s\-]+_/', '', $string)));
+		$escapedString = db::escape($string);
+		$array['names'] = explode(',', preg_replace('/\s*\_\-*\d+/', '', $escapedString));
+		$array['secures'] = explode(',', preg_replace('/(\D|\A)(\-?\d)/', '$1$2.', preg_replace('/[a-zA-Z0-9\s\-]+_/', '', $escapedString)));
 		
 		return $array;
 	}
@@ -205,9 +207,12 @@ class systemstats_index {
 		// Собираем строку элементов
 		$query = implode("','", $subject['names']);
 		
+		if ($time == 'hourly') $timeHolder = 'ts';
+		else $timeHolder = 'date';
+		
 		// Формируем запрос в БД
 		if ($mode == 'system')
-			$str = "SELECT unix_timestamp(`act`.`ts`) `ts`, `sys`.`name` `system`, `jumps` FROM `activity_$time` `act` JOIN `systems` `sys` ON (`act`.`system` = `sys`.`id`) WHERE `sys`.`name` IN ('$query');";
+			$str = "SELECT unix_timestamp(`act`.`$timeHolder`) `ts`, `sys`.`name` `system`, `jumps` FROM `activity_$time` `act` JOIN `systems` `sys` ON (`act`.`system` = `sys`.`id`) WHERE `sys`.`name` IN ('$query');";
 		else																																				// Запрос для регионального графика еще не готов, тут просто заглушка
 			$str = "SELECT unix_timestamp(`act`.`ts`) `ts`, `sys`.`name` `system`, `jumps` FROM `activity_hourly` `act` JOIN `systems` `sys` ON (`act`.`system` = `sys`.`id`) WHERE `sys`.`name` IN ('Amarr', 'Jita', 'Rens');";
 			
