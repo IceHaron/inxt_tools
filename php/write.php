@@ -52,4 +52,4 @@ if (!$e) echo mysqli_error($link);
 // echo('<pre>');
 // var_dump($q);
 // echo('</pre>');
-echo 'Memory peak usage in bytes: ' . memory_get_peak_usage();
+// echo 'Memory peak usage in bytes: ' . memory_get_peak_usage();
