@@ -20,8 +20,7 @@
 		</div>
 		<div id="graphTools">
 			<input type="text" id="systemSearch" placeholder="Найти систему">
-			<!--<div id="systemSearchVariants"><div class="ssVariant"><span id="ssVariantsSS">1.0</span> <span id="ssVariantsStar">Amarr</span> <span id="ssVariantsReg">Domain</span></div></div>-->
-			<button name="draw" onclick="drawGraph();">Нарисовать</button>
+			<div id="systemSearchVariants"></div>
 			{mainsupport}
 		</div>
 		<div class="clear"></div>
@@ -37,7 +36,7 @@
 	<div class="clear"></div>
 </div>
 <div id="maincontent">
-	<div id="chart_div" style="width: 100%;"></div>
-	{maincontent}
+	<div id="chart_head">{maincontent}</div>
+	<div id="chart_div" style="margin:5px;"></div>
 	<div class="clear"></div>
 </div>

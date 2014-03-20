@@ -72,8 +72,8 @@ class systemstats_index {
 		
 		// Формируем строки для отображения на странице
 		$maincaption = 'График активности в системах';
-		$mainsupport = '<label>Ссылка на график: <input type="text" readonly name="link" id="graphLink" value="' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . '"></label>';
-		$maincontent = '<div id="strForChart">' . self::getStringForGraph($time, $mode, $subject) . '</div>';
+		$mainsupport = '';
+		$maincontent = '<button name="draw" onclick="drawGraph();">Нарисовать</button><label>Ссылка на график: <input type="text" readonly name="link" id="graphLink" value="' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . '"></label><div id="strForChart">' . self::getStringForGraph($time, $mode, $subject) . '</div>';
 		
 		// Формируем облако регионов
 		foreach (self::$regions as $id => $name) $regions[$name] = $id;
@@ -242,4 +242,29 @@ class systemstats_index {
 		return $res;
 	}
 
+/**
+*	
+*	Поиск систем по части названия (AJAX)
+*	@param	search - часть названия системы
+*	@return void
+*	
+**/	
+	public static function searchSystems() {
+		global $GAMINAS;
+		self::init();
+		$GAMINAS['notemplate'] = TRUE;
+
+		$search = isset($_GET['search']) ? $_GET['search'] : 'nothing';
+		$escapedString = db::escape($search);
+		$q = "SELECT `systems`.*, `regions`.`name` `regionName` FROM `systems`	JOIN `regions` ON (`regions`.`id` = `systems`.`regionID`)	WHERE `systems`.`name` LIKE '%$escapedString%'";
+		$r = db::query($q);
+		if ($r != NULL) {
+			$arr = array();
+			foreach ($r as $system) {
+				$ss = number_format($system['security'], 1, '.', '');
+				$arr[] = array('id' => $system['id'], 'name' => $system['name'], 'security' => $ss, 'regionID' => $system['regionID'], 'regionName' => $system['regionName']);
+			}
+			echo json_encode($arr);
+		} else echo 'NULL';
+	}
 }

@@ -52,6 +52,7 @@ class db {
 		else $res = ($query_result === FALSE) ? mysqli_error(self::$con) : $query_result;
 		// fb($res, 'RESULT');
 		if (mysqli_error(self::$con) != '') return mysqli_error(self::$con);
+		if (!isset($res)) $res = NULL;																							// Если выборка пустая, присваиваем NULL
 		return $res;
 	}
 	

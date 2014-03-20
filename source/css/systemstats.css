@@ -9,19 +9,39 @@
 	margin: 10px;
 }
 #strForChart { display: none; }
-#systemSearch {
-	width: 200px;
-}
+#graphLink { width: 30% }
+#chart_head { margin: 10px; }
+#systemSearch { width: 220px; }
 #systemSearchVariants {
-	min-width: 200px;
 	min-height: 30px;
-	left: 825px;
+	max-height: 500px;
+	min-width: 225px;
 	position: absolute;
-	background-color: white;
+	padding-top: 5px;
+	background-color: #222;
 	font-size: 12px;
+	overflow-y: scroll;
+	display: none;
+}
+.ssVariant {
+	padding: 3px;
+}
+.ssVariant:hover {
+	background-color: #555;
+	cursor: pointer;
+}
+.ssVariantSS {
+	font-weight: bold;
+}
+.ssVariantStar {
+	color: white;
+	font-weight: bold;
+}
+.ssVariantReg {
+	float:right;
 }
 #regionCloud {
-	width: 80%;
+	width: calc(100% - 230px);
 	float: left;
 	padding: 10px 0;
 }
@@ -47,10 +67,10 @@
 	border: 1px solid white;
 }
 #selectedStars {
-	width: 17%;
+	width: 230px;
 	height: 500px;
 	float: right;
-	padding: 10px;
+	padding: 10px 0;
 	overflow-y: scroll;
 }
 .selectedStar {
@@ -74,7 +94,7 @@
 	background-color: #555;
 }
 .systemHolder {
-	width: 175px; /* Подогнал под Ardishapur Prime */
+	width: 190px; /* Подогнал под Tash-Murkon Prime */
 	display: inline-block;
 	margin: 5px;
 }

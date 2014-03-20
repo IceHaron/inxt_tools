@@ -83,9 +83,57 @@ $('#namesearch').keyup(function(key) {
 		$(this).parent().remove();
 	});
 	
+	/* Скрытие облака регионов и выбранных систем при клике на соответствующую кнопку */
 	$('.hideRegs').click(function() {
 		$('#regionCloud').toggle();
 		$('#selectedStars').toggle();
+	});
+	
+	/* Поиск систем */
+	$('#systemSearch').keyup(function(key) {
+		var noAcceptKeys = new Array(
+			9		// Tab
+		, 16	// Shift
+		, 17	// Ctrl
+		, 18	// Alt
+		, 37	// Left
+		, 38	// Up
+		, 39	// Right
+		, 40	// Down
+		, 116	// F5
+		);
+		var pass = true;
+		for (i in noAcceptKeys) {
+			if (noAcceptKeys[i] === key.keyCode) pass = false
+		}
+		if (pass && $(this).val().length > 2) {
+			$.ajax({
+				type: 'GET'
+			, url: 'searchsystems'
+			, data: {'search' : $(this).val()}
+			, dataType: 'json'
+			, success: function(data) {
+					$('#systemSearchVariants').html('').show();
+					for (i in data) {
+						var variant = data[i];
+						$('#systemSearchVariants').append('<div class="ssVariant" data-regid="' + variant.regionID + '" data-id="' + variant.id + '" data-name="' + variant.name + '"><span style="color: ' + SecurityStanding.paint(variant.security) + '" class="ssVariantSS">' + SecurityStanding.format(variant.security) + '</span><span class="ssVariantStar">' + variant.name + '</span><span class="ssVariantReg">' + variant.regionName + '</span></div>');
+					}
+				}
+			});
+		}
+	});
+	
+	/*  */
+	$(document).on('click', '.ssVariant', function() {
+		console.log('ololo');
+		var name = $(this).attr('data-name');
+		var id = $(this).attr('data-id');
+		var regid = $(this).attr('data-regid');
+		var ss = $(this).children('.ssVariantSS').text();
+		
+		$('#selectedStars').append('<div class="selectedStar" data-regid="' + regid + '" data-id="' + id + '" data-name="' + name + '"><div class="ss" style="color:' + SecurityStanding.paint(ss) + '">' + ss + '</div>' + name + '<img class="deselectStar" src="/source/img/delete.png"></div>');
+		
+		$('#systemSearchVariants').hide();
 	});
 	
 /* End of READY() */
@@ -129,16 +177,10 @@ function getSystems(regions) {
 		// Делаем модальное окно
 			for (sysid in data) {
 				var sysinfo = data[sysid];
-				var ss = parseFloat(sysinfo.security).toFixed(1);												// Нам нужен СС системы чтобы раскрасить его в нужный цвет
+				var ss = SecurityStanding.format(sysinfo.security);												// Нам нужен СС системы чтобы раскрасить его в нужный цвет
 				if (!sysinputs.hasOwnProperty(sysinfo['regname'])) sysinputs[ sysinfo['regname'] ] = '';
+				var color = SecurityStanding.paint(ss);
 				
-				var numSS = parseFloat(ss);
-				if (numSS === 1) color = 'skyblue';
-				if (numSS <= 0.9 && numSS > 0.6) color = 'green';
-				if (numSS <= 0.6 && numSS > 0.4) color = 'yellow';
-				if (numSS <= 0.4 && numSS > 0.0) color = 'orange';
-				if (numSS <= 0.0) color = 'red';
-
 				// Моя придумка: помечаем регионы ВХ
 				if (sysinfo['name'].search('/J\d{6}/') != -1) sysname = '&lt;WH&gt; ' + sysinfo['name'];
 				else sysname = sysinfo['name'];
@@ -269,7 +311,6 @@ function makeChart(time, mode, subject) {			// На время разработ�
 		data: {'time': time, 'mode': mode, 'subject': subject},
 		success: function(data) {
 			eval("array = " + data);																									// Единственный рабочий способ полученную строку без ошибок перевести в массив
-			console.log(array);
 			customChart(array, time);																									// Рисуем график
 			// Составляем и записываем в нужный блок ссылку на график, закрываем прогрессбар
 			link += '?time=' + time + '&mode=' + mode + '&subject=' + subject;
@@ -372,4 +413,22 @@ var myDate = {
 		return outStr;
 	}
 	
+};
+
+var SecurityStanding = {
+	paint : function(ss) {
+		var color = 'red';
+		var numSS = this.format(ss);
+		if (numSS == 1) color = 'skyblue';
+		if (numSS <= 0.9 && numSS > 0.6) color = 'green';
+		if (numSS <= 0.6 && numSS > 0.4) color = 'yellow';
+		if (numSS <= 0.4 && numSS > 0.0) color = 'orange';
+
+		return color;
+	},
+	format : function (ss) {
+		var formatted = parseFloat(ss).toFixed(1)
+		
+		return formatted;
+	}
 };
