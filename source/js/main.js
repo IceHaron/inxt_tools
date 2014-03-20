@@ -107,6 +107,7 @@ $('#namesearch').keyup(function(key) {
 			if (noAcceptKeys[i] === key.keyCode) pass = false
 		}
 		if (pass && $(this).val().length > 2) {
+			$('#systemSearchVariants').html('<img width="20" src="/source/img/loading.gif">').show();
 			$.ajax({
 				type: 'GET'
 			, url: 'searchsystems'
@@ -116,16 +117,21 @@ $('#namesearch').keyup(function(key) {
 					$('#systemSearchVariants').html('').show();
 					for (i in data) {
 						var variant = data[i];
-						$('#systemSearchVariants').append('<div class="ssVariant" data-regid="' + variant.regionID + '" data-id="' + variant.id + '" data-name="' + variant.name + '"><span style="color: ' + SecurityStanding.paint(variant.security) + '" class="ssVariantSS">' + SecurityStanding.format(variant.security) + '</span><span class="ssVariantStar">' + variant.name + '</span><span class="ssVariantReg">' + variant.regionName + '</span></div>');
+						if ($('.selectedStar[data-name="' + variant.name + '"]').length == 0)
+							$('#systemSearchVariants').append('<div class="ssVariant" data-regid="' + variant.regionID + '" data-id="' + variant.id + '" data-name="' + variant.name + '"><span style="color: ' + SecurityStanding.paint(variant.security) + '" class="ssVariantSS">' + SecurityStanding.format(variant.security) + '</span><span class="ssVariantStar">' + variant.name + '</span><span class="ssVariantReg">' + variant.regionName + '</span></div>');
+						else
+							$('#systemSearchVariants').append('<div class="ssVariantInactive" data-regid="' + variant.regionID + '" data-id="' + variant.id + '" data-name="' + variant.name + '"><span style="color: ' + SecurityStanding.paint(variant.security) + '" class="ssVariantSS">' + SecurityStanding.format(variant.security) + '</span><span class="ssVariantStar">' + variant.name + '</span><span class="ssVariantReg">' + variant.regionName + '</span></div>');
 					}
+				}
+			, complete: function(data) {
+					if (data.responseText == 'NULL') $('#systemSearchVariants').html('Nothing found').show();
 				}
 			});
 		}
 	});
 	
-	/*  */
+	/* При выборе варианта в поиске скрываем список вариантов и добавляем выбранную систему в список */
 	$(document).on('click', '.ssVariant', function() {
-		console.log('ololo');
 		var name = $(this).attr('data-name');
 		var id = $(this).attr('data-id');
 		var regid = $(this).attr('data-regid');
@@ -134,6 +140,19 @@ $('#namesearch').keyup(function(key) {
 		$('#selectedStars').append('<div class="selectedStar" data-regid="' + regid + '" data-id="' + id + '" data-name="' + name + '"><div class="ss" style="color:' + SecurityStanding.paint(ss) + '">' + ss + '</div>' + name + '<img class="deselectStar" src="/source/img/delete.png"></div>');
 		
 		$('#systemSearchVariants').hide();
+		$(this).attr('class', 'ssVariantInactive');
+	});
+	
+	$(document).click(function(t) {
+		if ($(t.target).attr('class') != 'ssVariant'
+			&& $(t.target).attr('class') != 'ssVariantStar'
+			&& $(t.target).attr('class') != 'ssVariantSS'
+			&& $(t.target).attr('class') != 'ssVariantReg'
+			&& $(t.target).attr('id') != 'systemSearch'
+			&& $(t.target).attr('id') != 'systemSearchVariants'
+			)
+				$('#systemSearchVariants').hide();
+		if ($(t.target).attr('id') == 'systemSearch' && $('.ssVariant').length > 0) $('#systemSearchVariants').show();
 	});
 	
 /* End of READY() */

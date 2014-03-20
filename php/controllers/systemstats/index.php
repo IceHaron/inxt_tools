@@ -256,7 +256,7 @@ class systemstats_index {
 
 		$search = isset($_GET['search']) ? $_GET['search'] : 'nothing';
 		$escapedString = db::escape($search);
-		$q = "SELECT `systems`.*, `regions`.`name` `regionName` FROM `systems`	JOIN `regions` ON (`regions`.`id` = `systems`.`regionID`)	WHERE `systems`.`name` LIKE '%$escapedString%'";
+		$q = "SELECT `systems`.*, `regions`.`name` `regionName` FROM `systems`	JOIN `regions` ON (`regions`.`id` = `systems`.`regionID`)	WHERE `systems`.`name` LIKE '%$escapedString%' ORDER BY `systems`.`name`";
 		$r = db::query($q);
 		if ($r != NULL) {
 			$arr = array();

@@ -30,6 +30,9 @@
 	background-color: #555;
 	cursor: pointer;
 }
+.ssVariantInactive {
+	background-color: #999;
+}
 .ssVariantSS {
 	font-weight: bold;
 }
