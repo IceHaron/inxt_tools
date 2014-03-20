@@ -1,5 +1,11 @@
 /* Для графика активности */
 
+#drawing {
+	bottom: 0;
+	right: 0;
+	width: 150px;
+	height: 150px;
+}
 #timeSelector {
 	margin: 10px;
 	float: left;

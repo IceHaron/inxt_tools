@@ -141,8 +141,10 @@ $('#namesearch').keyup(function(key) {
 		
 		$('#systemSearchVariants').hide();
 		$(this).attr('class', 'ssVariantInactive');
+		drawGraph();
 	});
 	
+	/* Скрываем список найденных систем при клике в другое место */
 	$(document).click(function(t) {
 		if ($(t.target).attr('class') != 'ssVariant'
 			&& $(t.target).attr('class') != 'ssVariantStar'
@@ -319,8 +321,9 @@ function getInfo() {
 function makeChart(time, mode, subject) {			// На время разработки определю дефолтную отрисовку систем, регионы появятся много позже
 	var link = $('#graphLink').val().replace(/\?.+/,'');
 	
-	$('#shadow').show();																													// Показываем прогресс-бар
-	$('#loading').show();
+	// $('#shadow').show();																													// Показываем прогресс-бар
+	// $('#loading').show();
+	$('#drawing').show();
 	$('#annotation').text('Рисуем график активности');
 	$('#progressbar div').css('width', '0');
 	
@@ -334,8 +337,9 @@ function makeChart(time, mode, subject) {			// На время разработ�
 			// Составляем и записываем в нужный блок ссылку на график, закрываем прогрессбар
 			link += '?time=' + time + '&mode=' + mode + '&subject=' + subject;
 			$('#graphLink').val(link);
-			$('#shadow').hide();
-			$('#loading').hide();
+			// $('#shadow').hide();
+			// $('#loading').hide();
+			$('#drawing').hide();
 		}
 	});
 
