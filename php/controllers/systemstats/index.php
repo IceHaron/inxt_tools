@@ -115,15 +115,6 @@ class systemstats_index {
 			$selectedStars = '<div data-name="Amarr" data-id="30002187" data-regid="10000043" class="selectedStar"><div style="color:skyblue" class="ss">1.0</div>Amarr<img src="/source/img/delete.png" class="deselectStar"></div><div data-name="Jita" data-id="30000142" data-regid="10000002" class="selectedStar"><div style="color:green" class="ss">0.9</div>Jita<img src="/source/img/delete.png" class="deselectStar"></div><div data-name="Dodixie" data-id="30002659" data-regid="10000032" class="selectedStar"><div style="color:green" class="ss">0.9</div>Dodixie<img src="/source/img/delete.png" class="deselectStar"></div><div data-name="Rens" data-id="30002510" data-regid="10000030" class="selectedStar"><div style="color:green" class="ss">0.9</div>Rens<img src="/source/img/delete.png" class="deselectStar"></div>';
 		}
 		
-		//
-		$presetNumber = 1;
-		$presets = '';
-		while (isset($_COOKIE[ 'preset_' . $presetNumber ])) {
-			$preset = json_decode($_COOKIE[ 'preset_' . $presetNumber ], TRUE);
-			$active = $preset['link'] == 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] ? 'selected' : '';
-			$presets .= '<option value="' . $presetNumber . '"' . $active . '>' . $preset['name'] . '</option>';
-			$presetNumber++;
-		}
 		
 		// Запихиваем результаты в глобальную переменную
 		$GAMINAS['maincaption'] = $maincaption;
@@ -131,7 +122,6 @@ class systemstats_index {
 		$GAMINAS['maincontent'] = $maincontent;
 		$GAMINAS['regionbuttons'] = $regionButtons;
 		$GAMINAS['selectedstars'] = $selectedStars;
-		$GAMINAS['presets'] = $presets;
 	}
 	
 /**

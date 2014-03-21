@@ -159,20 +159,31 @@ $('#namesearch').keyup(function(key) {
 		if ($(t.target).attr('id') == 'systemSearch' && $('.ssVariant').length > 0) $('#systemSearchVariants').show();
 	});
 	
+	/* Формирование опций для селектора пресетов */
+	var presetNumber = 1;
+	var presets = '';
+	while (localStorage.getItem('preset_' + presetNumber) !== null) {
+		var preset = JSON.parse(localStorage.getItem('preset_' + presetNumber));
+		var active = preset.link == window.location ? 'selected' : '';
+		presets += '<option value="' + presetNumber + '" ' + active + '>' + preset.name + '</option>';
+		presetNumber++;
+	}
+	$('#selectPreset').append(presets);
+		
 	/* Блокирование/разблокирование кнопки "Сохранить пресет" */
 	$('#presetName').keyup(function() {
 		if ($(this).val() != '') $('#savePreset').attr('disabled', false);
 		else $('#savePreset').attr('disabled', true);
 	});
 	
-	/* Сохранение пресета в куки */
+	/* Сохранение пресета в localStorage */
 	$('#savePreset').click(function() {
 		var presetName = $('#presetName').val();
 		var presetNumber = 1;
 		var graphLink = $('#graphLink').val();
-		var cookieString = JSON.stringify({name: presetName, link: graphLink});
-		while ($.cookie('preset_' + presetNumber) != undefined) presetNumber++;
-		$.cookie('preset_' + presetNumber, cookieString, {path: '/', expires: 30});
+		var string = JSON.stringify({name: presetName, link: graphLink});
+		while (localStorage.getItem('preset_' + presetNumber) != undefined) presetNumber++;
+		localStorage.setItem('preset_' + presetNumber, string);
 		$('#selectPreset').append('<option value="' + presetNumber + '">' + presetName + '</option>');
 	});
 	
@@ -180,7 +191,7 @@ $('#namesearch').keyup(function(key) {
 	$('#loadPreset').click(function() {
 		var presetNumber = $('#selectPreset').val();
 		if (presetNumber != '0') {
-			window.location = JSON.parse($.cookie('preset_' + presetNumber)).link;
+			window.location = JSON.parse(localStorage.getItem('preset_' + presetNumber)).link;
 		} else {
 			window.location = '/systemstats/show';
 		}
@@ -189,7 +200,7 @@ $('#namesearch').keyup(function(key) {
 	/* Удаление пресета */
 	$('#deletePreset').click(function() {
 		var presetNumber = $('#selectPreset').val();
-		$.cookie('preset_' + presetNumber, null);
+		localStorage.removeItem('preset_' + presetNumber, null);
 		$('option[value="' + presetNumber + '"]').remove();
 	});
 	
