@@ -76,11 +76,13 @@ $('#namesearch').keyup(function(key) {
 		var ss =  $(this).next()[0].outerHTML;
 		if (this.checked) $('#selectedStars').append('<div class="selectedStar" data-regid="' + regid + '" data-id="' + id + '" data-name="' + name + '">' + ss + name + '<img class="deselectStar" src="/source/img/delete.png"></div>');
 		else $('#selectedStars .selectedStar[data-name="' + name + '"]').remove();
+		drawGraph();
 	});
 	
 	/* Убираем систему из списка при клике на крестик около нее */
 	$(document).on('click', '.deselectStar', function() {
 		$(this).parent().remove();
+		drawGraph();
 	});
 	
 	/* Скрытие облака регионов и выбранных систем при клике на соответствующую кнопку */
@@ -107,7 +109,7 @@ $('#namesearch').keyup(function(key) {
 			if (noAcceptKeys[i] === key.keyCode) pass = false
 		}
 		if (pass && $(this).val().length > 2) {
-			$('#systemSearchVariants').html('<img width="20" src="/source/img/loading.gif">').show();
+			$('#systemSearchVariants').html('<img width="30" src="/source/img/loading-dark.gif">').show();
 			$.ajax({
 				type: 'GET'
 			, url: 'searchsystems'
@@ -155,6 +157,40 @@ $('#namesearch').keyup(function(key) {
 			)
 				$('#systemSearchVariants').hide();
 		if ($(t.target).attr('id') == 'systemSearch' && $('.ssVariant').length > 0) $('#systemSearchVariants').show();
+	});
+	
+	/* Блокирование/разблокирование кнопки "Сохранить пресет" */
+	$('#presetName').keyup(function() {
+		if ($(this).val() != '') $('#savePreset').attr('disabled', false);
+		else $('#savePreset').attr('disabled', true);
+	});
+	
+	/* Сохранение пресета в куки */
+	$('#savePreset').click(function() {
+		var presetName = $('#presetName').val();
+		var presetNumber = 1;
+		var graphLink = $('#graphLink').val();
+		var cookieString = JSON.stringify({name: presetName, link: graphLink});
+		while ($.cookie('preset_' + presetNumber) != undefined) presetNumber++;
+		$.cookie('preset_' + presetNumber, cookieString, {path: '/', expires: 30});
+		$('#selectPreset').append('<option value="' + presetNumber + '">' + presetName + '</option>');
+	});
+	
+	/* Загрузка пресета */
+	$('#loadPreset').click(function() {
+		var presetNumber = $('#selectPreset').val();
+		if (presetNumber != '0') {
+			window.location = JSON.parse($.cookie('preset_' + presetNumber)).link;
+		} else {
+			window.location = '/systemstats/show';
+		}
+	});
+	
+	/* Удаление пресета */
+	$('#deletePreset').click(function() {
+		var presetNumber = $('#selectPreset').val();
+		$.cookie('preset_' + presetNumber, null);
+		$('option[value="' + presetNumber + '"]').remove();
 	});
 	
 /* End of READY() */
@@ -335,7 +371,7 @@ function makeChart(time, mode, subject) {			// На время разработ�
 			eval("array = " + data);																									// Единственный рабочий способ полученную строку без ошибок перевести в массив
 			customChart(array, time);																									// Рисуем график
 			// Составляем и записываем в нужный блок ссылку на график, закрываем прогрессбар
-			link += '?time=' + time + '&mode=' + mode + '&subject=' + subject;
+			link += '?time=' + time + '&mode=' + mode + '&subject=' + escape(subject);
 			$('#graphLink').val(link);
 			// $('#shadow').hide();
 			// $('#loading').hide();
