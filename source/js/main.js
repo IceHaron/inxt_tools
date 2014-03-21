@@ -6,6 +6,8 @@
 **/
 $(document).ready(function() {
 
+var somethingChanged = false;
+
 /* При клике на тень скрываем ее и все модальные окна */
 $('#shadow').click(function() {
 	$(this).hide();
@@ -76,13 +78,13 @@ $('#namesearch').keyup(function(key) {
 		var ss =  $(this).next()[0].outerHTML;
 		if (this.checked) $('#selectedStars').append('<div class="selectedStar" data-regid="' + regid + '" data-id="' + id + '" data-name="' + name + '">' + ss + name + '<img class="deselectStar" src="/source/img/delete.png"></div>');
 		else $('#selectedStars .selectedStar[data-name="' + name + '"]').remove();
-		drawGraph();
+		somethingChanged = true;
 	});
 	
 	/* Убираем систему из списка при клике на крестик около нее */
 	$(document).on('click', '.deselectStar', function() {
 		$(this).parent().remove();
-		drawGraph();
+		if ($('.selectedStar').length != 0) somethingChanged = true;
 	});
 	
 	/* Скрытие облака регионов и выбранных систем при клике на соответствующую кнопку */
@@ -143,7 +145,7 @@ $('#namesearch').keyup(function(key) {
 		
 		$('#systemSearchVariants').hide();
 		$(this).attr('class', 'ssVariantInactive');
-		drawGraph();
+		somethingChanged = true;
 	});
 	
 	/* Скрываем список найденных систем при клике в другое место */
@@ -203,6 +205,12 @@ $('#namesearch').keyup(function(key) {
 		localStorage.removeItem('preset_' + presetNumber, null);
 		$('option[value="' + presetNumber + '"]').remove();
 	});
+	
+	/*  */
+	setInterval(function() {
+		if (somethingChanged) drawGraph();
+		somethingChanged = false;
+	}, 5000);
 	
 /* End of READY() */
 });
