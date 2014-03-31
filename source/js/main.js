@@ -9,30 +9,30 @@ $(document).ready(function() {
 var somethingChanged = false;
 
 /* При клике на тень скрываем ее и все модальные окна */
-$('#shadow').click(function() {
-	$(this).hide();
-	$('.modal').hide();
-});
+	$('#shadow').click(function() {
+		$(this).hide();
+		$('.modal').hide();
+	});
 
 /* Клик на заголовке скрывает/раскрывает фильтр и что-то еще делает, пока не придумал */
-$('#namesearch').keyup(function(key) {
-	if (key.keyCode != '16' && $(this).val().length > 0) {												// Не буду отслеживать Шифт
-		what = $(this).val().toLowerCase();
-		filtered = 0;
-		agreed = 0;
-		$('.gamename').each(function() {
-			where = $(this).text().toLowerCase();
-			if (where.search(what) == -1) { $(this).parent().hide(); filtered++; }		// Все, что отфильтровывается, скрываем
-			else { $(this).parent().show();	agreed++; }																// А все, что удовлетворяет, показываем.
-		});
-		$('#filtercomment').text('Показано ' + agreed + ', отфильтровано ' + filtered);
-	} else if ($(this).val().length == 0) $('#filtercomment').text('');
-});
+	$('#namesearch').keyup(function(key) {
+		if (key.keyCode != '16' && $(this).val().length > 0) {												// Не буду отслеживать Шифт
+			what = $(this).val().toLowerCase();
+			filtered = 0;
+			agreed = 0;
+			$('.gamename').each(function() {
+				where = $(this).text().toLowerCase();
+				if (where.search(what) == -1) { $(this).parent().hide(); filtered++; }		// Все, что отфильтровывается, скрываем
+				else { $(this).parent().show();	agreed++; }																// А все, что удовлетворяет, показываем.
+			});
+			$('#filtercomment').text('Показано ' + agreed + ', отфильтровано ' + filtered);
+		} else if ($(this).val().length == 0) $('#filtercomment').text('');
+	});
 
 /* Клик на заголовке скрывает/раскрывает фильтр и что-то еще делает, пока не придумал */
-  $('#maincaption').click(function() {
-    $('#mainsupport').toggle();																									// Фильтр пока существует только в библиотеке, в этот блок думаю напихать всяких разных удобных штук
-  });
+	$('#maincaption').click(function() {
+	  $('#mainsupport').toggle();																									// Фильтр пока существует только в библиотеке, в этот блок думаю напихать всяких разных удобных штук
+	});
   
 /* Перехватчик клика на логофф, кнопка должна что-то делать хитрое, пока просто перенаправляет на страничку логоффа */
   $('#logoff').click(function() {
@@ -51,7 +51,7 @@ $('#namesearch').keyup(function(key) {
 		else $(this).children('td').animate({'opacity': '0.3'}, 100);
 	});
 	
-	/* Получаем из блока JSON-строку чтобы нарисовать по ней график */
+/* Получаем из блока JSON-строку чтобы нарисовать по ней график */
 	if (document.getElementById('strForChart') !== null) {
 		eval("array = " + $('#strForChart').text());
 		customChart(array, 'hourly');
@@ -62,7 +62,7 @@ $('#namesearch').keyup(function(key) {
 		this.select();
 	});
 	
-	/* При клике на регион выводим модальное окно с его системами */
+/* При клике на регион выводим модальное окно с его системами */
 	$('.regButton').click(function() {
 		var regID = $(this).attr('data-id');
 		$('#shadow').show();
@@ -70,7 +70,7 @@ $('#namesearch').keyup(function(key) {
 		getSystems(regID);
 	});
 	
-	/* При выборе системы в модальном окне заносим ее в блок выбранных систем, при снятии галки убираем систему из списка выбранных */
+/* При выборе системы в модальном окне заносим ее в блок выбранных систем, при снятии галки убираем систему из списка выбранных */
 	$(document).on('change', '.systemHolder input', function() {
 		var name = $(this).attr('data-name');
 		var id = $(this).attr('data-id');
@@ -81,19 +81,19 @@ $('#namesearch').keyup(function(key) {
 		somethingChanged = true;
 	});
 	
-	/* Убираем систему из списка при клике на крестик около нее */
+/* Убираем систему из списка при клике на крестик около нее */
 	$(document).on('click', '.deselectStar', function() {
 		$(this).parent().remove();
 		if ($('.selectedStar').length != 0) somethingChanged = true;
 	});
 	
-	/* Скрытие облака регионов и выбранных систем при клике на соответствующую кнопку */
+/* Скрытие облака регионов и выбранных систем при клике на соответствующую кнопку */
 	$('.hideRegs').click(function() {
 		$('#regionCloud').toggle();
 		$('#selectedStars').toggle();
 	});
 	
-	/* Поиск систем */
+/* Поиск систем */
 	$('#systemSearch').keyup(function(key) {
 		var noAcceptKeys = new Array(
 			9		// Tab
@@ -134,7 +134,7 @@ $('#namesearch').keyup(function(key) {
 		}
 	});
 	
-	/* При выборе варианта в поиске скрываем список вариантов и добавляем выбранную систему в список */
+/* При выборе варианта в поиске скрываем список вариантов и добавляем выбранную систему в список */
 	$(document).on('click', '.ssVariant', function() {
 		var name = $(this).attr('data-name');
 		var id = $(this).attr('data-id');
@@ -148,7 +148,7 @@ $('#namesearch').keyup(function(key) {
 		somethingChanged = true;
 	});
 	
-	/* Скрываем список найденных систем при клике в другое место */
+/* Скрываем список найденных систем при клике в другое место */
 	$(document).click(function(t) {
 		if ($(t.target).attr('class') != 'ssVariant'
 			&& $(t.target).attr('class') != 'ssVariantStar'
@@ -172,13 +172,13 @@ $('#namesearch').keyup(function(key) {
 	}
 	$('#selectPreset').append(presets);
 		
-	/* Блокирование/разблокирование кнопки "Сохранить пресет" */
+/* Блокирование/разблокирование кнопки "Сохранить пресет" */
 	$('#presetName').keyup(function() {
 		if ($(this).val() != '') $('#savePreset').attr('disabled', false);
 		else $('#savePreset').attr('disabled', true);
 	});
 	
-	/* Сохранение пресета в localStorage */
+/* Сохранение пресета в localStorage */
 	$('#savePreset').click(function() {
 		var presetName = $('#presetName').val();
 		var presetNumber = 1;
@@ -189,7 +189,7 @@ $('#namesearch').keyup(function(key) {
 		$('#selectPreset').append('<option value="' + presetNumber + '">' + presetName + '</option>');
 	});
 	
-	/* Загрузка пресета */
+/* Загрузка пресета */
 	$('#loadPreset').click(function() {
 		var presetNumber = $('#selectPreset').val();
 		if (presetNumber != '0') {
@@ -199,14 +199,14 @@ $('#namesearch').keyup(function(key) {
 		}
 	});
 	
-	/* Удаление пресета */
+/* Удаление пресета */
 	$('#deletePreset').click(function() {
 		var presetNumber = $('#selectPreset').val();
 		localStorage.removeItem('preset_' + presetNumber, null);
 		$('option[value="' + presetNumber + '"]').remove();
 	});
 	
-	/*  */
+/* Раз в пять секунд проверяем изменения сета систем и рисуем график */
 	setInterval(function() {
 		if (somethingChanged) drawGraph();
 		somethingChanged = false;
@@ -458,7 +458,6 @@ var myDate = {
 *	@return res - дата в формате строки
 *	
 **/
-
 	morph: function(date, mode) {
 		var day = this.zerofill(date.getDate().toString(), 2);
 		var mon = this.zerofill(parseInt(date.getMonth().toString()) + 1, 2);
@@ -480,7 +479,6 @@ var myDate = {
 *	@return outStr - число в строчном формате, дополненное слева нулями до нужной длины строки
 *	
 **/
-
 	zerofill: function(num, len) {
 		var numLen = (num+'').length;
 		var outStr = '';
@@ -493,7 +491,20 @@ var myDate = {
 	
 };
 
+/**
+*	
+*	Объект для работы с секьюром
+*	
+**/
 var SecurityStanding = {
+
+/**
+*	
+*	Перекраска СС системы для примерного соответствия цвету в игре.
+* @param (string/float) - СС системы
+*	@return color - цвет окраса СС в CSS-формате
+*	
+**/
 	paint : function(ss) {
 		var color = 'red';
 		var numSS = this.format(ss);
@@ -504,6 +515,14 @@ var SecurityStanding = {
 
 		return color;
 	},
+
+/**
+*	
+*	Переформатирование СС системы в нужный формат: -0.0
+* @param (string/float) - СС системы в грязном виде
+*	@return formatted - СС системы в нужном формате
+*	
+**/
 	format : function (ss) {
 		var formatted = parseFloat(ss).toFixed(1)
 		
