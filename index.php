@@ -204,7 +204,8 @@ if (!$GAMINAS['isfile']) {																											// Если обращае�
 	if (!isset($GAMINAS['notemplate'])) INCLUDE_ONCE('html/index.html');					// Ну и подгружаем макет, конечно же
 	
 } else {																																				// Если же обращение идет непосредственно к файлу
-	INCLUDE(trim($_SERVER['REQUEST_URI'], '/'));
+	header('HTTP/1.0 404 Not Found');
+	// INCLUDE(trim($_SERVER['REQUEST_URI'], '/'));
 	// echo 'Nonono, David Blaine!';
 }
 ?>
