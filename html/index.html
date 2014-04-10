@@ -87,6 +87,7 @@
 <!-- ПОЛ -->
 
 		<div id="footer">
+			<? if ($_SERVER['HTTP_HOST'] != 'tools.ice') { ?>
 			<div id="ad">
 				<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
 				<!-- Реклама над бэктрейсом -->
@@ -98,6 +99,7 @@
 				(adsbygoogle = window.adsbygoogle || []).push({});
 				</script>
 			</div>
+			<? } ?>
 			<div id="backtrace">
 				<label>Backtrace</label>
 				<? foreach($GAMINAS['backtrace'] as $message) { ?>
