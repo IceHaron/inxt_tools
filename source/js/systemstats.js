@@ -194,8 +194,9 @@ function getSystems(regions) {
 		success: function(data) {
 			$('#systemSetHolder').empty();
 		// Делаем модальное окно
-			for (sysid in data) {
-				var sysinfo = data[sysid];
+			for (order in data) {
+				var sysid = data[order]['id'];
+				var sysinfo = data[order];
 				var ss = SecurityStanding.format(sysinfo.security);												// Нам нужен СС системы чтобы раскрасить его в нужный цвет
 				if (!sysinputs.hasOwnProperty(sysinfo['regname'])) sysinputs[ sysinfo['regname'] ] = '';
 				var color = SecurityStanding.paint(ss);

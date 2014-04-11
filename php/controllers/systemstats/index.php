@@ -46,10 +46,15 @@ class systemstats_index {
 		foreach ($regionset as $regID) {
 			foreach (self::$stars as $starid => $starinfo) {
 				if ($starinfo['regionID'] == $regID) {
-					$res[ $starid ] = $starinfo;
-					$res[ $starid ]['regionName'] = self::$regions[ $regID ];
+					$sort[] = $starinfo['name'];
+					$star[ $starinfo['name'] ] = $starinfo;
+					$star[ $starinfo['name'] ]['regionName'] = self::$regions[ $regID ];
 				}
 			}
+		}
+		sort($sort);
+		foreach ($sort as $order => $name) {
+			$res[ $order ] = $star[ $name ];
 		}
 		echo json_encode($res);
 	}

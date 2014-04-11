@@ -120,7 +120,9 @@
 
 				</script>
 			</div>
-			<? } ?>
+			<? } 
+			if (isset($GAMINAS['username']) && $GAMINAS['username'] == 'Ice_Haron') {
+			?>
 			<div id="backtrace">
 				<label>Backtrace</label>
 				<? foreach($GAMINAS['backtrace'] as $message) { ?>
@@ -128,7 +130,8 @@
 				<? } ?>
 				<div class="clear"></div>
 			</div>
-			<? if (isset($GAMINAS['todo'])) { ?>
+			<? }
+			if (isset($GAMINAS['todo'])) { ?>
 			<table id="todo" cellpadding="3">
 				<thead>
 					<tr>
