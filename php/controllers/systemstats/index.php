@@ -76,7 +76,7 @@ class systemstats_index {
 		$subject = isset($_GET['subject']) ? self::parseStarList(urldecode($_GET['subject'])) : 'default';
 		
 		// Формируем строки для отображения на странице
-		$maincaption = 'График активности в системах';
+		$maincaption = 'График активности в системах (жмякните чтобы скрыть/показать фильтры)';
 		$mainsupport = '';
 		$maincontent = '<button name="draw" onclick="drawGraph();">Нарисовать</button><label>Ссылка на график: <input type="text" readonly name="link" id="graphLink" value="http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . '"></label><div id="strForChart">' . self::getStringForGraph($time, $mode, $subject) . '</div>';
 		
@@ -143,7 +143,7 @@ class systemstats_index {
 		// Определяем параметры
 		$time = isset($_GET['time']) ? urldecode($_GET['time']) : 'hourly';
 		$mode = isset($_GET['mode']) ? urldecode($_GET['mode']) : 'system';
-		$subject = isset($_GET['subject']) ? self::parseStarList(urldecode($_GET['subject'])) : 'default';
+		$subject = $_GET['subject'] ? self::parseStarList(urldecode($_GET['subject'])) : 'default';
 
 		// Формируем строку в зависимости от параметров
 		$res = self::getStringForGraph($time, $mode, $subject);
@@ -220,10 +220,10 @@ class systemstats_index {
 		if ($mode == 'system')
 			$str = "SELECT unix_timestamp(`act`.`$timeHolder`) `ts`, `sys`.`name` `system`, `jumps` FROM `activity_$time` `act` JOIN `systems` `sys` ON (`act`.`system` = `sys`.`id`) WHERE `sys`.`name` IN ('$query');";
 		else																																				// Запрос для регионального графика еще не готов, тут просто заглушка
-			$str = "SELECT unix_timestamp(`act`.`ts`) `ts`, `sys`.`name` `system`, `jumps` FROM `activity_hourly` `act` JOIN `systems` `sys` ON (`act`.`system` = `sys`.`id`) WHERE `sys`.`name` IN ('Amarr', 'Jita', 'Rens');";
+			$str = "SELECT unix_timestamp(`act`.`ts`) `ts`, `sys`.`name` `system`, `jumps` FROM `activity_hourly` `act` JOIN `systems` `sys` ON (`act`.`system` = `sys`.`id`) WHERE `sys`.`name` IN ('Amarr', 'Jita', 'Dodixie, 'Rens');";
 			
 		// Отправляем запрос в БД
- 		$q = db::query($str);
+		$q = db::query($str);
 		
 		// Разбираем запрос
 		foreach ($q as $sysinfo) {
