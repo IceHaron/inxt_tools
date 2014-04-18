@@ -218,43 +218,22 @@ function getSystems(regions) {
 			$('#systemSetHolder').append(fullModalContent).show();
 			
 			
-			/* Устанавливаем состояние всех чекбоксов в зависимости от GET`а */
-			var get = unescape(window.location.search.substring(1)).replace('+', ' ').split('&');
+			/* Устанавливаем состояние всех чекбоксов в зависимости от выбранных систем */
+			var get = $('.selectedStar')
 			if (get[0] != '') {
 				var query = {};
 				
-				for (i in get) {
-					elem = get[i].split('=');
-					query[ elem[0] ] = elem[1].replace(/\_\d+/g, '').split(',');					// Разбираем GET и превращаем его в массив
-				}
-				
-				$('.graphfilter input').each(function() {
+				$('.regionHolder input').each(function() {
 					this.checked = false;																									// Очищаем выделение
-					
-					if ($(this).attr('name') !== undefined) name = $(this).attr('name').replace('system', 'star');
-					
-					if (query.hasOwnProperty(name)) {																			// Отсеиваем чекбоксы, упомянутые в запросе
-					
-						for (i in query[ name ]) {
-							value = query[ name ][i];
-							
-							if ($(this).attr('data-name') == value || $(this).attr('data-time') == value) {
-							
-								if ($(this).attr('name') == 'region') {
-									regid = $(this).attr('data-id');
-									// Все системы упомянутых регионов нужно показать
-									// $('#system input[data-regid="' + regid + '"]').parent().show();
-								}
-								
-								this.checked = true;																						// Расставляем нужные галочки
-							}
-							
-						}
-						
-					}
-					
 				});
 				
+				get.each(function() {
+					elem = $(this).attr('data-id');
+					$('.regionHolder input[data-id="' + elem + '"]').each(function() {
+						this.checked = true;
+					});
+				});
+
 			}
 			
 		},
