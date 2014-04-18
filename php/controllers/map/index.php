@@ -16,7 +16,7 @@ class map_index {
 	private function map_index() {
 		global $GAMINAS;
 
-		self::getRoute('Amarr','Jita');
+		// self::getRoute('Amarr','Jita');
 		
 		$GAMINAS['maincaption'] = 'EVE Universe Map';
 		$GAMINAS['mainsupport'] = 'Содержание вспомогательного блока';
@@ -26,6 +26,7 @@ class map_index {
 
 	public function getRoute($from, $to) {
 		echo file_get_contents("http://api.eve-central.com/api/route/from/$from/to/$to");
+		
 	}
 
 }
