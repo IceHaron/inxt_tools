@@ -68,9 +68,11 @@
 <!-- ГЛАВНАЯ МЕНЮШКА -->
 			<div id="topmenu">
           <a href="/systemstats/show"><div class="topmenunode">Статистика активности систем</div></a>
-          <a href="/ssf"><div class="topmenunode">EVESSF</div></a>
-          <a href="/map"><div class="topmenunode">Карта</div></a>
-          <a href="/wtf/four/level/addr"><div class="topmenunode" style="float:right;">WTF</div></a>
+          <? if (isset($GAMINAS['username']) && $GAMINAS['username'] == 'Ice_Haron') { ?>
+						<a href="/ssf"><div class="topmenunode">EVESSF</div></a>
+						<a href="/map"><div class="topmenunode">Карта</div></a>
+						<a href="/wtf/four/level/addr"><div class="topmenunode" style="float:right;">WTF</div></a>
+					<? } ?>
 					<div class="clear"></div>
       </div>
 <!-- / Главная менюшка -->
