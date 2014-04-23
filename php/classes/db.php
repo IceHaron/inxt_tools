@@ -20,8 +20,6 @@ class db {
 *	
 **/
 	private function db() {
-	
-		global $GAMINAS;
 		
 		$host = 'localhost';
 		$user = 'srv44030_tools';
@@ -38,9 +36,9 @@ class db {
 		} else self::$con = $link;
 		
 		if (!mysqli_set_charset($link, "utf8")) {
-			$GAMINAS['backtrace'][] = "Error loading character set utf8: " . mysqli_error($link);
+			root::$_ALL['backtrace'][] = "Error loading character set utf8: " . mysqli_error($link);
 		} else {
-			$GAMINAS['backtrace'][] = "Current character set: " . mysqli_character_set_name($link);
+			root::$_ALL['backtrace'][] = "Current character set: " . mysqli_character_set_name($link);
 		}
 	}
 	

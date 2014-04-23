@@ -14,12 +14,11 @@ class ssf_index {
 	}
 	
 	private function ssf_index() {
-		global $GAMINAS;
 		
-		$GAMINAS['maincaption'] = 'EVE Smart Star Filters';
-		$GAMINAS['mainsupport'] = 'Содержание вспомогательного блока';
-		$GAMINAS['maincontent'] = 'Содержание центрального блока';
-		$GAMINAS['backtrace'][] = 'initialized ssf/index';
+		root::$_ALL['maincaption'] = 'EVE Smart Star Filters';
+		root::$_ALL['mainsupport'] = 'Содержание вспомогательного блока';
+		root::$_ALL['maincontent'] = 'Содержание центрального блока';
+		root::$_ALL['backtrace'][] = 'initialized ssf/index';
 	}
 
 }

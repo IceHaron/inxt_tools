@@ -1,3 +1,4 @@
+TODO -- Организовать класс universe -- UNDONE
 TODO -- EVE Smart Star Filters -- UNDONE
 QUEST -- EVE Smart Star Filters -- UNDONE
 QUEST -- Недельные графики -- UNDONE

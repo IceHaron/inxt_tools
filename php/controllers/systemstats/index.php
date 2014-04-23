@@ -8,26 +8,17 @@
 
 class systemstats_index {
 
-	public static $regions;
-	public static $stars;
-	
 	public static function init() {
 		return new self();
 	}
 	
 /**
 *	
-*	Конструктор: здесь мы собираем из файлов инфу о системах и регионах
+*	Конструктор
 *	
 **/
 	private function systemstats_index() {
-		global $GAMINAS;
 		
-		foreach (db::query('SELECT * FROM `regions`') as $region) $regions[ $region['id'] ] = $region['name'];
-		self::$regions = $regions;
-		foreach (db::query('SELECT `sys`.*, `reg`.`name` `regname` FROM `systems` `sys` JOIN `regions` `reg` ON (`sys`.`regionID` = `reg`.`id`)') as $system) $systems[ $system['id'] ] = $system;
-		self::$stars = $systems;
-		$GAMINAS['backtrace'][] = 'Took region set and star set from DataBase';
 	}
 	
 /**
@@ -38,25 +29,9 @@ class systemstats_index {
 *	
 **/
 	public static function getSystems($regions = '') {
-		global $GAMINAS;
-		self::init();
-		$GAMINAS['notemplate'] = TRUE;
+		root::$_ALL['notemplate'] = TRUE;
 		$r = $regions ? $regions : urldecode($_GET['regions']);
-		$regionset = explode(',', $r);
-		foreach ($regionset as $regID) {
-			foreach (self::$stars as $starid => $starinfo) {
-				if ($starinfo['regionID'] == $regID) {
-					$sort[] = $starinfo['name'];
-					$star[ $starinfo['name'] ] = $starinfo;
-					$star[ $starinfo['name'] ]['regionName'] = self::$regions[ $regID ];
-				}
-			}
-		}
-		sort($sort);
-		foreach ($sort as $order => $name) {
-			$res[ $order ] = $star[ $name ];
-		}
-		echo json_encode($res);
+		echo universe::getSystems($r);
 	}
 	
 /**
@@ -67,9 +42,6 @@ class systemstats_index {
 *	
 **/
 	public static function show($what = '') {
-		global $GAMINAS;
-		self::init();
-		
 		// Определяем параметры
 		$time = isset($_GET['time']) ? db::escape(urldecode($_GET['time'])) : 'hourly';
 		$mode = isset($_GET['mode']) ? db::escape(urldecode($_GET['mode'])) : 'system';
@@ -81,7 +53,7 @@ class systemstats_index {
 		$maincontent = '<button name="draw" onclick="drawGraph();">Нарисовать</button><label>Ссылка на график: <input type="text" readonly name="link" id="graphLink" value="http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . '"></label><div id="strForChart">' . self::getStringForGraph($time, $mode, $subject) . '</div>';
 		
 		// Формируем облако регионов
-		foreach (self::$regions as $id => $name) $regions[$name] = $id;
+		foreach (universe::$regions as $id => $name) $regions[$name] = $id;
 		ksort($regions, SORT_STRING);
 		$regionButtons = '';
 		
@@ -122,11 +94,11 @@ class systemstats_index {
 		
 		
 		// Запихиваем результаты в глобальную переменную
-		$GAMINAS['maincaption'] = $maincaption;
-		$GAMINAS['mainsupport'] = $mainsupport;
-		$GAMINAS['maincontent'] = $maincontent;
-		$GAMINAS['regionbuttons'] = $regionButtons;
-		$GAMINAS['selectedstars'] = $selectedStars;
+		root::$_ALL['maincaption'] = $maincaption;
+		root::$_ALL['mainsupport'] = $mainsupport;
+		root::$_ALL['maincontent'] = $maincontent;
+		root::$_ALL['regionbuttons'] = $regionButtons;
+		root::$_ALL['selectedstars'] = $selectedStars;
 	}
 	
 /**
@@ -136,9 +108,7 @@ class systemstats_index {
 *	
 **/
 	public static function drawGraph() {
-		global $GAMINAS;
-		self::init();
-		$GAMINAS['notemplate'] = TRUE;																							// Выключаем отображение макета
+		root::$_ALL['notemplate'] = TRUE;																							// Выключаем отображение макета
 		
 		// Определяем параметры
 		$time = isset($_GET['time']) ? urldecode($_GET['time']) : 'hourly';
@@ -190,9 +160,6 @@ class systemstats_index {
 *	
 **/	
 	public static function getStringForGraph($time = 'hourly', $mode = 'system', $subject = 'default') {
-		global $GAMINAS;
-		self::init();
-		
 		// Определяем параметры
 		if ($subject === 'default')
 			$subject = array(
@@ -254,23 +221,9 @@ class systemstats_index {
 *	@param	search - часть названия системы
 *	@return void
 *	
-**/	
+**/
 	public static function searchSystems() {
-		global $GAMINAS;
-		self::init();
-		$GAMINAS['notemplate'] = TRUE;
-
-		$search = isset($_GET['search']) ? $_GET['search'] : 'nothing';
-		$escapedString = db::escape($search);
-		$q = "SELECT `systems`.*, `regions`.`name` `regionName` FROM `systems`	JOIN `regions` ON (`regions`.`id` = `systems`.`regionID`)	WHERE `systems`.`name` LIKE '%$escapedString%' ORDER BY `systems`.`name`";
-		$r = db::query($q);
-		if ($r != NULL) {
-			$arr = array();
-			foreach ($r as $system) {
-				$ss = number_format($system['security'], 1, '.', '');
-				$arr[] = array('id' => $system['id'], 'name' => $system['name'], 'security' => $ss, 'regionID' => $system['regionID'], 'regionName' => $system['regionName']);
-			}
-			echo json_encode($arr);
-		} else echo 'NULL';
+		root::$_ALL['notemplate'] = TRUE;
+		echo universe::searchSystems();
 	}
 }

@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-  <title>EVEIT</title>
-  <link type="text/css" rel="stylesheet" href="<?=$GAMINAS['source']?>/css/main.css"></link>
+  <title><?=root::$_ALL['maintitle']?> &mdash; INXT Tools</title>
+  <link type="text/css" rel="stylesheet" href="<?=root::$_ALL['source']?>/css/main.css"></link>
   <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
-  <script src="<?=$GAMINAS['source']?>/js/main.js"></script>
+  <script src="<?=root::$_ALL['source']?>/js/main.js"></script>
 	<!-- Подгрузка стилей и скриптов в зависимости от адреса -->
-	<? if (@$GAMINAS['folder'] !== '') {?>
-		<link type="text/css" rel="stylesheet" href="<?=$GAMINAS['source']?>/css/<?=$GAMINAS['folder']?>.css"></link>
-		<script src="<?=$GAMINAS['source']?>/js/<?=$GAMINAS['folder']?>.js"></script>
+	<? if (@root::$_ALL['folder'] !== '') {?>
+		<link type="text/css" rel="stylesheet" href="<?=root::$_ALL['source']?>/css/<?=root::$_ALL['folder']?>.css"></link>
+		<script src="<?=root::$_ALL['source']?>/js/<?=root::$_ALL['folder']?>.js"></script>
 	<? } ?>
 </head>
 
@@ -41,7 +41,7 @@ screen.colorDepth:screen.pixelDepth))+";u"+escape(document.URL)+
 			
 <!-- АВАТАРКА, ЛОГИНИЗАЦИЯ И ПРОЧЕЕ -->
 			<div id="righthead">
-				<? if ($GAMINAS['uid'] === 0) { ?>																			<!-- Если мы не авторизованы -->
+				<? if (root::$_ALL['uid'] === 0) { ?>																			<!-- Если мы не авторизованы -->
 <!-- Закомментил на случай если вдруг все перестанет работать
         <script src="//ulogin.ru/js/ulogin.js"></script>
         <div id="uLogin" data-ulogin="display=panel;fields=first_name,last_name;providers=steam;hidden=;redirect_uri=http%3A%2F%2Fgaminas.ice"></div>
@@ -49,13 +49,13 @@ screen.colorDepth:screen.pixelDepth))+";u"+escape(document.URL)+
 <!-- Логинизация от uLogin -->
         <script src="//ulogin.ru/js/ulogin.js"></script>
         <div id="uLogin" data-ulogin="display=panel;fields=uid;providers=steam;hidden=;redirect_uri=;receiver=http%3A%2F%2Fgaminas.ice%2Fxd_custom.htm;callback=login">
-          <img src="<?=$GAMINAS['source']?>/img/steam.png" data-uloginbutton="steam"/>
+          <img src="<?=root::$_ALL['source']?>/img/steam.png" data-uloginbutton="steam"/>
         </div>
         <? } else { ?>																													<!-- Если мы уже залогинились -->
-        <a target="blank" href="<?=$GAMINAS['profurl']?>">
+        <a target="blank" href="<?=root::$_ALL['profurl']?>">
 					<div id="loginholder">
-						<div id="login"><?=$GAMINAS['username']?></div>
-						<img id="head_ava" src="<?=$GAMINAS['avatar']?>"/>
+						<div id="login"><?=root::$_ALL['username']?></div>
+						<img id="head_ava" src="<?=root::$_ALL['avatar']?>"/>
 					</div>
 				</a>
         <button id="logoff">Logoff</button>
@@ -77,7 +77,7 @@ screen.colorDepth:screen.pixelDepth))+";u"+escape(document.URL)+
 <!-- ГЛАВНАЯ МЕНЮШКА -->
 			<div id="topmenu">
           <a href="/systemstats/show"><div class="topmenunode">Статистика активности систем</div></a>
-          <? if (isset($GAMINAS['username']) && $GAMINAS['username'] == 'Ice_Haron') { ?>
+          <? if (isset(root::$_ALL['username']) && root::$_ALL['username'] == 'Ice_Haron') { ?>
 						<a href="/ssf"><div class="topmenunode">EVESSF</div></a>
 						<a href="/map"><div class="topmenunode">Карта</div></a>
 						<a href="/wtf/four/level/addr"><div class="topmenunode" style="float:right;">WTF</div></a>
@@ -109,7 +109,7 @@ screen.colorDepth:screen.pixelDepth))+";u"+escape(document.URL)+
 				<script>
 					(adsbygoogle = window.adsbygoogle || []).push({});
 				</script>
-				<? if (isset($GAMINAS['username']) && $GAMINAS['username'] == 'Ice_Haron') { ?>
+				<? if (isset(root::$_ALL['username']) && root::$_ALL['username'] == 'Ice_Haron') { ?>
 					<!--LiveInternet logo--><a href="http://www.liveinternet.ru/click"
 					target="_blank"><img src="//counter.yadro.ru/logo?29.2"
 					title="LiveInternet: показано количество просмотров и посетителей"
@@ -127,17 +127,17 @@ screen.colorDepth:screen.pixelDepth))+";u"+escape(document.URL)+
 				</script>
 			</div>
 			<? } 
-			if (isset($GAMINAS['username']) && $GAMINAS['username'] == 'Ice_Haron') {
+			if (isset(root::$_ALL['username']) && root::$_ALL['username'] == 'Ice_Haron') {
 			?>
 			<div id="backtrace">
 				<label>Backtrace</label>
-				<? foreach($GAMINAS['backtrace'] as $message) { ?>
+				<? foreach(root::$_ALL['backtrace'] as $message) { ?>
 					<p><?=$message?></p>
 				<? } ?>
 				<div class="clear"></div>
 			</div>
 			<? }
-			if (isset($GAMINAS['todo'])) { ?>
+			if (isset(root::$_ALL['todo'])) { ?>
 			<table id="todo" cellpadding="3">
 				<thead>
 					<tr>
@@ -147,7 +147,7 @@ screen.colorDepth:screen.pixelDepth))+";u"+escape(document.URL)+
 					</tr>
 				</thead>
 				<tbody>
-					<?foreach ($GAMINAS['todo'] as $k => $todoarr) {?>
+					<?foreach (root::$_ALL['todo'] as $k => $todoarr) {?>
 							<tr class="todotr">
 								<td class="<?=$todoarr['state'].' '.$todoarr['class']?> left">
 									<?=$todoarr['class']?>

@@ -1,0 +1,13 @@
+#strForMap {
+	display: none;
+}
+#map {
+	display: inline-block;
+}
+#control {
+	width: calc(100% - 920px);
+	min-width: 400px;
+	padding: 10px;
+	float:right;
+	background-color: red;
+}

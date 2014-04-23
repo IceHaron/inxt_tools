@@ -1,5 +1,4 @@
-<?
-
+<?php
 
 /**
 *	
@@ -19,7 +18,6 @@ class auth {
 *	
 */
 	private function auth() {
-		global $GAMINAS;
 		
 // Логинизация от uLogin, оставлю пока здесь, мало ли пригодится
 		
@@ -36,16 +34,16 @@ class auth {
 // Конец логинизации через uLogin, теперь все по хардкору
 		if (isset($_SESSION['uid']) && $_SESSION['uid'] !== '' && $_SESSION['uid'] !== NULL) {
 			// Проверяем, может, в сессии лежит айдишник? это значит, что мы уже авторизованы
-			$GAMINAS['uid'] = $_SESSION['uid'];
-			$GAMINAS['backtrace'][] = 'Logged in through session';
+			root::$_ALL['uid'] = $_SESSION['uid'];
+			root::$_ALL['backtrace'][] = 'Logged in through session';
 		} else if (isset($_COOKIE['uid']) && $_COOKIE['uid'] !== '' && $_COOKIE['uid'] !== NULL) {
 			// Не в сессии, так в печеньках
-			$GAMINAS['uid'] = $_COOKIE['uid'];
-			$_SESSION['uid'] = $GAMINAS['uid'];
-			$GAMINAS['backtrace'][] = 'Logged in through cookie';
-		} else $GAMINAS['uid'] = 0;																									// Ну если даже в печеньках нет нашего юида, то все-таки мы не логинились
+			root::$_ALL['uid'] = $_COOKIE['uid'];
+			$_SESSION['uid'] = root::$_ALL['uid'];
+			root::$_ALL['backtrace'][] = 'Logged in through cookie';
+		} else root::$_ALL['uid'] = 0;																									// Ну если даже в печеньках нет нашего юида, то все-таки мы не логинились
 		
-		$uid = $GAMINAS['uid'] ? $GAMINAS['uid'] : 0;																// Делалось для сокращения кода, после модификаций можно будет это убрать и лишний раз не переобъявлять переменную
+		$uid = root::$_ALL['uid'] ? root::$_ALL['uid'] : 0;																// Делалось для сокращения кода, после модификаций можно будет это убрать и лишний раз не переобъявлять переменную
 		
 		if ($uid !== 0) {																														// Если мы авторизованы, надо подгрузить из стима наши данные
 			$str = '';
@@ -69,15 +67,15 @@ class auth {
 			// echo '<pre>';
 			// var_dump($json);
 			// echo '</pre>';
-			$GAMINAS['username'] = $json->profile->response->players[0]->personaname;	// ...и парсим...
-			$GAMINAS['profurl'] = $json->profile->response->players[0]->profileurl;		// ...парсим...
-			$GAMINAS['avatar'] = $json->profile->response->players[0]->avatar;				// ...и еще раз парсим...
+			root::$_ALL['username'] = $json->profile->response->players[0]->personaname;	// ...и парсим...
+			root::$_ALL['profurl'] = $json->profile->response->players[0]->profileurl;		// ...парсим...
+			root::$_ALL['avatar'] = $json->profile->response->players[0]->avatar;				// ...и еще раз парсим...
 		} else {
 			// Ну и если все-таки мы не авторизованы, выводим сообщение, не знаю пока, зачем.
-			$GAMINAS['nologin'] = 'You are not logged in!';
+			root::$_ALL['nologin'] = 'You are not logged in!';
 		}
 		// echo '<pre>';
-		// var_dump('GLOBAL', $GAMINAS);
+		// var_dump('GLOBAL', root::$_ALL);
 		// echo '</pre>';
 	}
 	
