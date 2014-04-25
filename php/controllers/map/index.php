@@ -23,6 +23,17 @@ class map_index {
 			JOIN `regions` as `rfrom` ON (`rfrom`.`id` = `from`.`regionID`)
 			JOIN `regions` as `rto` ON (`rto`.`id` = `to`.`regionID`)
 			WHERE `rfrom`.`name` != `rto`.`name`;");
+		for ($i = 0; $i < count($jumps); $i++) {
+			if (isset($jumps[$i])) {
+				$jump = $jumps[$i];
+				for ($j = 0; $j < count($jumps); $j++) {
+					if (isset($jumps[$j])) {
+						$subj = $jumps[$j];
+						if ($subj['fromName'] == $jump['toName']) unset($jumps[$j]);
+					}
+				}
+			}
+		}
 		$map = array('dots' => $dots, 'jumps' => $jumps);
 		$regionList = db::query("SELECT `id`, `name` FROM srv44030_tools.regions WHERE `id` < 11000000 ORDER BY `name`;");
 		$regstr = '<select name="region"><option value="0">&mdash;&mdash;&mdash;Выберите регион&mdash;&mdash;&mdash;</option>';
@@ -30,7 +41,7 @@ class map_index {
 			$regstr .= '<option value="' . $region['id'] . '">' . $region['name'] . '</option>';
 		}
 		$regstr .= '</select>';
-		$maincontent = '<div id="control">' . $regstr . '</div><div id="strForMap">' . json_encode($map) . '</div>';
+		$maincontent = '<div id="control"><div class="startx"></div><div class="x"></div><div class="starty"></div><div class="y"></div>' . $regstr . '</div><div id="strForMap">' . json_encode($map) . '</div>';
 		
 		root::$_ALL['maincaption'] = 'EVE Universe Map';
 		root::$_ALL['mainsupport'] = 'Содержание вспомогательного блока';

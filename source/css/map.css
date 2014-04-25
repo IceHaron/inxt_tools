@@ -2,6 +2,8 @@
 	display: none;
 }
 #map {
+	width: 890px;
+	height: 650px;
 	display: inline-block;
 }
 #control {
@@ -11,3 +13,29 @@
 	float:right;
 	background-color: red;
 }
+.jump {
+	width: 100px;
+	height: 1px;
+	margin-top: 100px;
+	margin-left: 100px;
+	position: absolute;
+	transform: rotate(200deg);
+	transform-origin: 0 0 0;
+	background-color: grey;
+}
+.star {
+	width: 3px;
+	height: 3px;
+	position: absolute;
+	background-color: white;
+}
+.starName {
+	margin-left: 104px;
+	margin-top: 94px;
+	display: block;
+	position: absolute;
+	font-size: 8px;
+	color: white;
+}
+.startX {display:none;}
+.startY {display:none;}
