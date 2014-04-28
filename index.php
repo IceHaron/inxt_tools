@@ -66,7 +66,7 @@ class root {
 		if(gettype($filter) == 'string' && $filter != '') { 												// Если даем строкой только один нужный модуль
 			root::$_ALL['backtrace'][] = 'got string filter: ' . $filter;
 			$files = glob('php/classes/' . $filter . '.php');
-		} else if (gettype($filter) == 'array') { 																	// Если в массиве перечисляем нужные модули
+		} else if (gettype($filter) == 'array') {																		// Если в массиве перечисляем нужные модули
 			$backtrace = 'got array filter: ';
 
 			foreach ($filter as $need) {
@@ -101,7 +101,6 @@ class root {
 	private static function url_parse() {
 		global $auth;																																// Класс auth полюбому уже объявлен. лишний раз его объявлять не надо, просто обращаемся к глобалке
 		$path = explode('/', trim($_SERVER['REQUEST_URI'], '/'));										// Отрезаем крайние слеши у адреса и разбиваем его в массив
-		root::$_ALL['folder'] = $path[0];																							// Первый уровень всегда определяет группу контроллеров
 		$a = $path;
 		
 		if (strpos(array_pop($a), '.') === FALSE) {																	// Проверяем наличие точки в последнем элементе (признак адреса типа /wtf/tell.php, не нужно нам такой радости.)
@@ -109,6 +108,7 @@ class root {
 			if ($path[0] != '') {
 				$count = count($path);																									// Считаем количество уровней в адресе
 				$path[ $count-1 ] = preg_replace('/\?.+/', '', $path[ $count-1 ]);			// Убираем GET, в адресе он нам не нужен, он уже в переменной
+				root::$_ALL['folder'] = $path[0];																				// Первый уровень всегда определяет группу контроллеров
 				
 				if ($count == 1) {																											// Один уровень: <host>/library
 					root::$_ALL['controller'] = 'index';

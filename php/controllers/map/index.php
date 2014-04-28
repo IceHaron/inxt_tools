@@ -44,7 +44,7 @@ class map_index {
 		$maincontent = '<div id="control"><div class="startx"></div><div class="x"></div><div class="starty"></div><div class="y"></div>' . $regstr . '</div><div id="strForMap">' . json_encode($map) . '</div>';
 		
 		root::$_ALL['maincaption'] = 'EVE Universe Map';
-		root::$_ALL['mainsupport'] = 'Содержание вспомогательного блока';
+		root::$_ALL['mainsupport'] = 'Содержимое вспомогательного блока';
 		root::$_ALL['maincontent'] = $maincontent;
 		root::$_ALL['backtrace'][] = 'initialized map/index';
 	}

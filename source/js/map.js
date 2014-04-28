@@ -1,11 +1,8 @@
 $(document).ready(function() {
-	var canvas = $('#map');
-	// var canvas=document.getElementById("map");
-	// var cxt=canvas.getContext("2d");
-	// var width = canvas.width;
-	// var height = canvas.height;
-	var width = 890;
-	var height = 650;
+	var canvas=document.getElementById("map");
+	var cxt=canvas.getContext("2d");
+	var width = canvas.width;
+	var height = canvas.height;
 	var padding = 50;
 	var depth = 500
 	var map = JSON.parse($('#strForMap').text());
@@ -47,7 +44,7 @@ $(document).ready(function() {
 	var scaleY = (height-padding*2) / (maxy - miny);
 	var scaleZ = (depth-padding*2) / (maxz - minz);
 	calc();
-	canvas.mousedown(function(e) {
+	$(canvas).mousedown(function(e) {
 		var pos = $(this).offset();
 		$('.startx').html(e.pageX-pos.left);
 		$('.starty').html(e.pageY-pos.top);
@@ -64,7 +61,7 @@ $(document).ready(function() {
 		$(window).bind('mouseup', function(ev) {
 		});
 	});
-	canvas.mouseup(function() {
+	$(canvas).mouseup(function() {
 		$(canvas).unbind('mousemove');
 		$(window).unbind('mouseup');
 	});
@@ -88,47 +85,37 @@ $(document).ready(function() {
 	}
 
 	function draw() {
-		// canvas.width = canvas.width;
-		// cxt.fillStyle = "black";
-		// cxt.fillRect(0, 0, canvas.width, canvas.height);
-		// cxt.fillStyle = 'white';
-		// cxt.strokeStyle = 'grey';
-		// cxt.font = "normal 8pt Sans-Serif";
+		canvas.width = width;
+		cxt.fillStyle = "black";
+		cxt.fillRect(0, 0, width, height);
+		cxt.fillStyle = 'white';
+		cxt.strokeStyle = 'grey';
+		cxt.font = "normal 8pt Sans-Serif";
 		for (i in jumps) {
 			var jump = jumps[i];
 			var newfromx = coords[jump.fromName]["x"]*Math.cos(azimut) - coords[jump.fromName]["y"]*Math.sin(azimut);
 			var newfromy = coords[jump.fromName]["x"]*Math.cos(zenit)*Math.sin(azimut) + coords[jump.fromName]["y"]*Math.cos(zenit)*Math.cos(azimut) - coords[jump.fromName]["z"]*Math.sin(zenit);
 			var newtox = coords[jump.toName]["x"]*Math.cos(azimut) - coords[jump.toName]["y"]*Math.sin(azimut);
 			var newtoy = coords[jump.toName]["x"]*Math.cos(zenit)*Math.sin(azimut) + coords[jump.toName]["y"]*Math.cos(zenit)*Math.cos(azimut) - coords[jump.toName]["z"]*Math.sin(zenit);
-			// cxt.beginPath();
-			// cxt.moveTo(newfromx+canvas.width/2+2, -newfromy+canvas.height/2+2);
-			// cxt.lineTo(newtox+canvas.width/2+2, -newtoy+canvas.height/2+2);
-			// cxt.closePath();
-			// cxt.stroke();
+			cxt.beginPath();
+			cxt.moveTo(newfromx+width/2+2, -newfromy+height/2+2);
+			cxt.lineTo(newtox+width/2+2, -newtoy+height/2+2);
+			cxt.closePath();
+			cxt.stroke();
 		}
 		for (i in coords) {
 			var dot = coords[i];
 			var multiplier = dot["z"] > 0 ? 1.1 : 0.9;
-			var newx = Math.round(dot["x"]*Math.cos(azimut) - dot["y"]*Math.sin(azimut) + width/2);
-			var newy = Math.round(dot["x"]*Math.cos(zenit)*Math.sin(azimut) + dot["y"]*Math.cos(zenit)*Math.cos(azimut) - dot["z"]*Math.sin(zenit) + height/2);
+			var newx = dot["x"]*Math.cos(azimut) - dot["y"]*Math.sin(azimut);
+			var newy = dot["x"]*Math.cos(zenit)*Math.sin(azimut) + dot["y"]*Math.cos(zenit)*Math.cos(azimut) - dot["z"]*Math.sin(zenit);
 			// var newz = dot["x"]*Math.sin(zenit)*Math.sin(azimut) + dot["y"]*Math.sin(zenit)*Math.cos(azimut) + dot["z"]*Math.cos(zenit);
 			// console.log(i,dot,newx,newy);
-			if ($('.star[data-name="' + i + '"]').length == 0) {
-				canvas.append('<div class="star" data-name="' + i + '" style="margin-left:' + newx + 'px;margin-top:' + newy + 'px;"></div>');
-				canvas.append('<span class="starName" data-name="' + i + '" style="margin-left:' + (newx + 4) + 'px;margin-top:' + (newy - 6) + 'px;">' + i + '</span>');
-			} else {
-				var oldX = $('.star[data-name="' + i + '"]').css('margin-left');
-				if (oldX != newx) {
-					$('.star[data-name="' + i + '"]').css({'margin-left': newx, 'margin-top':newy});
-					$('.starName[data-name="' + i + '"]').css({'margin-left': newx+4, 'margin-top':newy-6});
-				}
-			}
-			// cxt.fillRect(newx+canvas.width/2, -newy+canvas.height/2, 4, 4);
-			// cxt.fillText(i,newx+canvas.width/2, -newy+canvas.height/2-1);
+			cxt.fillRect(newx+width/2, -newy+height/2, 4, 4);
+			cxt.fillText(i,newx+width/2, -newy+height/2-1);
 
 			// cxt.beginPath();
-			// cxt.moveTo(0+canvas.width/2+2, 0+canvas.height/2+2);
-			// cxt.lineTo(newx+canvas.width/2+2, -newy+canvas.height/2+2);
+			// cxt.moveTo(0+width/2+2, 0+height/2+2);
+			// cxt.lineTo(newx+width/2+2, -newy+height/2+2);
 			// cxt.closePath();
 			// cxt.stroke();
 		}
