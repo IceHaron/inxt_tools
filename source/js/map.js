@@ -44,33 +44,47 @@ $(document).ready(function() {
 	var scaleY = (height-padding*2) / (maxy - miny);
 	var scaleZ = (depth-padding*2) / (maxz - minz);
 	calc();
+	draw();
+	allowSelect();
+
 	$(canvas).mousedown(function(e) {
+		$('.star').remove();
 		var pos = $(this).offset();
 		$('.startx').html(e.pageX-pos.left);
 		$('.starty').html(e.pageY-pos.top);
-		$(canvas).bind('mousemove', function(ev) {
-			var pos = $(this).offset();
-			// $('.x').html(ev.pageX-pos.left-parseInt($('.startx').html()));
-			// $('.y').html(ev.pageY-pos.top-parseInt($('.starty').html()));
-			azimut += (ev.pageX-pos.left-parseInt($('.startx').html()))/500;
-			zenit += (ev.pageY-pos.top-parseInt($('.starty').html()))/500;
-			draw();
-			$('.startx').html(ev.pageX-pos.left);
-			$('.starty').html(ev.pageY-pos.top);
-		});
+		$(canvas).bind('mousemove', drag);
 		$(window).bind('mouseup', function(ev) {
 		});
 	});
+
 	$(canvas).mouseup(function() {
 		$(canvas).unbind('mousemove');
 		$(window).unbind('mouseup');
+		allowSelect();
+	});
+	$(document).on('click', '.star', function() {
+		var newLoc = window.location.pathname + '?reg=' + escape($(this).attr('data-name'));
+		window.location = newLoc;
 	});
 
-	// setInterval(function() {
-	// 	azimut += 0.05;
-	// 	zenit += 0.05;
+	function allowSelect() {
+		for (i in dots) {
+			var dot = dots[i];
+			$('.interaction').append('<div class="star" data-name="' + i + '"><img src="/source/img/starCircle.png"></div>');
+			$('.star[data-name="' + i + '"]').css({'margin-left':dot["x"]+width/2-10, 'margin-top':-dot["y"]+height/2-10});
+		}
+	}
+
+	function drag(ev) {
+		var pos = $(this).offset();
+		// $('.x').html(ev.pageX-pos.left-parseInt($('.startx').html()));
+		// $('.y').html(ev.pageY-pos.top-parseInt($('.starty').html()));
+		azimut += (ev.pageX-pos.left-parseInt($('.startx').html()))/500;
+		zenit += (ev.pageY-pos.top-parseInt($('.starty').html()))/500;
 		draw();
-	// }, 100);
+		$('.startx').html(ev.pageX-pos.left);
+		$('.starty').html(ev.pageY-pos.top);
+	}
 
 	function calc() {
 		for (i in dots) {
@@ -112,7 +126,7 @@ $(document).ready(function() {
 			// console.log(i,dot,newx,newy);
 			cxt.fillRect(newx+width/2, -newy+height/2, 4, 4);
 			cxt.fillText(i,newx+width/2, -newy+height/2-1);
-
+			dots[i] = {"x":newx,"y":newy};
 			// cxt.beginPath();
 			// cxt.moveTo(0+width/2+2, 0+height/2+2);
 			// cxt.lineTo(newx+width/2+2, -newy+height/2+2);

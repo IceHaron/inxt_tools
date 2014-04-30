@@ -135,7 +135,7 @@ class root {
 					echo file_get_contents('error/404.php');
 					die;
 				}
-			}
+			} else root::$_ALL['folder'] = '';
 				
 			// fb($path, 'PATH');
 			root::$_ALL['isfile'] = FALSE;																						// Ставим триггер в положение FALSE чтобы позже определить, пытаемся мы обратиться к файлу напрямую или ввели нормальный путь
