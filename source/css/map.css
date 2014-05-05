@@ -24,5 +24,10 @@
 .star:hover {
 	opacity: 1;
 }
+.starName {
+	color: red;
+	background-color: black;
+	position: absolute;
+}
 .startx {display:none;}
 .starty {display:none;}

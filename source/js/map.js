@@ -30,19 +30,27 @@ $(document).ready(function() {
 		// , 'height':{'x':0,'y':200,'z':0}
 		// , 'length':{'x':0,'y':0,'z':200}
 	};
+	var visibleDots = {};
+	var currentRegion = $('#mapRegion option:selected').val() != 0 ? $('#mapRegion option:selected').html() : '';
 	for (i in dots) {
 		var dot = dots[i];
 		coords[dot.name] = {};
-		if (parseFloat(dot.pos_x) < minx) minx = parseFloat(dot.pos_x);
-		if (parseFloat(dot.pos_x) > maxx) maxx = parseFloat(dot.pos_x);
-		if (parseFloat(dot.pos_y) < miny) miny = parseFloat(dot.pos_y);
-		if (parseFloat(dot.pos_y) > maxy) maxy = parseFloat(dot.pos_y);
-		if (parseFloat(dot.pos_z) < minz) minz = parseFloat(dot.pos_z);
-		if (parseFloat(dot.pos_z) > maxz) maxz = parseFloat(dot.pos_z);
+		visibleDots[dot.name] = {};
+		if (dot.regName == currentRegion || currentRegion == '') {
+			if (parseFloat(dot.pos_x) < minx) minx = parseFloat(dot.pos_x);
+			if (parseFloat(dot.pos_x) > maxx) maxx = parseFloat(dot.pos_x);
+			if (parseFloat(dot.pos_y) < miny) miny = parseFloat(dot.pos_y);
+			if (parseFloat(dot.pos_y) > maxy) maxy = parseFloat(dot.pos_y);
+			if (parseFloat(dot.pos_z) < minz) minz = parseFloat(dot.pos_z);
+			if (parseFloat(dot.pos_z) > maxz) maxz = parseFloat(dot.pos_z);
+		}
 	}
-	var scaleX = (width-padding*2) / (maxx - minx);
-	var scaleY = (height-padding*2) / (maxy - miny);
-	var scaleZ = (depth-padding*2) / (maxz - minz);
+	var divx = maxx - minx;
+	var divy = maxy - miny;
+	var divz = maxz - minz;
+	var scaleX = (width-padding*2) / divx;
+	var scaleY = (height-padding*2) / divy;
+	var scaleZ = (depth-padding*2) / divz;
 	calc();
 	draw();
 	allowSelect();
@@ -63,13 +71,15 @@ $(document).ready(function() {
 		allowSelect();
 	});
 	$(document).on('click', '.star', function() {
-		var newLoc = window.location.pathname + '?reg=' + escape($(this).attr('data-name'));
-		window.location = newLoc;
+		if (window.location.search == '') {
+			var newLoc = window.location.pathname + '?reg=' + escape($(this).attr('data-name'));
+			window.location = newLoc;
+		}
 	});
 
 	function allowSelect() {
-		for (i in dots) {
-			var dot = dots[i];
+		for (i in visibleDots) {
+			var dot = visibleDots[i];
 			$('.interaction').append('<div class="star" data-name="' + i + '"><img src="/source/img/starCircle.png"></div>');
 			$('.star[data-name="' + i + '"]').css({'margin-left':dot["x"]+width/2-10, 'margin-top':-dot["y"]+height/2-10});
 		}
@@ -89,11 +99,13 @@ $(document).ready(function() {
 	function calc() {
 		for (i in dots) {
 			var dot = dots[i];
-			var x = (parseFloat(dot.pos_x) + Math.abs(minx)) * scaleX + padding - width/2;
-			var y = (parseFloat(dot.pos_y) + Math.abs(miny)) * scaleY + padding - height/2;
-			var z = (parseFloat(dot.pos_z) + Math.abs(minz)) * scaleZ + padding - depth/2;
+			var x = (parseFloat(dot.pos_x) - minx - divx / 2) * scaleX;
+			var y = (parseFloat(dot.pos_y) - miny - divy / 2) * scaleY;
+			var z = (parseFloat(dot.pos_z) - minz - divz / 2) * scaleZ;
 			coords[dot.name]["x"] = x;
+			visibleDots[dot.name]["x"] = x;
 			coords[dot.name]["y"] = y;
+			visibleDots[dot.name]["y"] = y;
 			coords[dot.name]["z"] = z;
 		}
 	}
@@ -126,7 +138,8 @@ $(document).ready(function() {
 			// console.log(i,dot,newx,newy);
 			cxt.fillRect(newx+width/2, -newy+height/2, 4, 4);
 			cxt.fillText(i,newx+width/2, -newy+height/2-1);
-			dots[i] = {"x":newx,"y":newy};
+			visibleDots[i]["x"] = newx;
+			visibleDots[i]["y"] = newy;
 			// cxt.beginPath();
 			// cxt.moveTo(0+width/2+2, 0+height/2+2);
 			// cxt.lineTo(newx+width/2+2, -newy+height/2+2);
@@ -134,5 +147,17 @@ $(document).ready(function() {
 			// cxt.stroke();
 		}
 	}
+
+	$('#drawMap').click(function() {
+		window.location = window.location.pathname + "?reg=" + escape($('#mapRegion option:selected').html());
+	});
+
+	$(document).on('mouseenter', '.star', function() {
+		var starName = $(this).attr('data-name');
+		$(this).append('<span class="starName">' + starName + '</span>');
+	});
+	$(document).on('mouseleave', '.star', function() {
+		$(this).children('.starName').remove();
+	});
 
 });

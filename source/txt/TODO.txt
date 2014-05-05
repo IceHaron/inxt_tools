@@ -1,4 +1,4 @@
-TODO -- Организовать класс universe -- UNDONE
+TODO -- Организовать класс universe -- DONE
 TODO -- EVE Smart Star Filters -- UNDONE
 QUEST -- EVE Smart Star Filters -- UNDONE
 QUEST -- Недельные графики -- UNDONE
@@ -8,7 +8,6 @@ TODO -- Реализовать очищение таблицы activity_hourly -
 TODO -- Реорганизовать базу данных -- DONE
 TODO -- Сделать выбор систем через модальное окно -- DONE
 TODO -- Добавить генерацию ссылки на график и возможность передавать параметры GET`ом -- DONE
-TODO -- Разбить записывающий write.php так, чтобы точно не словить недостаток памяти -- UNDONE
 TODO -- Сделать поиск внутри фильтров -- DONE
 TODO -- Сделать пресеты выборок -- DONE
 TODO -- Сделать создание пользователями собственных пресетов -- DONE
