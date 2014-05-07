@@ -1,3 +1,6 @@
+TODO -- Flash Map -- UNDONE
+TODO -- Перспектива -- DONE
+TODO -- Пути по Дейкстре -- UNDONE
 TODO -- Организовать класс universe -- DONE
 TODO -- EVE Smart Star Filters -- UNDONE
 QUEST -- EVE Smart Star Filters -- UNDONE

@@ -1,10 +1,9 @@
 <?
 
 /**
-*	
-*	Тестовый класс, воротим здесь что захотим и всякие штуки тестируем именно тут.
-*	Заодно это шаблон для создания других классов.
-*	
+* 
+* Карта вселенной
+* 
 **/
 
 class map_index {
@@ -17,13 +16,16 @@ class map_index {
 
 		// self::getRoute('Amarr','Jita');
 		if (!isset($_GET['reg'])) {
-			$jumps = db::query("SELECT DISTINCT `rfrom`.`name` as `fromName`, `rto`.`name` as `toName` FROM `gates` as `g`
-				JOIN `systems` as `from` ON (`g`.`from` = `from`.`id`)
-				JOIN `systems` as `to` ON (`g`.`to` = `to`.`id`)
-				JOIN `regions` as `rfrom` ON (`rfrom`.`id` = `from`.`regionID`)
-				JOIN `regions` as `rto` ON (`rto`.`id` = `to`.`regionID`)
-				WHERE `rfrom`.`name` != `rto`.`name`;");
-			$dots = db::query("SELECT `id`, `name`, `pos_x`, `pos_y`, `pos_z` FROM `regions` WHERE `id` < 11000000");
+			$jumps = db::query("SELECT DISTINCT `rfrom`.`name` as `fromName`, `rto`.`name` as `toName`
+														FROM `gates` as `g`
+															JOIN `systems` as `from` ON (`g`.`from` = `from`.`id`)
+															JOIN `systems` as `to` ON (`g`.`to` = `to`.`id`)
+															JOIN `regions` as `rfrom` ON (`rfrom`.`id` = `from`.`regionID`)
+															JOIN `regions` as `rto` ON (`rto`.`id` = `to`.`regionID`)
+														WHERE `rfrom`.`name` != `rto`.`name`
+															AND `rfrom`.`id` NOT IN (10000004, 10000017, 10000019)
+															AND `rto`.`id` NOT IN (10000004, 10000017, 10000019);");
+			$dots = db::query("SELECT `id`, `name`, `pos_x`, `pos_y`, `pos_z` FROM `regions` WHERE `id` < 11000000 AND `id` NOT IN (10000004, 10000017, 10000019);");
 		} else {
 			$jumps = db::query("SELECT DISTINCT `from`.`name` as `fromName`, `to`.`name` as `toName`, `rto`.`name` as `toReg` FROM `gates` as `g`
 				JOIN `systems` as `from` ON (`g`.`from` = `from`.`id`)
@@ -37,7 +39,10 @@ class map_index {
 			}
 			$dots = db::query("SELECT `s`.`id`, `s`.`name`, `s`.`pos_x`, `s`.`pos_y`, `s`.`pos_z`, `r`.`name` as `regName` FROM `systems` as `s` JOIN `regions` as `r` ON (`s`.`regionID` = `r`.`id`) WHERE `r`.`name` = '{$_GET['reg']}' OR `s`.`name` IN (" . substr($foreign, 2) . ")");
 		}
-/*		for ($i = 0; $i < count($jumps); $i++) {
+		foreach ($jumps as $jump) {
+			$routeDots[ $jump['fromName'] ][ $jump['toName'] ] = 1;
+		}
+/*    for ($i = 0; $i < count($jumps); $i++) {
 			if (isset($jumps[$i])) {
 				$jump = $jumps[$i];
 				for ($j = 0; $j < count($jumps); $j++) {
@@ -48,7 +53,7 @@ class map_index {
 				}
 			}
 		}*/
-		$map = array('dots' => $dots, 'jumps' => $jumps);
+		$map = array('dots' => $dots, 'jumps' => $jumps, 'routeDots' => $routeDots);
 		$regionList = db::query("SELECT `id`, `name` FROM `regions` WHERE `id` < 11000000 ORDER BY `name`;");
 		$regstr = '<select name="region" id="mapRegion"><option value="0">&mdash;&mdash;&mdash;Выберите регион&mdash;&mdash;&mdash;</option>';
 		foreach ($regionList as $region) {

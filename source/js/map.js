@@ -30,7 +30,20 @@ $(document).ready(function() {
 		// , 'height':{'x':0,'y':200,'z':0}
 		// , 'length':{'x':0,'y':0,'z':200}
 	};
-	var visibleDots = {};
+	var visibleDots = {
+		//   'a':{'x':-100,'y':100,'z':100}
+		// , 'b':{'x':100,'y':100,'z':100}
+		// , 'c':{'x':100,'y':-100,'z':100}
+		// , 'd':{'x':-100,'y':-100,'z':100}
+		// , 'e':{'x':-100,'y':100,'z':-100}
+		// , 'f':{'x':100,'y':100,'z':-100}
+		// , 'g':{'x':100,'y':-100,'z':-100}
+		// , 'h':{'x':-100,'y':-100,'z':-100}
+		// , 'z':{'x':0,'y':0,'z':0}
+		// , 'width':{'x':200,'y':0,'z':0}
+		// , 'height':{'x':0,'y':200,'z':0}
+		// , 'length':{'x':0,'y':0,'z':200}
+	};
 	var currentRegion = $('#mapRegion option:selected').val() != 0 ? $('#mapRegion option:selected').html() : '';
 	for (i in dots) {
 		var dot = dots[i];
@@ -54,6 +67,7 @@ $(document).ready(function() {
 	calc();
 	draw();
 	allowSelect();
+	route();
 
 	$(canvas).mousedown(function(e) {
 		$('.star').remove();
@@ -121,25 +135,28 @@ $(document).ready(function() {
 			var jump = jumps[i];
 			var newfromx = coords[jump.fromName]["x"]*Math.cos(azimut) - coords[jump.fromName]["y"]*Math.sin(azimut);
 			var newfromy = coords[jump.fromName]["x"]*Math.cos(zenit)*Math.sin(azimut) + coords[jump.fromName]["y"]*Math.cos(zenit)*Math.cos(azimut) - coords[jump.fromName]["z"]*Math.sin(zenit);
+			var newfromz = coords[jump.fromName]["x"]*Math.sin(zenit)*Math.sin(azimut) + coords[jump.fromName]["y"]*Math.sin(zenit)*Math.cos(azimut) + coords[jump.fromName]["z"]*Math.cos(zenit);
+			var fromPerspective = (newfromz + divz * scaleZ) / divz / scaleZ / 10 + 0.9;
 			var newtox = coords[jump.toName]["x"]*Math.cos(azimut) - coords[jump.toName]["y"]*Math.sin(azimut);
 			var newtoy = coords[jump.toName]["x"]*Math.cos(zenit)*Math.sin(azimut) + coords[jump.toName]["y"]*Math.cos(zenit)*Math.cos(azimut) - coords[jump.toName]["z"]*Math.sin(zenit);
+			var newtoz = coords[jump.toName]["x"]*Math.sin(zenit)*Math.sin(azimut) + coords[jump.toName]["y"]*Math.sin(zenit)*Math.cos(azimut) + coords[jump.toName]["z"]*Math.cos(zenit);
+			var toPerspective = (newtoz + divz * scaleZ) / divz / scaleZ / 10 + 0.9;
 			cxt.beginPath();
-			cxt.moveTo(newfromx+width/2+2, -newfromy+height/2+2);
-			cxt.lineTo(newtox+width/2+2, -newtoy+height/2+2);
+			cxt.moveTo(newfromx*fromPerspective+width/2+2, -newfromy*fromPerspective+height/2+2);
+			cxt.lineTo(newtox*toPerspective+width/2+2, -newtoy*toPerspective+height/2+2);
 			cxt.closePath();
 			cxt.stroke();
 		}
 		for (i in coords) {
 			var dot = coords[i];
-			var multiplier = dot["z"] > 0 ? 1.1 : 0.9;
 			var newx = dot["x"]*Math.cos(azimut) - dot["y"]*Math.sin(azimut);
 			var newy = dot["x"]*Math.cos(zenit)*Math.sin(azimut) + dot["y"]*Math.cos(zenit)*Math.cos(azimut) - dot["z"]*Math.sin(zenit);
-			// var newz = dot["x"]*Math.sin(zenit)*Math.sin(azimut) + dot["y"]*Math.sin(zenit)*Math.cos(azimut) + dot["z"]*Math.cos(zenit);
-			// console.log(i,dot,newx,newy);
-			cxt.fillRect(newx+width/2, -newy+height/2, 4, 4);
-			cxt.fillText(i,newx+width/2, -newy+height/2-1);
-			visibleDots[i]["x"] = newx;
-			visibleDots[i]["y"] = newy;
+			var newz = dot["x"]*Math.sin(zenit)*Math.sin(azimut) + dot["y"]*Math.sin(zenit)*Math.cos(azimut) + dot["z"]*Math.cos(zenit);
+			var perspective = (newz + divz * scaleZ) / divz / scaleZ / 10 + 0.9;
+			cxt.fillRect(newx*perspective+width/2, -newy*perspective+height/2, 3, 3);
+			cxt.fillText(i,newx*perspective+width/2, -newy*perspective+height/2-1);
+			visibleDots[i]["x"] = newx*perspective;
+			visibleDots[i]["y"] = newy*perspective;
 			// cxt.beginPath();
 			// cxt.moveTo(0+width/2+2, 0+height/2+2);
 			// cxt.lineTo(newx+width/2+2, -newy+height/2+2);
@@ -159,5 +176,72 @@ $(document).ready(function() {
 	$(document).on('mouseleave', '.star', function() {
 		$(this).children('.starName').remove();
 	});
+
+	function route(from, to) {
+		from = from ? from : 'Deklein';
+		to = to ? to : 'Domain';
+		var routeDots = map.routeDots;
+		var d = {}; // Длина пути
+		var p = {}; // Кратчайший путь
+		var u = {}; // Посещенные вершины
+		var n = {}; // Вершины для посещения
+		var now = '';
+		var counter = 0;
+		var min = 0;
+		var mindot = '';
+		d[from] = 0;
+		u[from] = d[from];
+		now = from;
+		for (i in dots) {
+			if (dots[i]['name'] != from) {
+				d[dots[i]['name']] = 10000;
+			}
+		}
+
+		while (now != to/* && counter < 100*/) {
+			var trigger = false;
+			// console.log("Entering to " + now, d[now]);
+			delete n[now];
+			u[now] = d[now];
+			for (i in routeDots[now]) {
+				if (d[i] > d[now] + routeDots[now][i] && !u.hasOwnProperty(i)) {
+					d[i] = d[now] + routeDots[now][i];
+				}
+			// console.log("Looking " + i, d[i]);
+				if (!u.hasOwnProperty(i)) {
+					triger = true;
+					n[i] = d[i];
+					min = d[i];
+					mindot = i;
+					// console.log("Setting to minimum: " + i, d[i]);
+				}
+			}
+			for (i in n) {
+				// console.log("Calculating minimum for " + i, d[i], d[i] <= min && !u.hasOwnProperty(i) && trigger == false);
+				if (d[i] <= min && !u.hasOwnProperty(i) && trigger == false) {
+					min = d[i];
+					mindot = i;
+				}
+			}
+			// console.log("Minimum: " + mindot, min);
+			delete n[mindot];
+			u[mindot] = min;
+			now = mindot;
+			counter++;
+		}
+		console.log(now != to, counter < 100);
+		p[ d[now] ] = now;
+		counter = 0;
+		while (now != from/* && counter < 100*/) {
+			for (i in routeDots[now]) {
+				if (d[i] < d[now]) {
+					p[ d[i] ] = i;
+					now = i;
+				}
+			}
+		}
+
+		console.log(d,p,u,n);
+	}
 
 });
