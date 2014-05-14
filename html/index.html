@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-  <title><?=root::$_ALL['maintitle']?> &mdash; INXT Tools</title>
-  <link type="text/css" rel="stylesheet" href="<?=root::$_ALL['source']?>/css/main.css"></link>
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
-  <script src="<?=root::$_ALL['source']?>/js/main.js"></script>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	<title><?=root::$_ALL['maintitle']?> &mdash; INXT Tools</title>
+	<link type="text/css" rel="stylesheet" href="<?=root::$_ALL['source']?>/css/main.css"></link>
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+	<script src="<?=root::$_ALL['source']?>/js/main.js"></script>
 	<!-- Подгрузка стилей и скриптов в зависимости от адреса -->
 	<? if (@root::$_ALL['folder'] !== '') {?>
 		<link type="text/css" rel="stylesheet" href="<?=root::$_ALL['source']?>/css/<?=root::$_ALL['folder']?>.css"></link>
@@ -43,27 +43,27 @@ screen.colorDepth:screen.pixelDepth))+";u"+escape(document.URL)+
 			<div id="righthead">
 				<? if (root::$_ALL['uid'] === 0) { ?>																			<!-- Если мы не авторизованы -->
 <!-- Закомментил на случай если вдруг все перестанет работать
-        <script src="//ulogin.ru/js/ulogin.js"></script>
-        <div id="uLogin" data-ulogin="display=panel;fields=first_name,last_name;providers=steam;hidden=;redirect_uri=http%3A%2F%2Fgaminas.ice"></div>
+				<script src="//ulogin.ru/js/ulogin.js"></script>
+				<div id="uLogin" data-ulogin="display=panel;fields=first_name,last_name;providers=steam;hidden=;redirect_uri=http%3A%2F%2Fgaminas.ice"></div>
 -->
 <!-- Логинизация от uLogin -->
-        <script src="//ulogin.ru/js/ulogin.js"></script>
-        <div id="uLogin" data-ulogin="display=panel;fields=uid;providers=steam;hidden=;redirect_uri=;receiver=http%3A%2F%2Fgaminas.ice%2Fxd_custom.htm;callback=login">
-          <img src="<?=root::$_ALL['source']?>/img/steam.png" data-uloginbutton="steam"/>
-        </div>
-        <? } else { ?>																													<!-- Если мы уже залогинились -->
-        <a target="blank" href="<?=root::$_ALL['profurl']?>">
+				<script src="//ulogin.ru/js/ulogin.js"></script>
+				<div id="uLogin" data-ulogin="display=panel;fields=uid;providers=steam;hidden=;redirect_uri=;receiver=http%3A%2F%2Fgaminas.ice%2Fxd_custom.htm;callback=login">
+					<img src="<?=root::$_ALL['source']?>/img/steam.png" data-uloginbutton="steam"/>
+				</div>
+				<? } else { ?>																													<!-- Если мы уже залогинились -->
+				<a target="blank" href="<?=root::$_ALL['profurl']?>">
 					<div id="loginholder">
 						<div id="login"><?=root::$_ALL['username']?></div>
 						<img id="head_ava" src="<?=root::$_ALL['avatar']?>"/>
 					</div>
 				</a>
-        <button id="logoff">Logoff</button>
-        <? } ?>
-      </div>
+				<button id="logoff">Logoff</button>
+				<? } ?>
+			</div>
 <!-- / Аватарка, логинизация и прочее -->
 
-    </div>
+		</div>
 		
 <!-- / Шапка -->
 		
@@ -72,26 +72,26 @@ screen.colorDepth:screen.pixelDepth))+";u"+escape(document.URL)+
 		
 <!-- ТЕЛО -->
 
-    <div id="body">
+		<div id="body">
 
 <!-- ГЛАВНАЯ МЕНЮШКА -->
 			<div id="topmenu">
-          <a href="/systemstats/show"><div class="topmenunode">Статистика активности систем</div></a>
-          <? if (isset(root::$_ALL['username']) && root::$_ALL['username'] == 'Ice_Haron') { ?>
+					<a href="/systemstats/show"><div class="topmenunode">Статистика активности систем</div></a>
+					<a href="/map"><div class="topmenunode">Карта</div></a>
+					<? if (isset(root::$_ALL['username']) && root::$_ALL['username'] == 'Ice_Haron') { ?>
 						<a href="/ssf"><div class="topmenunode">EVESSF</div></a>
-						<a href="/map"><div class="topmenunode">Карта</div></a>
 						<a href="/wtf/four/level/addr"><div class="topmenunode" style="float:right;">WTF</div></a>
 					<? } ?>
 					<div class="clear"></div>
-      </div>
+			</div>
 <!-- / Главная менюшка -->
 
 <!-- ОСНОВНОЙ БЛОК -->
 <?=$page?>
 <!-- / Основной блок -->
 			
-      <div class="clear"></div>
-    </div>
+			<div class="clear"></div>
+		</div>
 		
 <!-- / Тело -->
 
@@ -103,9 +103,9 @@ screen.colorDepth:screen.pixelDepth))+";u"+escape(document.URL)+
 				<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
 				<!-- Реклама над бэктрейсом -->
 				<ins class="adsbygoogle"
-				     style="display:inline-block;width:728px;height:90px;"
-				     data-ad-client="ca-pub-3229615097509542"
-				     data-ad-slot="6161465918"></ins>
+						 style="display:inline-block;width:728px;height:90px;"
+						 data-ad-client="ca-pub-3229615097509542"
+						 data-ad-slot="6161465918"></ins>
 				<script>
 					(adsbygoogle = window.adsbygoogle || []).push({});
 				</script>
@@ -116,13 +116,13 @@ screen.colorDepth:screen.pixelDepth))+";u"+escape(document.URL)+
 					alt="" border="0" width="88" height="120"/></a><!--/LiveInternet-->
 				<? } ?>
 				<script>
-				  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-				  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-				  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-				  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+					(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+					(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+					m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+					})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-				  ga('create', 'UA-49939731-1', 'inextinctae.ru');
-				  ga('send', 'pageview');
+					ga('create', 'UA-49939731-1', 'inextinctae.ru');
+					ga('send', 'pageview');
 
 				</script>
 			</div>
@@ -163,13 +163,13 @@ screen.colorDepth:screen.pixelDepth))+";u"+escape(document.URL)+
 					} ?>
 				</tbody>
 			</table>
-			Stats v.0.4.17.50, Map v.0.3.0.7, Core v.0.4.2.13&nbsp;&nbsp;&nbsp;&copy;CCP hf. All rights reserved. Used with permission.
+			Stats v.0.4.17.50, Map v.0.3.0.7, Core v.0.4.3.14&nbsp;&nbsp;&nbsp;&copy;CCP hf. All rights reserved. Used with permission.
 		</div>
 		
 <!-- / Пол -->
 		
-    <div class="clear"></div>
-  </div>
+		<div class="clear"></div>
+	</div>
 </body>
 
 <!--
@@ -178,31 +178,31 @@ Steam API key for gaminas.ru: 0BE85074D210A01F70B48205C44D1D56
 Остановился на чтении вот этой странички про .htaccess: http://www.htaccess.net.ru/doc/Redirect/Redirect.php
 
 Моя учетка в XML-формате: http://steamcommunity.com/id/ice_haron/?xml=1 или http://steamcommunity.com/profiles/76561197991665605/?xml=1
-  После любой почти ссылки на стиме добавляем ?xml=1 и получаем эту страницу в формате XML
-  
+	После любой почти ссылки на стиме добавляем ?xml=1 и получаем эту страницу в формате XML
+	
 Моя учетка в JSON-формате: http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=0BE85074D210A01F70B48205C44D1D56&steamids=76561197991665605
-  С JSON все немного сложнее, но тоже не суперхардкор. key - это мой API-key, а steamids - мой айдишник
-  
+	С JSON все немного сложнее, но тоже не суперхардкор. key - это мой API-key, а steamids - мой айдишник
+	
 Мой каталог игрушек в XML-формате: http://steamcommunity.com/id/Ice_Haron/games/?tab=all&l=russian&xml=1
-  Тут все понятно
-  
+	Тут все понятно
+	
 Мой каталог игрушек в JSON-формате: http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=0BE85074D210A01F70B48205C44D1D56&steamid=76561197991665605&format=json&include_appinfo=1
-  Тут веселее: если не написать include_appinfo=1, то в ответе будет только айдишник игрушки и сколько часов сыграно
-  
+	Тут веселее: если не написать include_appinfo=1, то в ответе будет только айдишник игрушки и сколько часов сыграно
+	
 Пример юзания img_icon_url: http://media.steampowered.com/steamcommunity/public/images/apps/210770/4cdfa1d19be460374a111b718ce3a204f21ea1dc.jpg
-  После apps идет айдишник игрули, а потом идет имя файла, которое прилетает в ответе
-  
+	После apps идет айдишник игрули, а потом идет имя файла, которое прилетает в ответе
+	
 Пример юзания img_logo_url: http://media.steampowered.com/steamcommunity/public/images/apps/210770/333a8c65480bb85148bb3a185843a8520ae5d90f.jpg
-  Та же петрушка
-  
+	Та же петрушка
+	
 Пример юзания картинки из инвентаря: http://cdn.steamcommunity.com/economy/image/dDtWCk0tb3zFHlGsyQM9Nsx3nLsJXWEyENrY-XDiZJWxLX7pBiY-by-KQVCtOi-vwnvHqkMCPX5GhN3jN6YunLk8dfsRejF7ZtZaALN_NfmSN9j_AkI=/330x192
-  Тут все хитрее: видать парсер разбивает эту ссылень и у себя там как-то что-то делает, ибо у картинки нет разрешения, а после последнего слеша можно указать разрешение картинки и он отдает ее в этом разрешении.
-  Там есть какие-то пределы, типа он не может отдать картинку в большем разрешении, чем она у них лежит, но в общем, все работает на ура, возможно, это можно юзать.
-  
+	Тут все хитрее: видать парсер разбивает эту ссылень и у себя там как-то что-то делает, ибо у картинки нет разрешения, а после последнего слеша можно указать разрешение картинки и он отдает ее в этом разрешении.
+	Там есть какие-то пределы, типа он не может отдать картинку в большем разрешении, чем она у них лежит, но в общем, все работает на ура, возможно, это можно юзать.
+	
 Интересный сайтец, вводим юзернейм или айдишник и получаем дохера инфы: http://heavenanvil.ru/
-  Достаточно неплохая инфа, для разгона и вспоминания забытого пойдет.
-  
+	Достаточно неплохая инфа, для разгона и вспоминания забытого пойдет.
+	
 Ну и статейка на хабрахабре про Steam API: http://habrahabr.ru/post/172223/
-  Коротенькая оказалась, уже прочитал, однако полезная.
+	Коротенькая оказалась, уже прочитал, однако полезная.
 
 -->

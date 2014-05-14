@@ -90,7 +90,7 @@ class auth {
 		unset ($_SESSION['uid']);
 		setcookie('uid', '', time(), '/');																			// Пример удаления печенки: имя, пустое значение, нынешний таймстамп и обязательно совпадающий с существующей кукой путь
 		unset ($_COOKIE['uid']);
-		echo '<meta http-equiv="refresh" content="0;URL=http://gaminas.ice" />';
+		echo '<meta http-equiv="refresh" content="0;URL=/" />';
 	}
 }
 
