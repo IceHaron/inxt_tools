@@ -8,6 +8,7 @@ $(document).ready(function() {
 	var map = JSON.parse($('#strForMap').text());
 	var dots = map.dots;
 	var jumps = map.jumps;
+	var path = {};
 	// var dots = {};
 	// var jumps = {};
 	var pi = Math.PI;
@@ -65,9 +66,11 @@ $(document).ready(function() {
 	var scaleY = (height-padding*2) / divy;
 	var scaleZ = (depth-padding*2) / divz;
 	calc();
-	draw();
-	allowSelect();
-	route();
+	if (get.hasOwnProperty('from') && get.hasOwnProperty('to')) route(get.from, get.to);
+	else {
+		draw();
+		allowSelect();
+	}
 
 	$(canvas).mousedown(function(e) {
 		$('.star').remove();
@@ -85,8 +88,10 @@ $(document).ready(function() {
 		allowSelect();
 	});
 	$(document).on('click', '.star', function() {
-		if (window.location.search == '') {
-			var newLoc = window.location.pathname + '?reg=' + escape($(this).attr('data-name'));
+		if (!get.hasOwnProperty('reg')) {
+			var search = '';
+			for (i in get) search += '&'+i+'='+get[i];
+			var newLoc = window.location.pathname + '?reg=' + escape($(this).attr('data-name')) + search;
 			window.location = newLoc;
 		}
 	});
@@ -94,8 +99,12 @@ $(document).ready(function() {
 	function allowSelect() {
 		for (i in visibleDots) {
 			var dot = visibleDots[i];
-			$('.interaction').append('<div class="star" data-name="' + i + '"><img src="/source/img/starCircle.png"></div>');
-			$('.star[data-name="' + i + '"]').css({'margin-left':dot["x"]+width/2-10, 'margin-top':-dot["y"]+height/2-10});
+			var posleft = dot["x"]+width/2-10;
+			var postop = -dot["y"]+height/2-10;
+			if (postop > -10 && posleft > -10 && postop < height-15 && posleft < width-15) {
+				$('.interaction').append('<div class="star" data-name="' + i + '"><img src="/source/img/starCircle.png"></div>');
+				$('.star[data-name="' + i + '"]').css({'margin-left':posleft, 'margin-top':postop});
+			}
 		}
 	}
 
@@ -129,7 +138,7 @@ $(document).ready(function() {
 		cxt.fillStyle = "black";
 		cxt.fillRect(0, 0, width, height);
 		cxt.fillStyle = 'white';
-		cxt.strokeStyle = 'grey';
+		cxt.strokeStyle = '#505050';
 		cxt.font = "normal 8pt Sans-Serif";
 		for (i in jumps) {
 			var jump = jumps[i];
@@ -141,11 +150,14 @@ $(document).ready(function() {
 			var newtoy = coords[jump.toName]["x"]*Math.cos(zenit)*Math.sin(azimut) + coords[jump.toName]["y"]*Math.cos(zenit)*Math.cos(azimut) - coords[jump.toName]["z"]*Math.sin(zenit);
 			var newtoz = coords[jump.toName]["x"]*Math.sin(zenit)*Math.sin(azimut) + coords[jump.toName]["y"]*Math.sin(zenit)*Math.cos(azimut) + coords[jump.toName]["z"]*Math.cos(zenit);
 			var toPerspective = (newtoz + divz * scaleZ) / divz / scaleZ / 10 + 0.9;
+			// console.log(get, jump.fromName, jump.toName, path);
+			if (path.hasOwnProperty(jump.fromName) && path.hasOwnProperty(jump.toName)) cxt.strokeStyle = 'white';
 			cxt.beginPath();
 			cxt.moveTo(newfromx*fromPerspective+width/2+2, -newfromy*fromPerspective+height/2+2);
 			cxt.lineTo(newtox*toPerspective+width/2+2, -newtoy*toPerspective+height/2+2);
 			cxt.closePath();
 			cxt.stroke();
+			cxt.strokeStyle = '#505050';
 		}
 		for (i in coords) {
 			var dot = coords[i];
@@ -153,8 +165,10 @@ $(document).ready(function() {
 			var newy = dot["x"]*Math.cos(zenit)*Math.sin(azimut) + dot["y"]*Math.cos(zenit)*Math.cos(azimut) - dot["z"]*Math.sin(zenit);
 			var newz = dot["x"]*Math.sin(zenit)*Math.sin(azimut) + dot["y"]*Math.sin(zenit)*Math.cos(azimut) + dot["z"]*Math.cos(zenit);
 			var perspective = (newz + divz * scaleZ) / divz / scaleZ / 10 + 0.9;
+			if (path.hasOwnProperty(i)) cxt.fillStyle = 'yellow';
 			cxt.fillRect(newx*perspective+width/2, -newy*perspective+height/2, 3, 3);
 			cxt.fillText(i,newx*perspective+width/2, -newy*perspective+height/2-1);
+			cxt.fillStyle = 'white';
 			visibleDots[i]["x"] = newx*perspective;
 			visibleDots[i]["y"] = newy*perspective;
 			// cxt.beginPath();
@@ -178,70 +192,109 @@ $(document).ready(function() {
 	});
 
 	function route(from, to) {
-		from = from ? from : 'Deklein';
-		to = to ? to : 'Domain';
-		var routeDots = map.routeDots;
-		var d = {}; // Длина пути
-		var p = {}; // Кратчайший путь
-		var u = {}; // Посещенные вершины
-		var n = {}; // Вершины для посещения
-		var now = '';
-		var counter = 0;
-		var min = 0;
-		var mindot = '';
-		d[from] = 0;
-		u[from] = d[from];
-		now = from;
-		for (i in dots) {
-			if (dots[i]['name'] != from) {
-				d[dots[i]['name']] = 10000;
+		from = from ? from : 'Amarr';
+		to = to ? to : 'Jita';
+		var fromTrigger = false;
+		var toTrigger = false;
+		$.ajax({
+		  type: 'GET'
+		, url: 'map/getsystemsforrouter'
+		, data: {'from': from, 'to': to}
+		, dataType: 'json'
+		, success: function(data) {
+				// console.log(data);
+				console.timeStamp('Start');
+				var dots = data.dots;
+				var jumps = data.jumps;
+				var routeDots = data.routeDots;
+				var skeleton = {};
+				for (i in dots) {
+					var dot = dots[i];
+					if (dot.name == from) {
+						fromTrigger = true;
+					}
+					if (dot.name == to) {
+						toTrigger = true;
+					}
+					skeleton[dot.name] = dot.regName;
+				}
+				if (fromTrigger === true && toTrigger === true) {
+						var d = {}; // Длина пути
+						var p = {}; // Кратчайший путь
+						var r = {}; // Кратчайший путь по регионам
+						var u = {}; // Посещенные вершины
+						var n = {}; // Вершины для посещения
+						var now = '';
+						var counter = 0;
+						var min = 0;
+						var mindot = '';
+						d[from] = 0;
+						u[from] = d[from];
+						now = from;
+						for (i in dots) {
+							if (dots[i]['name'] != from) {
+								d[dots[i]['name']] = 10000;
+							}
+						}
+						while (now != to && counter < 10000) {
+							var trigger = false;
+							// console.log("Entering to " + now, d[now]);
+							delete n[now];
+							u[now] = d[now];
+							for (i in routeDots[now]) {
+								if (d[i] > d[now] + routeDots[now][i] && !u.hasOwnProperty(i)) {
+									d[i] = d[now] + routeDots[now][i];
+								}
+							// console.log("Looking " + i, d[i]);
+								if (!u.hasOwnProperty(i)) {
+									trigger = true;
+									n[i] = d[i];
+									min = d[i];
+									mindot = i;
+									// console.log("Setting to minimum: " + i, d[i]);
+								}
+							}
+							for (i in n) {
+								// console.log("Calculating minimum for " + i, d[i], (d[i] <= min && !u.hasOwnProperty(i)) || trigger == false);
+								if ((d[i] <= min && !u.hasOwnProperty(i)) || trigger == false) {
+									min = d[i];
+									mindot = i;
+								}
+							}
+							// console.log("Minimum: " + mindot, min);
+							delete n[mindot];
+							u[mindot] = min;
+							now = mindot;
+							counter++;
+						}
+						console.log(now == to ? 'Found path to destination in ' + counter + ' steps' : counter + ' steps was not enough to find the path');
+						now = to;
+						p[ now ] = d[now];
+						counter = 0;
+						while (now != from && counter < 10000) {
+							for (i in routeDots[now]) {
+								if (d[i] < d[now]) {
+									p[ i ] = d[i];
+									r[skeleton[i]] = d[i];
+									now = i;
+								}
+							}
+							counter++;
+						}
+						console.log('Path is ' + counter + ' jumps long');
+						console.timeStamp('Finish');
+						// console.log(d,p,u,n,r);
+						if (window.location.search.search('reg') == -1) savePath(r)
+						else savePath(p);
+				} else return false;
 			}
-		}
+		});
+	}
 
-		while (now != to/* && counter < 100*/) {
-			var trigger = false;
-			// console.log("Entering to " + now, d[now]);
-			delete n[now];
-			u[now] = d[now];
-			for (i in routeDots[now]) {
-				if (d[i] > d[now] + routeDots[now][i] && !u.hasOwnProperty(i)) {
-					d[i] = d[now] + routeDots[now][i];
-				}
-			// console.log("Looking " + i, d[i]);
-				if (!u.hasOwnProperty(i)) {
-					triger = true;
-					n[i] = d[i];
-					min = d[i];
-					mindot = i;
-					// console.log("Setting to minimum: " + i, d[i]);
-				}
-			}
-			for (i in n) {
-				// console.log("Calculating minimum for " + i, d[i], d[i] <= min && !u.hasOwnProperty(i) && trigger == false);
-				if (d[i] <= min && !u.hasOwnProperty(i) && trigger == false) {
-					min = d[i];
-					mindot = i;
-				}
-			}
-			// console.log("Minimum: " + mindot, min);
-			delete n[mindot];
-			u[mindot] = min;
-			now = mindot;
-			counter++;
-		}
-		console.log(now != to, counter < 100);
-		p[ d[now] ] = now;
-		counter = 0;
-		while (now != from/* && counter < 100*/) {
-			for (i in routeDots[now]) {
-				if (d[i] < d[now]) {
-					p[ d[i] ] = i;
-					now = i;
-				}
-			}
-		}
-
-		console.log(d,p,u,n);
+	function savePath(p) {
+		console.log(path = p);
+		draw();
+		allowSelect();
 	}
 
 });

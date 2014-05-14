@@ -75,7 +75,7 @@ class systemstats_index {
 			$selectedStars = '';
 			foreach ($subject['names'] as $i => $unit) {
 				$escapedUnit = db::escape($unit);
-				$q = "SELECT `id`, `regionID` FROM `systems` WHERE `name`='$escapedUnit';";
+				$q = "SELECT `s`.`id`, `s`.`regionID`, `r`.`name` AS `regionName` FROM `systems` AS `s` JOIN `regions` AS `r` ON (`r`.`id` = `s`.`regionID`) WHERE `s`.`name`='$escapedUnit';";
 				$r = db::query($q);
 				$ss = (float)$subject['secures'][$i];
 				
@@ -86,10 +86,10 @@ class systemstats_index {
 				if ($ss <= 0.4 && $ss > 0.0) $color = 'orange';
 				if ($ss <= 0.0) $color = 'red';
 				
-				$selectedStars .= '<div data-name="' . $unit . '" data-id="' . $r[0]['id'] . '" data-regid="' . $r[0]['regionID'] . '" class="selectedStar"><div style="color:' . $color . '" class="ss">' . $subject['secures'][$i] . '</div>' . $unit . '<img src="/source/img/delete.png" class="deselectStar"></div>';
+				$selectedStars .= '<div data-name="' . $unit . '" data-id="' . $r[0]['id'] . '" data-regid="' . $r[0]['regionID'] . '" class="selectedStar"><div style="color:' . $color . '" class="ss">' . $subject['secures'][$i] . '</div>' . $unit . '<img src="/source/img/delete.png" class="deselectStar"><div class="sysRegion">' . $r[0]['regionName'] . '</div></div>';
 			}
 		} else {
-			$selectedStars = '<div data-name="Amarr" data-id="30002187" data-regid="10000043" class="selectedStar"><div style="color:skyblue" class="ss">1.0</div>Amarr<img src="/source/img/delete.png" class="deselectStar"></div><div data-name="Jita" data-id="30000142" data-regid="10000002" class="selectedStar"><div style="color:green" class="ss">0.9</div>Jita<img src="/source/img/delete.png" class="deselectStar"></div><div data-name="Dodixie" data-id="30002659" data-regid="10000032" class="selectedStar"><div style="color:green" class="ss">0.9</div>Dodixie<img src="/source/img/delete.png" class="deselectStar"></div><div data-name="Rens" data-id="30002510" data-regid="10000030" class="selectedStar"><div style="color:green" class="ss">0.9</div>Rens<img src="/source/img/delete.png" class="deselectStar"></div>';
+			$selectedStars = '<div class="selectedStar" data-regid="10000043" data-id="30002187" data-name="Amarr"><div class="ss" style="color:skyblue">1.0</div>Amarr<img class="deselectStar" src="/source/img/delete.png"><div class="sysRegion">Domain</div></div><div class="selectedStar" data-regid="10000030" data-id="30002510" data-name="Rens"><div class="ss" style="color:green">0.9</div>Rens<img class="deselectStar" src="/source/img/delete.png"><div class="sysRegion">Heimatar</div></div><div class="selectedStar" data-regid="10000002" data-id="30000142" data-name="Jita"><div class="ss" style="color:green">0.9</div>Jita<img class="deselectStar" src="/source/img/delete.png"><div class="sysRegion">The Forge</div></div><div class="selectedStar" data-regid="10000032" data-id="30002659" data-name="Dodixie"><div class="ss" style="color:green">0.9</div>Dodixie<img class="deselectStar" src="/source/img/delete.png"><div class="sysRegion">Sinq Laison</div></div>';
 		}
 		
 		

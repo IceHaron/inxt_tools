@@ -1,3 +1,4 @@
+get = getGet();
 
 /**
 *	
@@ -37,7 +38,6 @@ $(document).ready(function() {
 /* End of READY() */
 });
 
-
 /**
 *	
 *	Функция логина от uLogin
@@ -53,6 +53,23 @@ function login(token){
 			window.location.reload(); 																								// Костыль
 		}
 	});
+}
+
+/**
+*	
+*	Функция получения GET-запроса
+*	
+**/
+function getGet() {
+	if (window.location.search != '') {
+		var path = window.location.search.replace(/\?/, '').split('&');
+		var result = {};
+		for (i in path) {
+			var a = path[i].split('=');
+			result[ a[0] ] = a[1];
+		}
+		return result;
+	} else return {};
 }
 
 /**

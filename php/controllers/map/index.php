@@ -26,21 +26,12 @@ class map_index {
 															AND `rfrom`.`id` NOT IN (10000004, 10000017, 10000019)
 															AND `rto`.`id` NOT IN (10000004, 10000017, 10000019);");
 			$dots = db::query("SELECT `id`, `name`, `pos_x`, `pos_y`, `pos_z` FROM `regions` WHERE `id` < 11000000 AND `id` NOT IN (10000004, 10000017, 10000019);");
-		} else {
-			$jumps = db::query("SELECT DISTINCT `from`.`name` as `fromName`, `to`.`name` as `toName`, `rto`.`name` as `toReg` FROM `gates` as `g`
-				JOIN `systems` as `from` ON (`g`.`from` = `from`.`id`)
-				JOIN `systems` as `to` ON (`g`.`to` = `to`.`id`)
-				JOIN `regions` as `rfrom` ON (`rfrom`.`id` = `from`.`regionID`)
-				JOIN `regions` as `rto` ON (`rto`.`id` = `to`.`regionID`)
-				WHERE `rfrom`.`name` = '{$_GET['reg']}';");
-			$foreign = '';
 			foreach ($jumps as $jump) {
-				if ($jump['toReg'] != $_GET['reg']) $foreign .= ", '" . $jump['toName'] . "'";
+				$routeDots[ $jump['fromName'] ][ $jump['toName'] ] = 1;
 			}
-			$dots = db::query("SELECT `s`.`id`, `s`.`name`, `s`.`pos_x`, `s`.`pos_y`, `s`.`pos_z`, `r`.`name` as `regName` FROM `systems` as `s` JOIN `regions` as `r` ON (`s`.`regionID` = `r`.`id`) WHERE `r`.`name` = '{$_GET['reg']}' OR `s`.`name` IN (" . substr($foreign, 2) . ")");
-		}
-		foreach ($jumps as $jump) {
-			$routeDots[ $jump['fromName'] ][ $jump['toName'] ] = 1;
+			$map = array('dots' => $dots, 'jumps' => $jumps, 'routeDots' => $routeDots);
+		} else {
+			$map = universe::getRegionMap($_GET['reg']);
 		}
 /*    for ($i = 0; $i < count($jumps); $i++) {
 			if (isset($jumps[$i])) {
@@ -53,7 +44,6 @@ class map_index {
 				}
 			}
 		}*/
-		$map = array('dots' => $dots, 'jumps' => $jumps, 'routeDots' => $routeDots);
 		$regionList = db::query("SELECT `id`, `name` FROM `regions` WHERE `id` < 11000000 ORDER BY `name`;");
 		$regstr = '<select name="region" id="mapRegion"><option value="0">&mdash;&mdash;&mdash;Выберите регион&mdash;&mdash;&mdash;</option>';
 		foreach ($regionList as $region) {
@@ -68,6 +58,13 @@ class map_index {
 		root::$_ALL['mainsupport'] = 'Содержимое вспомогательного блока';
 		root::$_ALL['maincontent'] = $maincontent;
 		root::$_ALL['backtrace'][] = 'initialized map/index';
+	}
+
+	public static function getSystemsForRouter() {
+		$from = db::escape($_GET['from']);
+		$to = db::escape($_GET['to']);
+		root::$_ALL['notemplate'] = TRUE;
+		echo universe::getSystemsForRouter($from, $to);
 	}
 
 	public function getRoute($from, $to) {

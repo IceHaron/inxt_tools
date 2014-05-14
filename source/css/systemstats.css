@@ -61,7 +61,7 @@
 	float:right;
 }
 #regionCloud {
-	width: calc(100% - 230px);
+	width: calc(100% - 360px);
 	float: left;
 	padding: 10px 0;
 }
@@ -88,7 +88,7 @@
 }
 #presets {
 	float: right;
-	width: 230px;
+	width: 360px;
 	padding: 10px 0;
 }
 #presetName {
@@ -98,7 +98,7 @@
 	width: 100%;
 }
 #selectedStars {
-	width: 230px;
+	width: 360px;
 	height: 500px;
 	float: right;
 	padding: 10px 0;
@@ -112,6 +112,14 @@
 	border-radius: 3px;
 	-moz-border-radius: 3px;
 	-webkit-border-radius: 3px;
+}
+.sysRegion {
+	right: 135px;
+	position: absolute;
+	margin-top: -15px;
+	color: #aaa;
+	font-size: 10px;
+	 box-shadow: -5px 0 4px 2px #555;
 }
 .deselectStar {
 	width: 15px;
