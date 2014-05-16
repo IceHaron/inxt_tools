@@ -11,6 +11,7 @@ $(document).ready(function() {
 	var path = {};
 	// var dots = {};
 	// var jumps = {};
+	skeleton = {};
 	var pi = Math.PI;
 	var zenit = 0;
 	var azimut = 0;
@@ -58,6 +59,7 @@ $(document).ready(function() {
 			if (parseFloat(dot.pos_z) < minz) minz = parseFloat(dot.pos_z);
 			if (parseFloat(dot.pos_z) > maxz) maxz = parseFloat(dot.pos_z);
 		}
+		skeleton[dot.name] = {'regName' : dot.regName, 'security' : SecurityStanding.format(dot.security), 'id' : dot.id};
 	}
 	var divx = maxx - minx;
 	var divy = maxy - miny;
@@ -66,6 +68,11 @@ $(document).ready(function() {
 	var scaleY = (height-padding*2) / divy;
 	var scaleZ = (depth-padding*2) / divz;
 	calc();
+	// if (localStorage.getItem('from') !== null)
+		// $('#fromStar').val(localStorage.getItem('from')).attr('data-id', skeleton[localStorage.getItem('from')]['id']).css('background-color', 'lime');
+	// if (localStorage.getItem('to') !== null)
+		// $('#toStar').val(localStorage.getItem('to')).attr('data-id', skeleton[localStorage.getItem('to')]['id']).css('background-color', 'lime');
+	testRouter();
 	if (get.hasOwnProperty('from') && get.hasOwnProperty('to')) route(get.from, get.to);
 	else {
 		draw();
@@ -87,12 +94,22 @@ $(document).ready(function() {
 		$(window).unbind('mouseup');
 		allowSelect();
 	});
+
 	$(document).on('click', '.star', function() {
 		if (!get.hasOwnProperty('reg')) {
 			var search = '';
 			for (i in get) search += '&'+i+'='+get[i];
 			var newLoc = window.location.pathname + '?reg=' + escape($(this).attr('data-name')) + search;
 			window.location = newLoc;
+		} else {
+			var name = $(this).attr('data-name');
+			$('.star[data-name!="' + name + '"]').hide();
+			var fromPrefix = '';
+			var toPrefix = '';
+			if ($('#fromStar').val() == name && $('#fromStar').attr('data-id') !== undefined) toPrefix = 'not_';
+			if ($('#toStar').val() == name && $('#toStar').attr('data-id') !== undefined) fromPrefix = 'not_';
+			$(this).append('<div class="makePath"><div class="' + fromPrefix + 'fromHere">Отсюда</div><div class="' + toPrefix + 'toHere">Сюда</div></div>');
+			testRouter();
 		}
 	});
 
@@ -180,15 +197,108 @@ $(document).ready(function() {
 	}
 
 	$('#drawMap').click(function() {
-		window.location = window.location.pathname + "?reg=" + escape($('#mapRegion option:selected').html());
+		var search = '';
+		for (i in get) if (i != 'reg') search += '&' + i + '=' + get[i];
+		if ($('#mapRegion option:selected').val() != '0') window.location = window.location.pathname + "?reg=" + escape($('#mapRegion option:selected').html()) + search;
+		else window.location = window.location.pathname + (search != '' ? '?' + search.substr(1) : '');
 	});
+
+	$('#resetMap').click (function() {
+		var search = '';
+		for (i in get) if (i != 'reg') search += '&' + i + '=' + get[i];
+			window.location = window.location.pathname + '?' + search.substr(1);
+	})
 
 	$(document).on('mouseenter', '.star', function() {
 		var starName = $(this).attr('data-name');
 		$(this).append('<span class="starName">' + starName + '</span>');
 	});
+
 	$(document).on('mouseleave', '.star', function() {
 		$(this).children('.starName').remove();
+		$(this).children('.makePath').remove();
+		$('.star').show();
+	});
+
+	$(document).on('mouseenter', '.pathStar', function() {
+		var name = $(this).attr('data-name');
+		$('.star[data-name="' + name + '"]').css('opacity', '1').append('<span class="starName">' + name + '</span>');
+	});
+	$(document).on('mouseleave', '.pathStar', function() {
+		var name = $(this).attr('data-name');
+		$('.star[data-name="' + name + '"]').css('opacity', '').children('.starName').remove();
+	});
+
+	$(document).on('click', '.fromHere', function() {
+		var name = $(this).parent().parent().attr('data-name');
+		$('#fromStar').val(name).attr('data-id', skeleton[name]['id']).css('background-color', 'lime');
+	});
+
+	$(document).on('click', '.toHere', function() {
+		var name = $(this).parent().parent().attr('data-name');
+		$('#toStar').val(name).attr('data-id', skeleton[name]['id']).css('background-color', 'lime');
+	});
+
+/* Поиск систем */
+	$('#fromStar, #toStar').keyup(function(key) {
+		var noAcceptKeys = new Array(
+			9		// Tab
+		, 16	// Shift
+		, 17	// Ctrl
+		, 18	// Alt
+		, 37	// Left
+		, 38	// Up
+		, 39	// Right
+		, 40	// Down
+		, 116	// F5
+		);
+		var referrer = $(this).attr('id');
+		var pass = true;
+		for (i in noAcceptKeys) {
+			if (noAcceptKeys[i] === key.keyCode) pass = false
+		}
+		if (pass) $(this).css('background-color', 'lightpink').removeAttr('data-id');
+		if (pass && $(this).val().length > 2) {
+			$('#systemSearchVariants').html('<img width="30" src="/source/img/loading-dark.gif">').show();
+			$.ajax({
+				type: 'GET'
+			, url: 'systemstats/searchsystems'
+			, data: {'search' : $(this).val()}
+			, dataType: 'json'
+			, success: function(data) {
+					$('#systemSearchVariants').html('').show().attr('data-referrer', referrer);
+					for (i in data) {
+						var variant = data[i];
+						if ($('.selectedStar[data-name="' + variant.name + '"]').length == 0)
+							$('#systemSearchVariants').append('<div class="ssVariant" data-regid="' + variant.regionID + '" data-id="' + variant.id + '" data-name="' + variant.name + '"><span style="color: ' + SecurityStanding.paint(variant.security) + '" class="ssVariantSS">' + SecurityStanding.format(variant.security) + '</span><span class="ssVariantStar">' + variant.name + '</span><span class="ssVariantReg">' + variant.regionName + '</span></div>');
+						else
+							$('#systemSearchVariants').append('<div class="ssVariantInactive" data-regid="' + variant.regionID + '" data-id="' + variant.id + '" data-name="' + variant.name + '"><span style="color: ' + SecurityStanding.paint(variant.security) + '" class="ssVariantSS">' + SecurityStanding.format(variant.security) + '</span><span class="ssVariantStar">' + variant.name + '</span><span class="ssVariantReg">' + variant.regionName + '</span></div>');
+					}
+				}
+			, complete: function(data) {
+					if (data.responseText == 'NULL') $('#systemSearchVariants').html('Nothing found').show();
+				}
+			});
+		}
+	});
+
+	$('#fromStar, #toStar').click(function() {
+		$('#systemSearchVariants').hide();
+		if ($('.ssVariant').length > 0) $('#systemSearchVariants[data-referrer="' + $(this).attr('id') + '"]').show();
+	});
+
+	$('#fromStar, #toStar').change(function() {
+		var id = $(this).attr('data-id');
+		var name = $(this).val();
+		testRouter();
+	});
+
+	$(document).on('click', '.ssVariant', function() {
+		var name = $(this).attr('data-name');
+		var id = $(this).attr('data-id');
+		var referrer = $(this).parent().attr('data-referrer');
+		$('#' + referrer).val(name).attr('data-id', id).css('background-color', 'lime');
+		testRouter();
 	});
 
 	function route(from, to) {
@@ -207,7 +317,6 @@ $(document).ready(function() {
 				var dots = data.dots;
 				var jumps = data.jumps;
 				var routeDots = data.routeDots;
-				var skeleton = {};
 				for (i in dots) {
 					var dot = dots[i];
 					if (dot.name == from) {
@@ -216,7 +325,7 @@ $(document).ready(function() {
 					if (dot.name == to) {
 						toTrigger = true;
 					}
-					skeleton[dot.name] = dot.regName;
+					skeleton[dot.name] = {'regName' : dot.regName, 'security' : SecurityStanding.format(dot.security), 'id' : dot.id};
 				}
 				if (fromTrigger === true && toTrigger === true) {
 						var d = {}; // Длина пути
@@ -271,17 +380,27 @@ $(document).ready(function() {
 						now = to;
 						p[ now ] = d[now];
 						counter = 0;
+						var id = skeleton[now]['id'];
+						var regname = skeleton[now]['regName'];
+						var ss =  skeleton[now]['security'];
+						var color = SecurityStanding.paint(ss);
+						$('#path').prepend('<div class="pathStar" data-id="' + id + '" data-name="' + now + '"><div class="ss" style="color:' + color + '">' + ss + '</div>' + now + '<div class="sysRegHolder"><div class="sysPathRegion">' + regname + '</div></div></div>');
 						while (now != from && counter < 10000) {
 							for (i in routeDots[now]) {
 								if (d[i] < d[now]) {
 									p[ i ] = d[i];
-									r[skeleton[i]] = d[i];
+									r[skeleton[i]['regName']] = d[i];
+									var id = skeleton[i]['id'];
+									var regname = skeleton[i]['regName'];
+									var ss =  skeleton[i]['security'];
+									var color = SecurityStanding.paint(ss);
+									$('#path').prepend('<div class="pathStar" data-id="' + id + '" data-name="' + i + '"><div class="ss" style="color:' + color + '">' + ss + '</div>' + i + '<div class="sysRegHolder"><div class="sysPathRegion">' + regname + '</div></div></div>');
 									now = i;
 								}
 							}
 							counter++;
 						}
-						console.log('Path is ' + counter + ' jumps long');
+						console.log('Path is ' + counter + ' jumps long:', p);
 						console.timeStamp('Finish');
 						// console.log(d,p,u,n,r);
 						if (window.location.search.search('reg') == -1) savePath(r)
@@ -295,6 +414,16 @@ $(document).ready(function() {
 		console.log(path = p);
 		draw();
 		allowSelect();
+	}
+
+	function testRouter() {
+		if ($('#fromStar').val() != '' && $('#fromStar').attr('data-id') !== undefined) localStorage.setItem('from', $('#fromStar').val());
+			else localStorage.removeItem('from', null);
+		if ($('#toStar').val() != '' && $('#toStar').attr('data-id') !== undefined) localStorage.setItem('to', $('#toStar').val());
+			else localStorage.removeItem('to', null);
+		if($('#fromStar').val() != '' && $('#fromStar').attr('data-id') !== undefined && $('#toStar').val() != '' && $('#toStar').attr('data-id') !== undefined)
+			$('#submitPath').removeAttr('disabled');
+		else $('#submitPath').attr('disabled', true);
 	}
 
 });

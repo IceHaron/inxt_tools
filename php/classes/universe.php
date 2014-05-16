@@ -82,14 +82,16 @@ class universe {
 *	
 **/
 	public static function getRegionMap($region) {
-		$j = db::query("SELECT DISTINCT `from`.`name` as `fromName`, `to`.`name` as `toName`, `rto`.`name` as `toReg` FROM `gates` as `g`
+		$j = db::query("SELECT DISTINCT `from`.`name` as `fromName`, `rfrom`.`name` as `fromReg`, `to`.`name` as `toName`, `rto`.`name` as `toReg` FROM `gates` as `g`
 			JOIN `systems` as `from` ON (`g`.`from` = `from`.`id`)
 			JOIN `systems` as `to` ON (`g`.`to` = `to`.`id`)
 			JOIN `regions` as `rfrom` ON (`rfrom`.`id` = `from`.`regionID`)
 			JOIN `regions` as `rto` ON (`rto`.`id` = `to`.`regionID`)
 			WHERE `rfrom`.`name` = '$region';");
 		foreach ($j as $jump) {
-			$routeDots[ $jump['fromName'] ][ $jump['toName'] ] = 1;
+			if ($jump['fromReg'] != $jump['toReg']) $len = 1.01;
+			else $len = 1;
+			$routeDots[ $jump['fromName'] ][ $jump['toName'] ] = $len;
 		}
 		$foreign = '';
 		while (count($j) > 0) {
@@ -100,7 +102,7 @@ class universe {
 			}
 			$jumps[] = $jump;
 		}
-		$dots = db::query("SELECT `s`.`id`, `s`.`name`, `s`.`pos_x`, `s`.`pos_y`, `s`.`pos_z`, `r`.`name` as `regName` FROM `systems` as `s` JOIN `regions` as `r` ON (`s`.`regionID` = `r`.`id`) WHERE `r`.`name` = '$region' OR `s`.`name` IN (" . substr($foreign, 2) . ")");
+		$dots = db::query("SELECT `s`.*, `r`.`name` as `regName` FROM `systems` as `s` JOIN `regions` as `r` ON (`s`.`regionID` = `r`.`id`) WHERE `r`.`name` = '$region' OR `s`.`name` IN (" . substr($foreign, 2) . ")");
 		$map = array('dots' => $dots, 'jumps' => $jumps, 'routeDots' => $routeDots);
 		return $map;
 	}
@@ -141,7 +143,7 @@ class universe {
 			}
 		}
 		// var_dump($routeDots);
-		while (array_search(10000, $d) !== false/* $now != $toReg*/ && $counter < 100) {
+		while (array_search(10000, $d) !== false && $now != $toReg/* && $counter < 100*/) {
 			$trigger = false;
 			// var_dump("<br/><br/>Entering to " . $now, $d[$now]);
 			unset($n[$now]);
@@ -197,7 +199,11 @@ class universe {
 		// 		unset($a[$j]);
 		foreach ($routeDots[$now] as $i => $routeDot)
 			$a[$i] = $d[$i];
-		$stars = array('dots' => array(), 'jumps' => array(),'routeDots' => array());
+		if (count($p) == 1) {
+			$s = self::getRegionMap($p[0][0]);
+			$stars = array('dots' => $s['dots'], 'jumps' => $s['jumps'],'routeDots' => $s['routeDots']);
+		} else
+			$stars = array('dots' => array(), 'jumps' => array(),'routeDots' => array());
 		foreach ($a as $regname => $t) {
 			$s = self::getRegionMap($regname);
 			$stars['dots'] = array_merge($stars['dots'], $s['dots']);

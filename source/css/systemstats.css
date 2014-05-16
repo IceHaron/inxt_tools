@@ -29,37 +29,6 @@
 #graphLink { width: 30% }
 #chart_head { margin: 10px; }
 #systemSearch { width: 220px; }
-#systemSearchVariants {
-	min-height: 30px;
-	max-height: 500px;
-	min-width: 225px;
-	position: absolute;
-	padding-top: 5px;
-	background-color: #222;
-	font-size: 12px;
-	overflow-y: scroll;
-	display: none;
-}
-.ssVariant {
-	padding: 3px;
-}
-.ssVariant:hover {
-	background-color: #555;
-	cursor: pointer;
-}
-.ssVariantInactive {
-	background-color: #999;
-}
-.ssVariantSS {
-	font-weight: bold;
-}
-.ssVariantStar {
-	color: white;
-	font-weight: bold;
-}
-.ssVariantReg {
-	float:right;
-}
 #regionCloud {
 	width: calc(100% - 360px);
 	float: left;
@@ -113,13 +82,14 @@
 	-moz-border-radius: 3px;
 	-webkit-border-radius: 3px;
 }
+.sysRegHolder {
+}
 .sysRegion {
-	right: 135px;
-	position: absolute;
 	margin-top: -15px;
+	margin-right: 20px;
+	float: right;
 	color: #aaa;
 	font-size: 10px;
-	 box-shadow: -5px 0 4px 2px #555;
 }
 .deselectStar {
 	width: 15px;

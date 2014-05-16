@@ -57,6 +57,38 @@ a.nodeco {
 	position: fixed;
 }
 .ss { display: inline-block; width: 30px; }
+#systemSearchVariants {
+	min-height: 30px;
+	max-height: 500px;
+	min-width: 225px;
+	position: absolute;
+	padding-top: 5px;
+	background-color: #222;
+	font-size: 12px;
+	overflow-y: scroll;
+	display: none;
+}
+.ssVariant {
+	padding: 3px;
+}
+.ssVariant:hover {
+	background-color: #555;
+	cursor: pointer;
+}
+.ssVariantInactive {
+	background-color: #999;
+}
+.ssVariantSS {
+	font-weight: bold;
+}
+.ssVariantStar {
+	color: white;
+	font-weight: bold;
+}
+.ssVariantReg {
+	float:right;
+}
+
 
 /* Основная разметка, макет ================================================= */
 

@@ -52,10 +52,30 @@ class map_index {
 			$regstr .= '<option ' . $sel . ' value="' . $region['id'] . '">' . $region['name'] . '</option>';
 		}
 		$regstr .= '</select>';
-		$maincontent = '<div id="control"><div class="startx"></div><div class="x"></div><div class="starty"></div><div class="y"></div>' . $regstr . '<input type="button" value="Отрисовать" id="drawMap"></div><div id="strForMap">' . json_encode($map) . '</div>';
+		$mainsupport = '
+			<div id="control">
+				<div class="startx"></div>
+				<div class="x"></div>
+				<div class="starty"></div>
+				<div class="y"></div>
+				' . $regstr . '
+				<input type="button" value="Отрисовать" id="drawMap">
+				<input type="button" value="К карте вселенной" id="resetMap">
+			</div>
+			<div id="strForMap">' . json_encode($map) . '</div>
+			';
+		$mainsupport .= '
+			<form id="pathfinder" method="GET">
+				<input type="text" id="fromStar" name="from" placeholder="Отправная точка">
+				<input type="text" id="toStar" name="to" placeholder="Пункт назначения">
+				' . (isset($_GET['reg']) ? '<input type="hidden" name="reg" value="' . $_GET['reg'] . '">' : '') . '
+				<input type="submit" id="submitPath" disabled>
+				<div id="systemSearchVariants" class="mapSSV">ololo</div>
+			</form>';
+		$maincontent = '<div id="path"></div>';
 		
 		root::$_ALL['maincaption'] = 'EVE Universe Map';
-		root::$_ALL['mainsupport'] = 'Содержимое вспомогательного блока';
+		root::$_ALL['mainsupport'] = $mainsupport;
 		root::$_ALL['maincontent'] = $maincontent;
 		root::$_ALL['backtrace'][] = 'initialized map/index';
 	}

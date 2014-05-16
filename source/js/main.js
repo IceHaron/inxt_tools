@@ -35,6 +35,78 @@ $(document).ready(function() {
 		else $(this).children('td').animate({'opacity': '0.3'}, 100);
 	});
 	
+/* Поиск систем */
+	$('.systemSearch').keyup(function(key) {
+		var noAcceptKeys = new Array(
+			9		// Tab
+		, 16	// Shift
+		, 17	// Ctrl
+		, 18	// Alt
+		, 37	// Left
+		, 38	// Up
+		, 39	// Right
+		, 40	// Down
+		, 116	// F5
+		);
+		var pass = true;
+		for (i in noAcceptKeys) {
+			if (noAcceptKeys[i] === key.keyCode) pass = false
+		}
+		if (pass && $(this).val().length > 2) {
+			$('#systemSearchVariants').html('<img width="30" src="/source/img/loading-dark.gif">').show();
+			$.ajax({
+				type: 'GET'
+			, url: 'searchsystems'
+			, data: {'search' : $(this).val()}
+			, dataType: 'json'
+			, success: function(data) {
+					$('#systemSearchVariants').html('').show();
+					for (i in data) {
+						var variant = data[i];
+						if ($('.selectedStar[data-name="' + variant.name + '"]').length == 0)
+							$('#systemSearchVariants').append('<div class="ssVariant" data-regid="' + variant.regionID + '" data-id="' + variant.id + '" data-name="' + variant.name + '"><span style="color: ' + SecurityStanding.paint(variant.security) + '" class="ssVariantSS">' + SecurityStanding.format(variant.security) + '</span><span class="ssVariantStar">' + variant.name + '</span><span class="ssVariantReg">' + variant.regionName + '</span></div>');
+						else
+							$('#systemSearchVariants').append('<div class="ssVariantInactive" data-regid="' + variant.regionID + '" data-id="' + variant.id + '" data-name="' + variant.name + '"><span style="color: ' + SecurityStanding.paint(variant.security) + '" class="ssVariantSS">' + SecurityStanding.format(variant.security) + '</span><span class="ssVariantStar">' + variant.name + '</span><span class="ssVariantReg">' + variant.regionName + '</span></div>');
+					}
+				}
+			, complete: function(data) {
+					if (data.responseText == 'NULL') $('#systemSearchVariants').html('Nothing found').show();
+				}
+			});
+		}
+	});
+	
+/* При выборе варианта в поиске скрываем список вариантов и добавляем выбранную систему в список */
+	$(document).on('click', '.ssVariant', function() {
+		var name = $(this).attr('data-name');
+		var id = $(this).attr('data-id');
+		var regid = $(this).attr('data-regid');
+		var regname = $(this).children('.ssVariantReg').text();
+		var ss = $(this).children('.ssVariantSS').text();
+		
+		$('.fromSearch').append('<div class="selectedStar" data-regid="' + regid + '" data-id="' + id + '" data-name="' + name + '"><div class="ss" style="color:' + SecurityStanding.paint(ss) + '">' + ss + '</div>' + name + '<img class="deselectStar" src="/source/img/delete.png"><div class="sysRegHolder"><div class="sysRegion">' + regname + '</div></div></div>');
+		
+		$('#systemSearchVariants').hide();
+		$(this).attr('class', 'ssVariantInactive');
+		somethingChanged = true;
+	});
+	
+/* Скрываем список найденных систем при клике в другое место */
+	$(document).click(function(t) {
+		if ($(t.target).attr('class') != 'ssVariant'
+			&& $(t.target).attr('class') != 'ssVariantStar'
+			&& $(t.target).attr('class') != 'ssVariantSS'
+			&& $(t.target).attr('class') != 'ssVariantReg'
+			&& $(t.target).attr('class') != 'systemSearch'
+			&& $(t.target).attr('id') != 'systemSearch'
+			&& $(t.target).attr('id') != 'fromStar'
+			&& $(t.target).attr('id') != 'toStar'
+			&& $(t.target).attr('id') != 'systemSearchVariants'
+			)
+				$('#systemSearchVariants').hide();
+		if ($(t.target).attr('class') == 'systemSearch' && $('.ssVariant').length > 0) $('#systemSearchVariants').show();
+	});
+	
 /* End of READY() */
 });
 
@@ -118,4 +190,43 @@ var myDate = {
 		return outStr;
 	}
 	
+};
+
+/**
+*	
+*	Объект для работы с секьюром
+*	
+**/
+var SecurityStanding = {
+
+/**
+*	
+*	Перекраска СС системы для примерного соответствия цвету в игре.
+* @param (string/float) - СС системы
+*	@return color - цвет окраса СС в CSS-формате
+*	
+**/
+	paint : function(ss) {
+		var color = 'red';
+		var numSS = this.format(ss);
+		if (numSS == 1) color = 'skyblue';
+		if (numSS <= 0.9 && numSS > 0.6) color = 'green';
+		if (numSS <= 0.6 && numSS > 0.4) color = 'yellow';
+		if (numSS <= 0.4 && numSS > 0.0) color = 'orange';
+
+		return color;
+	},
+
+/**
+*	
+*	Переформатирование СС системы в нужный формат: -0.0
+* @param (string/float) - СС системы в грязном виде
+*	@return formatted - СС системы в нужном формате
+*	
+**/
+	format : function (ss) {
+		var formatted = parseFloat(ss).toFixed(1)
+		
+		return formatted;
+	}
 };

@@ -7,11 +7,40 @@
 	display: inline-block;
 }
 #control {
+	float: left;
+}
+#pathfinder {
+	margin-right: 50px;
+	float: right;
+}
+#path {
 	width: calc(100% - 920px);
-	min-width: 400px;
+	min-width: 250px;
 	padding: 10px;
 	float:right;
 	background-color: red;
+	height: 630px;
+	overflow-y: scroll;
+}
+#fromStar, #toStar {
+	background-color: lightpink;
+}
+.mapSSV { margin-left: 30px; }
+.pathStar {
+	margin: 5px;
+	padding: 5px;
+	color: white;
+	background-color: #555;
+	border-radius: 3px;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+}
+.sysPathRegion {
+	margin-top: -15px;
+	margin-right: 20px;
+	float: right;
+	color: #aaa;
+	font-size: 10px;
 }
 .interaction {
 	position: absolute;
@@ -28,6 +57,27 @@
 	color: red;
 	background-color: black;
 	position: absolute;
+}
+.makePath {
+	position: absolute;
+	margin-top: -55px;
+}
+.fromHere, .toHere {
+	border: 1px solid #555;
+	background-color: #555;
+	color: white;
+}
+.not_fromHere, .not_toHere {
+	border: 1px solid red;
+	background-color: #555;
+	color: red;
+}
+.toHere, .not_toHere {
+	margin-top: 30px;
+}
+.fromHere:hover, .toHere:hover {
+	color: lime;
+	border-color: white;
 }
 .startx {display:none;}
 .starty {display:none;}
