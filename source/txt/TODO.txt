@@ -1,6 +1,6 @@
-TODO -- Flash Map -- UNDONE
+TODO -- Подправить баги карты: почему-то нет линии между Inaro и Sirppala когда кладешь маршрут Амарр-Жита -- DONE
 TODO -- Перспектива -- DONE
-TODO -- Пути по Дейкстре -- UNDONE
+TODO -- Пути по Дейкстре -- DONE
 TODO -- Организовать класс universe -- DONE
 TODO -- EVE Smart Star Filters -- UNDONE
 QUEST -- EVE Smart Star Filters -- UNDONE
