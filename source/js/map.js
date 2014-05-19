@@ -206,7 +206,7 @@ $(document).ready(function() {
 	$('#resetMap').click (function() {
 		var search = '';
 		for (i in get) if (i != 'reg') search += '&' + i + '=' + get[i];
-			window.location = window.location.pathname + '?' + search.substr(1);
+			window.location = window.location.pathname + (search != '' ? '?' + search.substr(1) : '');
 	})
 
 	$(document).on('mouseenter', '.star', function() {
@@ -384,6 +384,7 @@ $(document).ready(function() {
 						var regname = skeleton[now]['regName'];
 						var ss =  skeleton[now]['security'];
 						var color = SecurityStanding.paint(ss);
+						var graphLink = ',' + now + '_' + ss.replace('.','');
 						$('#path').prepend('<div class="pathStar" data-id="' + id + '" data-name="' + now + '"><div class="ss" style="color:' + color + '">' + ss + '</div>' + now + '<div class="sysRegHolder"><div class="sysPathRegion">' + regname + '</div></div></div>');
 						while (now != from && counter < 10000) {
 							for (i in routeDots[now]) {
@@ -394,12 +395,14 @@ $(document).ready(function() {
 									var regname = skeleton[i]['regName'];
 									var ss =  skeleton[i]['security'];
 									var color = SecurityStanding.paint(ss);
+									graphLink = ',' + i + '_' + ss.replace('.','') + graphLink;
 									$('#path').prepend('<div class="pathStar" data-id="' + id + '" data-name="' + i + '"><div class="ss" style="color:' + color + '">' + ss + '</div>' + i + '<div class="sysRegHolder"><div class="sysPathRegion">' + regname + '</div></div></div>');
 									now = i;
 								}
 							}
 							counter++;
 						}
+						$('#path').prepend('<a target="blank" href="/systemstats/show?subject=' + graphLink.substr(1) + '"><button>Посмотреть график активности всех систем пути (новое окно)</button></a>');
 						console.log('Path is ' + counter + ' jumps long:', p);
 						console.timeStamp('Finish');
 						// console.log(d,p,u,n,r);

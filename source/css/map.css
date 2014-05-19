@@ -36,10 +36,16 @@
 }
 .sysPathRegion {
 	margin-top: -15px;
-	margin-right: 20px;
+	/*margin-right: 20px;*/
 	float: right;
 	color: #aaa;
 	font-size: 10px;
+}
+.gotoGraph {
+	width: 16px;
+	height: 16px;
+	float: right;
+	cursor: pointer;
 }
 .interaction {
 	position: absolute;
