@@ -1,45 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	<link type="text/css" rel="stylesheet" href="music.css"></link>
 </head>
-
-<style>
-body {
-	width: 960px;
-	height: 100%;
-	margin: 0 auto;
-	font-size: 18px;
-	font-style: italic;
-	font-family: sans-serif;
-	line-height: 150%;
-}
-#content {
-	min-height: 600px;
-	background: url(bg_guitar.png);
-}
-table {
-	border: none;
-}
-#head {
-	color: red;
-	font-size: 36px;
-	font-family: Monotype Coursiva;
-	font-style: italic;
-}
-#head td {
-	padding: 15px;
-}
-#menu {
-	width: 200px;
-	vertical-align: top;
-	font-size: 14px;
-}
-#menu ul {
-	list-style: none;
-	padding-left: 10px;
-}
-</style>
 
 <body>
 	<div id="content">
@@ -50,7 +14,19 @@ table {
 			<tr id="main">
 				<td id="menu">
 					<ul>
-						<li><a href="history.php">История гитары</a></li>
+						<li>Главная</li>
+						<li>
+							<span>История гитары</span>
+							<ul class="sub">
+								<li><a href="history_begin.php">Происхождение</a></li>
+								<li><a href="history_name_begin.php">Происхождение названия</a></li>
+								<li><a href="history_spanish.php">Испанская гитара</a></li>
+								<li><a href="history_russian.php">Русская гитара</a></li>
+								<li><a href="history_classic.php">Классическая гитара</a></li>
+								<li><a href="history_electro.php">Электрогитара</a></li>
+								<li><a href="history_other.php">Другие виды гитар</a></li>
+							</ul>
+						</li>
 						<li><a href="system.php">Устройство гитары</a></li>
 						<li><a href="classify.php">Классификация гитар</a></li>
 						<li><a href="technics.php">Техника игры на гитаре</a></li>

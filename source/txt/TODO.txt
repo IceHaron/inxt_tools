@@ -1,4 +1,7 @@
-TODO -- Подправить баги карты: почему-то нет линии между Inaro и Sirppala когда кладешь маршрут Амарр-Жита -- DONE
+TODO -- MAP: Выделенные системы -- DONE
+TODO -- SSF: Система -- DONE
+TODO -- SSF: Информация о системе подстать дотлану: http://evemaps.dotlan.net/system/Amarr -- DONE
+TODO -- SSF: Фильтры по характеристикам систем -- DONE
 TODO -- Перспектива -- DONE
 TODO -- Пути по Дейкстре -- DONE
 TODO -- Организовать класс universe -- DONE

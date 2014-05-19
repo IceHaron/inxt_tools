@@ -66,8 +66,8 @@ class map_index {
 			';
 		$mainsupport .= '
 			<form id="pathfinder" method="GET">
-				<input type="text" id="fromStar" name="from" placeholder="Отправная точка">
-				<input type="text" id="toStar" name="to" placeholder="Пункт назначения">
+				<input type="text" id="fromStar" name="from" placeholder="Отправная точка" autocomplete="off">
+				<input type="text" id="toStar" name="to" placeholder="Пункт назначения" autocomplete="off">
 				' . (isset($_GET['reg']) ? '<input type="hidden" name="reg" value="' . $_GET['reg'] . '">' : '') . '
 				<input type="submit" id="submitPath" disabled>
 				<div id="systemSearchVariants" class="mapSSV">ololo</div>

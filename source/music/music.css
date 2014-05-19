@@ -1,0 +1,52 @@
+body {
+	width: 960px;
+	height: 100%;
+	margin: 0 auto;
+	font-size: 18px;
+	font-style: italic;
+	font-family: sans-serif;
+	line-height: 125%;
+	text-align: justify;
+}
+#content {
+	min-height: 600px;
+	background: url(bg_guitar.png);
+}
+table {
+	border: none;
+}
+#head {
+	color: red;
+	font-size: 36px;
+	font-family: Monotype Coursiva;
+	font-style: italic;
+}
+#head td {
+	padding: 15px;
+}
+#menu {
+	width: 200px;
+	vertical-align: top;
+	font-size: 14px;
+}
+#menu ul {
+	list-style: none;
+	padding-left: 10px;
+}
+.sub {
+	font-size: 12px;
+	line-height: 115%;
+}
+.img-right {
+	float: right;
+	margin: 10px;
+}
+.img-right img {
+	max-width: 300px;
+	max-height: 200px;
+}
+.img-right p {
+	margin: 5px;
+	font-size: 12px;
+	text-align: center;
+}

@@ -113,89 +113,6 @@ $(document).ready(function() {
 		}
 	});
 
-	function allowSelect() {
-		for (i in visibleDots) {
-			var dot = visibleDots[i];
-			var posleft = dot["x"]+width/2-10;
-			var postop = -dot["y"]+height/2-10;
-			if (postop > -10 && posleft > -10 && postop < height-15 && posleft < width-15) {
-				$('.interaction').append('<div class="star" data-name="' + i + '"><img src="/source/img/starCircle.png"></div>');
-				$('.star[data-name="' + i + '"]').css({'margin-left':posleft, 'margin-top':postop});
-			}
-		}
-	}
-
-	function drag(ev) {
-		var pos = $(this).offset();
-		// $('.x').html(ev.pageX-pos.left-parseInt($('.startx').html()));
-		// $('.y').html(ev.pageY-pos.top-parseInt($('.starty').html()));
-		azimut += (ev.pageX-pos.left-parseInt($('.startx').html()))/500;
-		zenit += (ev.pageY-pos.top-parseInt($('.starty').html()))/500;
-		draw();
-		$('.startx').html(ev.pageX-pos.left);
-		$('.starty').html(ev.pageY-pos.top);
-	}
-
-	function calc() {
-		for (i in dots) {
-			var dot = dots[i];
-			var x = (parseFloat(dot.pos_x) - minx - divx / 2) * scaleX;
-			var y = (parseFloat(dot.pos_y) - miny - divy / 2) * scaleY;
-			var z = (parseFloat(dot.pos_z) - minz - divz / 2) * scaleZ;
-			coords[dot.name]["x"] = x;
-			visibleDots[dot.name]["x"] = x;
-			coords[dot.name]["y"] = y;
-			visibleDots[dot.name]["y"] = y;
-			coords[dot.name]["z"] = z;
-		}
-	}
-
-	function draw() {
-		canvas.width = width;
-		cxt.fillStyle = "black";
-		cxt.fillRect(0, 0, width, height);
-		cxt.fillStyle = 'white';
-		cxt.strokeStyle = '#505050';
-		cxt.font = "normal 8pt Sans-Serif";
-		for (i in jumps) {
-			var jump = jumps[i];
-			var newfromx = coords[jump.fromName]["x"]*Math.cos(azimut) - coords[jump.fromName]["y"]*Math.sin(azimut);
-			var newfromy = coords[jump.fromName]["x"]*Math.cos(zenit)*Math.sin(azimut) + coords[jump.fromName]["y"]*Math.cos(zenit)*Math.cos(azimut) - coords[jump.fromName]["z"]*Math.sin(zenit);
-			var newfromz = coords[jump.fromName]["x"]*Math.sin(zenit)*Math.sin(azimut) + coords[jump.fromName]["y"]*Math.sin(zenit)*Math.cos(azimut) + coords[jump.fromName]["z"]*Math.cos(zenit);
-			var fromPerspective = (newfromz + divz * scaleZ) / divz / scaleZ / 10 + 0.9;
-			var newtox = coords[jump.toName]["x"]*Math.cos(azimut) - coords[jump.toName]["y"]*Math.sin(azimut);
-			var newtoy = coords[jump.toName]["x"]*Math.cos(zenit)*Math.sin(azimut) + coords[jump.toName]["y"]*Math.cos(zenit)*Math.cos(azimut) - coords[jump.toName]["z"]*Math.sin(zenit);
-			var newtoz = coords[jump.toName]["x"]*Math.sin(zenit)*Math.sin(azimut) + coords[jump.toName]["y"]*Math.sin(zenit)*Math.cos(azimut) + coords[jump.toName]["z"]*Math.cos(zenit);
-			var toPerspective = (newtoz + divz * scaleZ) / divz / scaleZ / 10 + 0.9;
-			// console.log(get, jump.fromName, jump.toName, path);
-			if (path.hasOwnProperty(jump.fromName) && path.hasOwnProperty(jump.toName)) cxt.strokeStyle = 'white';
-			cxt.beginPath();
-			cxt.moveTo(newfromx*fromPerspective+width/2+2, -newfromy*fromPerspective+height/2+2);
-			cxt.lineTo(newtox*toPerspective+width/2+2, -newtoy*toPerspective+height/2+2);
-			cxt.closePath();
-			cxt.stroke();
-			cxt.strokeStyle = '#505050';
-		}
-		for (i in coords) {
-			var dot = coords[i];
-			var newx = dot["x"]*Math.cos(azimut) - dot["y"]*Math.sin(azimut);
-			var newy = dot["x"]*Math.cos(zenit)*Math.sin(azimut) + dot["y"]*Math.cos(zenit)*Math.cos(azimut) - dot["z"]*Math.sin(zenit);
-			var newz = dot["x"]*Math.sin(zenit)*Math.sin(azimut) + dot["y"]*Math.sin(zenit)*Math.cos(azimut) + dot["z"]*Math.cos(zenit);
-			var perspective = (newz + divz * scaleZ) / divz / scaleZ / 10 + 0.9;
-			if (path.hasOwnProperty(i)) cxt.fillStyle = 'yellow';
-			cxt.fillRect(newx*perspective+width/2, -newy*perspective+height/2, 3, 3);
-			cxt.fillText(i,newx*perspective+width/2, -newy*perspective+height/2-1);
-			cxt.fillStyle = 'white';
-			visibleDots[i]["x"] = newx*perspective;
-			visibleDots[i]["y"] = newy*perspective;
-			// cxt.beginPath();
-			// cxt.moveTo(0+width/2+2, 0+height/2+2);
-			// cxt.lineTo(newx+width/2+2, -newy+height/2+2);
-			// cxt.closePath();
-			// cxt.stroke();
-		}
-	}
-
 	$('#drawMap').click(function() {
 		var search = '';
 		for (i in get) if (i != 'reg') search += '&' + i + '=' + get[i];
@@ -307,7 +224,7 @@ $(document).ready(function() {
 		var fromTrigger = false;
 		var toTrigger = false;
 		$.ajax({
-		  type: 'GET'
+			type: 'GET'
 		, url: 'map/getsystemsforrouter'
 		, data: {'from': from, 'to': to}
 		, dataType: 'json'
@@ -385,7 +302,7 @@ $(document).ready(function() {
 						var ss =  skeleton[now]['security'];
 						var color = SecurityStanding.paint(ss);
 						var graphLink = ',' + now + '_' + ss.replace('.','');
-						$('#path').prepend('<div class="pathStar" data-id="' + id + '" data-name="' + now + '"><div class="ss" style="color:' + color + '">' + ss + '</div>' + now + '<div class="sysRegHolder"><div class="sysPathRegion">' + regname + '</div></div></div>');
+						$('#path').prepend('<div class="pathStar" data-id="' + id + '" data-name="' + now + '"><div class="ss" style="color:' + color + '">' + ss + '</div>' + now + '<div class="starMenuButton" data-id="' + id + '" data-name="' + now + '" data-ss="' + ss + '" data-regname="' + regname + '"></div><div class="sysRegHolder"><div class="sysPathRegion">' + regname + '</div></div></div>');
 						while (now != from && counter < 10000) {
 							for (i in routeDots[now]) {
 								if (d[i] < d[now]) {
@@ -396,15 +313,24 @@ $(document).ready(function() {
 									var ss =  skeleton[i]['security'];
 									var color = SecurityStanding.paint(ss);
 									graphLink = ',' + i + '_' + ss.replace('.','') + graphLink;
-									$('#path').prepend('<div class="pathStar" data-id="' + id + '" data-name="' + i + '"><div class="ss" style="color:' + color + '">' + ss + '</div>' + i + '<div class="sysRegHolder"><div class="sysPathRegion">' + regname + '</div></div></div>');
+									$('#path').prepend('<div class="pathStar" data-id="' + id + '" data-name="' + i + '"><div class="ss" style="color:' + color + '">' + ss + '</div>' + i + '<div class="starMenuButton" data-id="' + id + '" data-name="' + i + '" data-ss="' + ss + '" data-regname="' + regname + '"></div><div class="sysRegHolder"><div class="sysPathRegion">' + regname + '</div></div></div>');
 									now = i;
 								}
 							}
 							counter++;
 						}
-						$('#path').prepend('<a target="blank" href="/systemstats/show?subject=' + graphLink.substr(1) + '"><button>Посмотреть график активности всех систем пути (новое окно)</button></a>');
+						$('#path').prepend('<p>Проложенный путь:</p><a target="blank" href="/systemstats/show?subject=' + graphLink.substr(1) + '"><button>Посмотреть график активности всех систем пути (новое окно)</button></a>');
 						console.log('Path is ' + counter + ' jumps long:', p);
 						console.timeStamp('Finish');
+						for (var i = 0; i < localStorage.length; i++) {
+							key = localStorage.key(i);
+							if (key.search('mark_') !== -1) {
+								var star = JSON.parse(localStorage.getItem(key));
+								var color = SecurityStanding.paint(star.ss);
+								$('#path').prepend('<div class="pathStar" data-id="' + star.id + '" data-name="' + i + '"><div class="ss" style="color:' + color + '">' + star.ss + '</div>' + star.name + '<div class="starMenuButton" data-id="' + star.id + '" data-name="' + star.name + '" data-ss="' + star.ss + '" data-regname="' + star.regname + '"></div><div class="sysRegHolder"><div class="sysPathRegion">' + star.regname + '</div></div></div>');
+							}
+						}
+						$('#path').prepend('<p>Отмеченные системы:</p>');
 						// console.log(d,p,u,n,r);
 						if (window.location.search.search('reg') == -1) savePath(r)
 						else savePath(p);
@@ -412,6 +338,110 @@ $(document).ready(function() {
 			}
 		});
 	}
+
+	function allowSelect() {
+		for (i in visibleDots) {
+			var dot = visibleDots[i];
+			var posleft = dot["x"]+width/2-10;
+			var postop = -dot["y"]+height/2-10;
+			if (postop > -10 && posleft > -10 && postop < height-15 && posleft < width-15) {
+				$('.interaction').append('<div class="star" data-name="' + i + '"><img src="/source/img/starCircle.png"></div>');
+				$('.star[data-name="' + i + '"]').css({'margin-left':posleft, 'margin-top':postop});
+			}
+		}
+	}
+
+	function drag(ev) {
+		var pos = $(this).offset();
+		// $('.x').html(ev.pageX-pos.left-parseInt($('.startx').html()));
+		// $('.y').html(ev.pageY-pos.top-parseInt($('.starty').html()));
+		azimut += (ev.pageX-pos.left-parseInt($('.startx').html()))/500;
+		zenit += (ev.pageY-pos.top-parseInt($('.starty').html()))/500;
+		draw();
+		$('.startx').html(ev.pageX-pos.left);
+		$('.starty').html(ev.pageY-pos.top);
+	}
+
+	function calc() {
+		for (i in dots) {
+			var dot = dots[i];
+			var x = (parseFloat(dot.pos_x) - minx - divx / 2) * scaleX;
+			var y = (parseFloat(dot.pos_y) - miny - divy / 2) * scaleY;
+			var z = (parseFloat(dot.pos_z) - minz - divz / 2) * scaleZ;
+			coords[dot.name]["x"] = x;
+			visibleDots[dot.name]["x"] = x;
+			coords[dot.name]["y"] = y;
+			visibleDots[dot.name]["y"] = y;
+			coords[dot.name]["z"] = z;
+		}
+	}
+
+	function draw() {
+		canvas.width = width;
+		cxt.fillStyle = "black";
+		cxt.fillRect(0, 0, width, height);
+		cxt.fillStyle = 'white';
+		cxt.strokeStyle = '#505050';
+		cxt.font = "normal 8pt Sans-Serif";
+		for (i in jumps) {
+			if (!(localStorage.getItem('mark_' + skeleton[jumps[i].fromName]['id']) && localStorage.getItem('mark_' + skeleton[jumps[i].toName]['id'])) && !(path.hasOwnProperty(jumps[i].fromName) && path.hasOwnProperty(jumps[i].toName))) {
+				drawJump(jumps[i]);
+				cxt.strokeStyle = '#505050';
+			}
+		}
+		for (i in coords) {
+			if (!localStorage.getItem('mark_' + skeleton[i]['id']) && !path.hasOwnProperty(i)) {
+				drawStar(coords[i]);
+				cxt.fillStyle = 'white';
+			}
+		}
+		cxt.font = "bold 10pt Sans-Serif";
+		for (i in jumps) {
+			if (path.hasOwnProperty(jumps[i].fromName) && path.hasOwnProperty(jumps[i].toName)) {
+				cxt.strokeStyle = 'yellow';
+				drawJump(jumps[i]);
+			} else if (localStorage.getItem('mark_' + skeleton[jumps[i].fromName]['id']) && localStorage.getItem('mark_' + skeleton[jumps[i].toName]['id'])) {
+				cxt.strokeStyle = 'lime';
+				drawJump(jumps[i]);
+			}
+		}
+		for (i in coords) {
+			if (path.hasOwnProperty(i)) {
+				cxt.fillStyle = 'yellow';
+				drawStar(coords[i]);
+			} else if (localStorage.getItem('mark_' + skeleton[i]['id'])) {
+				cxt.fillStyle = 'lime';
+				drawStar(coords[i]);
+			}
+		}
+	}
+
+	function drawJump(jump) {
+		var newfromx = coords[jump.fromName]["x"]*Math.cos(azimut) - coords[jump.fromName]["y"]*Math.sin(azimut);
+		var newfromy = coords[jump.fromName]["x"]*Math.cos(zenit)*Math.sin(azimut) + coords[jump.fromName]["y"]*Math.cos(zenit)*Math.cos(azimut) - coords[jump.fromName]["z"]*Math.sin(zenit);
+		var newfromz = coords[jump.fromName]["x"]*Math.sin(zenit)*Math.sin(azimut) + coords[jump.fromName]["y"]*Math.sin(zenit)*Math.cos(azimut) + coords[jump.fromName]["z"]*Math.cos(zenit);
+		var fromPerspective = (newfromz + divz * scaleZ) / divz / scaleZ / 10 + 0.9;
+		var newtox = coords[jump.toName]["x"]*Math.cos(azimut) - coords[jump.toName]["y"]*Math.sin(azimut);
+		var newtoy = coords[jump.toName]["x"]*Math.cos(zenit)*Math.sin(azimut) + coords[jump.toName]["y"]*Math.cos(zenit)*Math.cos(azimut) - coords[jump.toName]["z"]*Math.sin(zenit);
+		var newtoz = coords[jump.toName]["x"]*Math.sin(zenit)*Math.sin(azimut) + coords[jump.toName]["y"]*Math.sin(zenit)*Math.cos(azimut) + coords[jump.toName]["z"]*Math.cos(zenit);
+		var toPerspective = (newtoz + divz * scaleZ) / divz / scaleZ / 10 + 0.9;
+		cxt.beginPath();
+		cxt.moveTo(newfromx*fromPerspective+width/2+2, -newfromy*fromPerspective+height/2+2);
+		cxt.lineTo(newtox*toPerspective+width/2+2, -newtoy*toPerspective+height/2+2);
+		cxt.closePath();
+		cxt.stroke();
+	};
+
+	function drawStar(dot) {
+		var newx = dot["x"]*Math.cos(azimut) - dot["y"]*Math.sin(azimut);
+		var newy = dot["x"]*Math.cos(zenit)*Math.sin(azimut) + dot["y"]*Math.cos(zenit)*Math.cos(azimut) - dot["z"]*Math.sin(zenit);
+		var newz = dot["x"]*Math.sin(zenit)*Math.sin(azimut) + dot["y"]*Math.sin(zenit)*Math.cos(azimut) + dot["z"]*Math.cos(zenit);
+		var perspective = (newz + divz * scaleZ) / divz / scaleZ / 10 + 0.9;
+		cxt.fillRect(newx*perspective+width/2, -newy*perspective+height/2, 3, 3);
+		cxt.fillText(i,newx*perspective+width/2, -newy*perspective+height/2-1);
+		visibleDots[i]["x"] = newx*perspective;
+		visibleDots[i]["y"] = newy*perspective;
+	};
 
 	function savePath(p) {
 		console.log(path = p);
