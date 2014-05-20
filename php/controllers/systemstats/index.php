@@ -45,7 +45,7 @@ class systemstats_index {
 		// Определяем параметры
 		$time = isset($_GET['time']) ? db::escape(urldecode($_GET['time'])) : 'hourly';
 		$mode = isset($_GET['mode']) ? db::escape(urldecode($_GET['mode'])) : 'system';
-		$subject = isset($_GET['subject']) ? self::parseStarList(urldecode($_GET['subject'])) : 'default';
+		$subject = isset($_GET['subject']) ? self::parseSystemList(urldecode($_GET['subject'])) : 'default';
 		
 		// Формируем строки для отображения на странице
 		$maincaption = 'График активности в системах (жмякните чтобы скрыть/показать фильтры)';
@@ -72,7 +72,7 @@ class systemstats_index {
 		
 		// Выбранные системы
 		if ($subject != 'default') {
-			$selectedStars = '';
+			$selectedSystems = '';
 			foreach ($subject['names'] as $i => $unit) {
 				$escapedUnit = db::escape($unit);
 				$q = "SELECT `s`.`id`, `s`.`regionID`, `r`.`name` AS `regionName` FROM `systems` AS `s` JOIN `regions` AS `r` ON (`r`.`id` = `s`.`regionID`) WHERE `s`.`name`='$escapedUnit';";
@@ -86,10 +86,10 @@ class systemstats_index {
 				if ($ss <= 0.4 && $ss > 0.0) $color = 'orange';
 				if ($ss <= 0.0) $color = 'red';
 				
-				$selectedStars .= '<div data-name="' . $unit . '" data-id="' . $r[0]['id'] . '" data-regid="' . $r[0]['regionID'] . '" class="selectedStar"><div style="color:' . $color . '" class="ss">' . $subject['secures'][$i] . '</div>' . $unit . '<img src="/source/img/delete.png" class="deselectStar"><div class="sysRegHolder"><div class="sysRegion">' . $r[0]['regionName'] . '</div></div></div>';
+				$selectedSystems .= '<div data-name="' . $unit . '" data-id="' . $r[0]['id'] . '" data-regid="' . $r[0]['regionID'] . '" class="selectedSystem"><div style="color:' . $color . '" class="ss">' . $subject['secures'][$i] . '</div>' . $unit . '<img src="/source/img/delete.png" class="deselectSystem"><div class="sysRegHolder"><div class="sysRegion">' . $r[0]['regionName'] . '</div></div></div>';
 			}
 		} else {
-			$selectedStars = '<div class="selectedStar" data-regid="10000043" data-id="30002187" data-name="Amarr"><div class="ss" style="color:skyblue">1.0</div>Amarr<img class="deselectStar" src="/source/img/delete.png"><div class="sysRegHolder"><div class="sysRegion">Domain</div></div></div><div class="selectedStar" data-regid="10000030" data-id="30002510" data-name="Rens"><div class="ss" style="color:green">0.9</div>Rens<img class="deselectStar" src="/source/img/delete.png"><div class="sysRegHolder"><div class="sysRegion">Heimatar</div></div></div><div class="selectedStar" data-regid="10000002" data-id="30000142" data-name="Jita"><div class="ss" style="color:green">0.9</div>Jita<img class="deselectStar" src="/source/img/delete.png"><div class="sysRegHolder"><div class="sysRegion">The Forge</div></div></div><div class="selectedStar" data-regid="10000032" data-id="30002659" data-name="Dodixie"><div class="ss" style="color:green">0.9</div>Dodixie<img class="deselectStar" src="/source/img/delete.png"><div class="sysRegHolder"><div class="sysRegion">Sinq Laison</div></div></div>';
+			$selectedSystems = '<div class="selectedSystem" data-regid="10000043" data-id="30002187" data-name="Amarr"><div class="ss" style="color:skyblue">1.0</div>Amarr<img class="deselectSystem" src="/source/img/delete.png"><div class="sysRegHolder"><div class="sysRegion">Domain</div></div></div><div class="selectedSystem" data-regid="10000030" data-id="30002510" data-name="Rens"><div class="ss" style="color:green">0.9</div>Rens<img class="deselectSystem" src="/source/img/delete.png"><div class="sysRegHolder"><div class="sysRegion">Heimatar</div></div></div><div class="selectedSystem" data-regid="10000002" data-id="30000142" data-name="Jita"><div class="ss" style="color:green">0.9</div>Jita<img class="deselectSystem" src="/source/img/delete.png"><div class="sysRegHolder"><div class="sysRegion">The Forge</div></div></div><div class="selectedSystem" data-regid="10000032" data-id="30002659" data-name="Dodixie"><div class="ss" style="color:green">0.9</div>Dodixie<img class="deselectSystem" src="/source/img/delete.png"><div class="sysRegHolder"><div class="sysRegion">Sinq Laison</div></div></div>';
 		}
 		
 		
@@ -98,7 +98,7 @@ class systemstats_index {
 		root::$_ALL['mainsupport'] = $mainsupport;
 		root::$_ALL['maincontent'] = $maincontent;
 		root::$_ALL['regionbuttons'] = $regionButtons;
-		root::$_ALL['selectedstars'] = $selectedStars;
+		root::$_ALL['selectedsystems'] = $selectedSystems;
 	}
 	
 /**
@@ -113,7 +113,7 @@ class systemstats_index {
 		// Определяем параметры
 		$time = isset($_GET['time']) ? urldecode($_GET['time']) : 'hourly';
 		$mode = isset($_GET['mode']) ? urldecode($_GET['mode']) : 'system';
-		$subject = $_GET['subject'] ? self::parseStarList(urldecode($_GET['subject'])) : 'default';
+		$subject = $_GET['subject'] ? self::parseSystemList(urldecode($_GET['subject'])) : 'default';
 
 		// Формируем строку в зависимости от параметров
 		$res = self::getStringForGraph($time, $mode, $subject);
@@ -142,7 +142,7 @@ class systemstats_index {
 		}
 *	
 **/
-	private static function parseStarList($string) {
+	private static function parseSystemList($string) {
 		$escapedString = db::escape($string);
 		$array['names'] = explode(',', preg_replace('/\s*\_\-*\d+/', '', $escapedString));
 		$array['secures'] = explode(',', preg_replace('/(\D|\A)(\-?\d)/', '$1$2.', preg_replace('/[a-zA-Z0-9\s\-]+_/', '', $escapedString)));
@@ -155,7 +155,7 @@ class systemstats_index {
 *	Метод, формирующий форматную строку для графика
 *	@param	time - временной типа графика (ежечасный/ежедневный/ежемесячный)
 *	@param	mode - тип графика система/регион
-*	@param	subject - массив элементов, отформатированный в parseStarList()
+*	@param	subject - массив элементов, отформатированный в parseSystemList()
 *	@return string - форматная строка с информацией для графика
 *	
 **/	

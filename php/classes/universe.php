@@ -46,7 +46,7 @@ class universe {
 				JOIN `systems` as `to` ON (`g`.`to` = `to`.`id`)
 				JOIN `regions` as `rfrom` ON (`rfrom`.`id` = `from`.`regionID`)
 				JOIN `regions` as `rto` ON (`rto`.`id` = `to`.`regionID`)');
-		root::$_ALL['backtrace'][] = 'Took region set and star set from DataBase';
+		root::$_ALL['backtrace'][] = 'Took region set and system set from DataBase';
 	}
 
 /**
@@ -59,17 +59,17 @@ class universe {
 	public static function getSystems($regions) {
 		$regionset = explode(',', $regions);
 		foreach ($regionset as $regID) {
-			foreach (self::$systems as $starid => $starinfo) {
-				if ($starinfo['regionID'] == $regID) {
-					$sort[] = $starinfo['name'];
-					$star[ $starinfo['name'] ] = $starinfo;
-					$star[ $starinfo['name'] ]['regionName'] = self::$regions[ $regID ];
+			foreach (self::$systems as $systemid => $systeminfo) {
+				if ($systeminfo['regionID'] == $regID) {
+					$sort[] = $susteminfo['name'];
+					$system[ $systeminfo['name'] ] = $systeminfo;
+					$system[ $systeminfo['name'] ]['regionName'] = self::$regions[ $regID ];
 				}
 			}
 		}
 		sort($sort);
 		foreach ($sort as $order => $name) {
-			$res[ $order ] = $star[ $name ];
+			$res[ $order ] = $system[ $name ];
 		}
 		return json_encode($res);
 	}
@@ -201,16 +201,16 @@ class universe {
 			$a[$i] = $d[$i];
 		if (count($p) == 1) {
 			$s = self::getRegionMap($p[0][0]);
-			$stars = array('dots' => $s['dots'], 'jumps' => $s['jumps'],'routeDots' => $s['routeDots']);
+			$systems = array('dots' => $s['dots'], 'jumps' => $s['jumps'],'routeDots' => $s['routeDots']);
 		} else
-			$stars = array('dots' => array(), 'jumps' => array(),'routeDots' => array());
+			$systems = array('dots' => array(), 'jumps' => array(),'routeDots' => array());
 		foreach ($a as $regname => $t) {
 			$s = self::getRegionMap($regname);
-			$stars['dots'] = array_merge($stars['dots'], $s['dots']);
-			$stars['jumps'] = array_merge($stars['jumps'], $s['jumps']);
-			$stars['routeDots'] = array_merge($stars['routeDots'], $s['routeDots']);
+			$systems['dots'] = array_merge($systems['dots'], $s['dots']);
+			$systems['jumps'] = array_merge($systems['jumps'], $s['jumps']);
+			$systems['routeDots'] = array_merge($systems['routeDots'], $s['routeDots']);
 		}
-		echo json_encode($stars);
+		echo json_encode($systems);
 	}
 
 /**

@@ -66,14 +66,14 @@
 #selectPreset {
 	width: 100%;
 }
-#selectedStars {
+#selectedSystems {
 	width: 360px;
 	height: 500px;
 	float: right;
 	padding: 10px 0;
 	overflow-y: scroll;
 }
-.selectedStar {
+.selectedSystem {
 	margin: 5px;
 	padding: 5px;
 	color: white;
@@ -91,7 +91,7 @@
 	color: #aaa;
 	font-size: 10px;
 }
-.deselectStar {
+.deselectSystem {
 	width: 15px;
 	height: 15px;
 	float: right;

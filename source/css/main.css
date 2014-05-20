@@ -38,7 +38,7 @@ a.nodeco {
 	background-color: black;
 	opacity: 0.5;
 }
-#starMenu {
+#systemMenu {
 	position: absolute;
 	padding: 2px 2px 0;
 	display: none;
@@ -49,7 +49,7 @@ a.nodeco {
 	-moz-border-radius: 3px;
 	-webkit-border-radius: 3px;
 }
-#starMenu * {
+#systemMenu * {
 	margin: 2px 2px 0 2px;
 	display: inline-block;
 	cursor: pointer;
@@ -100,14 +100,14 @@ a.nodeco {
 .ssVariantSS {
 	font-weight: bold;
 }
-.ssVariantStar {
+.ssVariantSystem {
 	color: white;
 	font-weight: bold;
 }
 .ssVariantReg {
 	float:right;
 }
-.starMenuButton {
+.systemMenuButton {
 	width: 16px;
 	height: 16px;
 	cursor: pointer;

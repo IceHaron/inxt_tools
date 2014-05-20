@@ -69,9 +69,9 @@ $(document).ready(function() {
 	var scaleZ = (depth-padding*2) / divz;
 	calc();
 	// if (localStorage.getItem('from') !== null)
-		// $('#fromStar').val(localStorage.getItem('from')).attr('data-id', skeleton[localStorage.getItem('from')]['id']).css('background-color', 'lime');
+		// $('#fromSystem').val(localStorage.getItem('from')).attr('data-id', skeleton[localStorage.getItem('from')]['id']).css('background-color', 'lime');
 	// if (localStorage.getItem('to') !== null)
-		// $('#toStar').val(localStorage.getItem('to')).attr('data-id', skeleton[localStorage.getItem('to')]['id']).css('background-color', 'lime');
+		// $('#toSystem').val(localStorage.getItem('to')).attr('data-id', skeleton[localStorage.getItem('to')]['id']).css('background-color', 'lime');
 	testRouter();
 	if (get.hasOwnProperty('from') && get.hasOwnProperty('to')) route(get.from, get.to);
 	else {
@@ -80,7 +80,7 @@ $(document).ready(function() {
 	}
 
 	$(canvas).mousedown(function(e) {
-		$('.star').remove();
+		$('.system').remove();
 		var pos = $(this).offset();
 		$('.startx').html(e.pageX-pos.left);
 		$('.starty').html(e.pageY-pos.top);
@@ -95,7 +95,7 @@ $(document).ready(function() {
 		allowSelect();
 	});
 
-	$(document).on('click', '.star', function() {
+	$(document).on('click', '.system', function() {
 		if (!get.hasOwnProperty('reg')) {
 			var search = '';
 			for (i in get) search += '&'+i+'='+get[i];
@@ -103,12 +103,15 @@ $(document).ready(function() {
 			window.location = newLoc;
 		} else {
 			var name = $(this).attr('data-name');
-			$('.star[data-name!="' + name + '"]').hide();
+			var id = skeleton[name]['id'];
+			var regname = skeleton[name]['regName'];
+			var ss =  skeleton[name]['security'];
+			$('.system[data-name!="' + name + '"]').hide();
 			var fromPrefix = '';
 			var toPrefix = '';
-			if ($('#fromStar').val() == name && $('#fromStar').attr('data-id') !== undefined) toPrefix = 'not_';
-			if ($('#toStar').val() == name && $('#toStar').attr('data-id') !== undefined) fromPrefix = 'not_';
-			$(this).append('<div class="makePath"><div class="' + fromPrefix + 'fromHere">Отсюда</div><div class="' + toPrefix + 'toHere">Сюда</div></div>');
+			if ($('#fromSystem').val() == name && $('#fromSystem').attr('data-id') !== undefined) toPrefix = 'not_';
+			if ($('#toSystem').val() == name && $('#toSystem').attr('data-id') !== undefined) fromPrefix = 'not_';
+			$(this).append('<div class="makePath"><div class="' + fromPrefix + 'fromHere">Отсюда</div><div class="' + toPrefix + 'toHere">Сюда</div></div><div class="systemMenu"></div>');
 			testRouter();
 		}
 	});
@@ -126,38 +129,38 @@ $(document).ready(function() {
 			window.location = window.location.pathname + (search != '' ? '?' + search.substr(1) : '');
 	})
 
-	$(document).on('mouseenter', '.star', function() {
-		var starName = $(this).attr('data-name');
-		$(this).append('<span class="starName">' + starName + '</span>');
+	$(document).on('mouseenter', '.system', function() {
+		var systemName = $(this).attr('data-name');
+		$(this).append('<span class="systemName">' + systemName + '</span>');
 	});
 
-	$(document).on('mouseleave', '.star', function() {
-		$(this).children('.starName').remove();
+	$(document).on('mouseleave', '.system', function() {
+		$(this).children('.systemName').remove();
 		$(this).children('.makePath').remove();
-		$('.star').show();
+		$('.system').show();
 	});
 
-	$(document).on('mouseenter', '.pathStar', function() {
+	$(document).on('mouseenter', '.pathSystem', function() {
 		var name = $(this).attr('data-name');
-		$('.star[data-name="' + name + '"]').css('opacity', '1').append('<span class="starName">' + name + '</span>');
+		$('.system[data-name="' + name + '"]').css('opacity', '1').append('<span class="systemName">' + name + '</span>');
 	});
-	$(document).on('mouseleave', '.pathStar', function() {
+	$(document).on('mouseleave', '.pathSystem', function() {
 		var name = $(this).attr('data-name');
-		$('.star[data-name="' + name + '"]').css('opacity', '').children('.starName').remove();
+		$('.system[data-name="' + name + '"]').css('opacity', '').children('.systemName').remove();
 	});
 
 	$(document).on('click', '.fromHere', function() {
 		var name = $(this).parent().parent().attr('data-name');
-		$('#fromStar').val(name).attr('data-id', skeleton[name]['id']).css('background-color', 'lime');
+		$('#fromSystem').val(name).attr('data-id', skeleton[name]['id']).css('background-color', 'lime');
 	});
 
 	$(document).on('click', '.toHere', function() {
 		var name = $(this).parent().parent().attr('data-name');
-		$('#toStar').val(name).attr('data-id', skeleton[name]['id']).css('background-color', 'lime');
+		$('#toSystem').val(name).attr('data-id', skeleton[name]['id']).css('background-color', 'lime');
 	});
 
 /* Поиск систем */
-	$('#fromStar, #toStar').keyup(function(key) {
+	$('#fromSystem, #toSystem').keyup(function(key) {
 		var noAcceptKeys = new Array(
 			9		// Tab
 		, 16	// Shift
@@ -186,10 +189,10 @@ $(document).ready(function() {
 					$('#systemSearchVariants').html('').show().attr('data-referrer', referrer);
 					for (i in data) {
 						var variant = data[i];
-						if ($('.selectedStar[data-name="' + variant.name + '"]').length == 0)
-							$('#systemSearchVariants').append('<div class="ssVariant" data-regid="' + variant.regionID + '" data-id="' + variant.id + '" data-name="' + variant.name + '"><span style="color: ' + SecurityStanding.paint(variant.security) + '" class="ssVariantSS">' + SecurityStanding.format(variant.security) + '</span><span class="ssVariantStar">' + variant.name + '</span><span class="ssVariantReg">' + variant.regionName + '</span></div>');
+						if ($('.selectedSystem[data-name="' + variant.name + '"]').length == 0)
+							$('#systemSearchVariants').append('<div class="ssVariant" data-regid="' + variant.regionID + '" data-id="' + variant.id + '" data-name="' + variant.name + '"><span style="color: ' + SecurityStanding.paint(variant.security) + '" class="ssVariantSS">' + SecurityStanding.format(variant.security) + '</span><span class="ssVariantSystem">' + variant.name + '</span><span class="ssVariantReg">' + variant.regionName + '</span></div>');
 						else
-							$('#systemSearchVariants').append('<div class="ssVariantInactive" data-regid="' + variant.regionID + '" data-id="' + variant.id + '" data-name="' + variant.name + '"><span style="color: ' + SecurityStanding.paint(variant.security) + '" class="ssVariantSS">' + SecurityStanding.format(variant.security) + '</span><span class="ssVariantStar">' + variant.name + '</span><span class="ssVariantReg">' + variant.regionName + '</span></div>');
+							$('#systemSearchVariants').append('<div class="ssVariantInactive" data-regid="' + variant.regionID + '" data-id="' + variant.id + '" data-name="' + variant.name + '"><span style="color: ' + SecurityStanding.paint(variant.security) + '" class="ssVariantSS">' + SecurityStanding.format(variant.security) + '</span><span class="ssVariantSystem">' + variant.name + '</span><span class="ssVariantReg">' + variant.regionName + '</span></div>');
 					}
 				}
 			, complete: function(data) {
@@ -199,12 +202,12 @@ $(document).ready(function() {
 		}
 	});
 
-	$('#fromStar, #toStar').click(function() {
+	$('#fromSystem, #toSystem').click(function() {
 		$('#systemSearchVariants').hide();
 		if ($('.ssVariant').length > 0) $('#systemSearchVariants[data-referrer="' + $(this).attr('id') + '"]').show();
 	});
 
-	$('#fromStar, #toStar').change(function() {
+	$('#fromSystem, #toSystem').change(function() {
 		var id = $(this).attr('data-id');
 		var name = $(this).val();
 		testRouter();
@@ -302,7 +305,7 @@ $(document).ready(function() {
 						var ss =  skeleton[now]['security'];
 						var color = SecurityStanding.paint(ss);
 						var graphLink = ',' + now + '_' + ss.replace('.','');
-						$('#path').prepend('<div class="pathStar" data-id="' + id + '" data-name="' + now + '"><div class="ss" style="color:' + color + '">' + ss + '</div>' + now + '<div class="starMenuButton" data-id="' + id + '" data-name="' + now + '" data-ss="' + ss + '" data-regname="' + regname + '"></div><div class="sysRegHolder"><div class="sysPathRegion">' + regname + '</div></div></div>');
+						$('#path').prepend('<div class="pathSystem" data-id="' + id + '" data-name="' + now + '"><div class="ss" style="color:' + color + '">' + ss + '</div>' + now + '<div class="systemMenuButton" data-id="' + id + '" data-name="' + now + '" data-ss="' + ss + '" data-regname="' + regname + '"></div><div class="sysRegHolder"><div class="sysPathRegion">' + regname + '</div></div></div>');
 						while (now != from && counter < 10000) {
 							for (i in routeDots[now]) {
 								if (d[i] < d[now]) {
@@ -313,7 +316,7 @@ $(document).ready(function() {
 									var ss =  skeleton[i]['security'];
 									var color = SecurityStanding.paint(ss);
 									graphLink = ',' + i + '_' + ss.replace('.','') + graphLink;
-									$('#path').prepend('<div class="pathStar" data-id="' + id + '" data-name="' + i + '"><div class="ss" style="color:' + color + '">' + ss + '</div>' + i + '<div class="starMenuButton" data-id="' + id + '" data-name="' + i + '" data-ss="' + ss + '" data-regname="' + regname + '"></div><div class="sysRegHolder"><div class="sysPathRegion">' + regname + '</div></div></div>');
+									$('#path').prepend('<div class="pathSystem" data-id="' + id + '" data-name="' + i + '"><div class="ss" style="color:' + color + '">' + ss + '</div>' + i + '<div class="systemMenuButton" data-id="' + id + '" data-name="' + i + '" data-ss="' + ss + '" data-regname="' + regname + '"></div><div class="sysRegHolder"><div class="sysPathRegion">' + regname + '</div></div></div>');
 									now = i;
 								}
 							}
@@ -325,9 +328,9 @@ $(document).ready(function() {
 						for (var i = 0; i < localStorage.length; i++) {
 							key = localStorage.key(i);
 							if (key.search('mark_') !== -1) {
-								var star = JSON.parse(localStorage.getItem(key));
-								var color = SecurityStanding.paint(star.ss);
-								$('#path').prepend('<div class="pathStar" data-id="' + star.id + '" data-name="' + i + '"><div class="ss" style="color:' + color + '">' + star.ss + '</div>' + star.name + '<div class="starMenuButton" data-id="' + star.id + '" data-name="' + star.name + '" data-ss="' + star.ss + '" data-regname="' + star.regname + '"></div><div class="sysRegHolder"><div class="sysPathRegion">' + star.regname + '</div></div></div>');
+								var system = JSON.parse(localStorage.getItem(key));
+								var color = SecurityStanding.paint(system.ss);
+								$('#path').prepend('<div class="pathSystem" data-id="' + system.id + '" data-name="' + system.name + '"><div class="ss" style="color:' + color + '">' + system.ss + '</div>' + system.name + '<div class="systemMenuButton" data-id="' + system.id + '" data-name="' + system.name + '" data-ss="' + system.ss + '" data-regname="' + system.regname + '"></div><div class="sysRegHolder"><div class="sysPathRegion">' + system.regname + '</div></div></div>');
 							}
 						}
 						$('#path').prepend('<p>Отмеченные системы:</p>');
@@ -345,8 +348,8 @@ $(document).ready(function() {
 			var posleft = dot["x"]+width/2-10;
 			var postop = -dot["y"]+height/2-10;
 			if (postop > -10 && posleft > -10 && postop < height-15 && posleft < width-15) {
-				$('.interaction').append('<div class="star" data-name="' + i + '"><img src="/source/img/starCircle.png"></div>');
-				$('.star[data-name="' + i + '"]').css({'margin-left':posleft, 'margin-top':postop});
+				$('.interaction').append('<div class="system" data-name="' + i + '"><img src="/source/img/starCircle.png"></div>');
+				$('.system[data-name="' + i + '"]').css({'margin-left':posleft, 'margin-top':postop});
 			}
 		}
 	}
@@ -391,7 +394,7 @@ $(document).ready(function() {
 		}
 		for (i in coords) {
 			if (!localStorage.getItem('mark_' + skeleton[i]['id']) && !path.hasOwnProperty(i)) {
-				drawStar(coords[i]);
+				drawSystem(coords[i]);
 				cxt.fillStyle = 'white';
 			}
 		}
@@ -408,10 +411,10 @@ $(document).ready(function() {
 		for (i in coords) {
 			if (path.hasOwnProperty(i)) {
 				cxt.fillStyle = 'yellow';
-				drawStar(coords[i]);
+				drawSystem(coords[i]);
 			} else if (localStorage.getItem('mark_' + skeleton[i]['id'])) {
 				cxt.fillStyle = 'lime';
-				drawStar(coords[i]);
+				drawSystem(coords[i]);
 			}
 		}
 	}
@@ -432,7 +435,7 @@ $(document).ready(function() {
 		cxt.stroke();
 	};
 
-	function drawStar(dot) {
+	function drawSystem(dot) {
 		var newx = dot["x"]*Math.cos(azimut) - dot["y"]*Math.sin(azimut);
 		var newy = dot["x"]*Math.cos(zenit)*Math.sin(azimut) + dot["y"]*Math.cos(zenit)*Math.cos(azimut) - dot["z"]*Math.sin(zenit);
 		var newz = dot["x"]*Math.sin(zenit)*Math.sin(azimut) + dot["y"]*Math.sin(zenit)*Math.cos(azimut) + dot["z"]*Math.cos(zenit);
@@ -450,13 +453,21 @@ $(document).ready(function() {
 	}
 
 	function testRouter() {
-		if ($('#fromStar').val() != '' && $('#fromStar').attr('data-id') !== undefined) localStorage.setItem('from', $('#fromStar').val());
+		if ($('#fromSystem').val() != '' && $('#fromSystem').attr('data-id') !== undefined) localStorage.setItem('from', $('#fromSystem').val());
 			else localStorage.removeItem('from', null);
-		if ($('#toStar').val() != '' && $('#toStar').attr('data-id') !== undefined) localStorage.setItem('to', $('#toStar').val());
+		if ($('#toSystem').val() != '' && $('#toSystem').attr('data-id') !== undefined) localStorage.setItem('to', $('#toSystem').val());
 			else localStorage.removeItem('to', null);
-		if($('#fromStar').val() != '' && $('#fromStar').attr('data-id') !== undefined && $('#toStar').val() != '' && $('#toStar').attr('data-id') !== undefined)
+		if($('#fromSystem').val() != '' && $('#fromSystem').attr('data-id') !== undefined && $('#toSystem').val() != '' && $('#toSystem').attr('data-id') !== undefined)
 			$('#submitPath').removeAttr('disabled');
 		else $('#submitPath').attr('disabled', true);
+	}
+
+	function drawSystemMenuButton(name) {
+		var id = skeleton[name]['id'];
+		var regname = skeleton[name]['regName'];
+		var ss =  skeleton[name]['security'];
+		var html = '<div class="systemMenuButton" data-id="' + id + '" data-name="' + name + '" data-ss="' + ss + '" data-regname="' + regname + '"></div>';
+		return html;
 	}
 
 });

@@ -33,8 +33,8 @@ var somethingChanged = false;
 		var regid = $(this).attr('data-regid');
 		var regname = $(this).parent().parent().parent().children().eq(0).text();
 		var ss =  $(this).next()[0].outerHTML;
-		if (this.checked) $('#selectedStars').append('<div class="selectedStar" data-regid="' + regid + '" data-id="' + id + '" data-name="' + name + '">' + ss + name + '<img class="deselectStar" src="/source/img/delete.png"><div class="sysRegHolder"><div class="sysRegion">' + regname + '</div></div></div>');
-		else $('#selectedStars .selectedStar[data-name="' + name + '"]').remove();
+		if (this.checked) $('#selectedSystems').append('<div class="selectedSystem" data-regid="' + regid + '" data-id="' + id + '" data-name="' + name + '">' + ss + name + '<img class="deselectSystem" src="/source/img/delete.png"><div class="sysRegHolder"><div class="sysRegion">' + regname + '</div></div></div>');
+		else $('#selectedSystems .selectedSystem[data-name="' + name + '"]').remove();
 		somethingChanged = true;
 	});
 
@@ -44,15 +44,15 @@ var somethingChanged = false;
 	});
 	
 /* Убираем систему из списка при клике на крестик около нее */
-	$(document).on('click', '.deselectStar', function() {
+	$(document).on('click', '.deselectSystem', function() {
 		$(this).parent().remove();
-		if ($('.selectedStar').length != 0) somethingChanged = true;
+		if ($('.selectedSystem').length != 0) somethingChanged = true;
 	});
 	
 /* Скрытие облака регионов и выбранных систем при клике на соответствующую кнопку */
 	$('.hideRegs').click(function() {
 		$('#regionCloud').toggle();
-		$('#selectedStars').toggle();
+		$('#selectedSystems').toggle();
 	});
 	
 	/* Формирование опций для селектора пресетов */
@@ -152,7 +152,7 @@ function getSystems(regions) {
 			
 			
 			/* Устанавливаем состояние всех чекбоксов в зависимости от выбранных систем */
-			var get = $('.selectedStar')
+			var get = $('.selectedSystem')
 			if (get[0] != '') {
 				var query = {};
 				
@@ -177,14 +177,14 @@ function getSystems(regions) {
 }
 
 /* check/uncheck систем в зависимости от региона и состояния его чекбокса */
-function checkStars(regid, state) {
+function checkSystems(regid, state) {
 	$('input[name="system"][data-regid="' + regid + '"]').each(function() {
 		this.checked = state;
 	});
 }
 
 /* show/hide систем в зависимости от региона и состояния его чекбокса */
-function toggleStars(regid, state) {
+function toggleSystems(regid, state) {
 	$('input[data-regid="' + regid + '"]').each(function() {
 		if (state) $(this).parent().show(); else $(this).parent().hide();
 		// this.checked = state;
@@ -212,7 +212,7 @@ function getInfo() {
 	var time = $('input[name="time"]:checked').attr('data-time') ? $('input[name="time"]:checked').attr('data-time') : 'hourly';
 	var mode = 'system';
 	var subject = '';
-	$('.selectedStar').each(function() {
+	$('.selectedSystem').each(function() {
 		subject += ',' + $(this).attr('data-name') + '_' + $(this).children('.ss').text().replace('.', '');
 	});
 	subject = subject.substr(1);

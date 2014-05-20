@@ -63,10 +63,10 @@ $(document).ready(function() {
 					$('#systemSearchVariants').html('').show();
 					for (i in data) {
 						var variant = data[i];
-						if ($('.selectedStar[data-name="' + variant.name + '"]').length == 0)
-							$('#systemSearchVariants').append('<div class="ssVariant" data-regid="' + variant.regionID + '" data-id="' + variant.id + '" data-name="' + variant.name + '"><span style="color: ' + SecurityStanding.paint(variant.security) + '" class="ssVariantSS">' + SecurityStanding.format(variant.security) + '</span><span class="ssVariantStar">' + variant.name + '</span><span class="ssVariantReg">' + variant.regionName + '</span></div>');
+						if ($('.selectedSystem[data-name="' + variant.name + '"]').length == 0)
+							$('#systemSearchVariants').append('<div class="ssVariant" data-regid="' + variant.regionID + '" data-id="' + variant.id + '" data-name="' + variant.name + '"><span style="color: ' + SecurityStanding.paint(variant.security) + '" class="ssVariantSS">' + SecurityStanding.format(variant.security) + '</span><span class="ssVariantSystem">' + variant.name + '</span><span class="ssVariantReg">' + variant.regionName + '</span></div>');
 						else
-							$('#systemSearchVariants').append('<div class="ssVariantInactive" data-regid="' + variant.regionID + '" data-id="' + variant.id + '" data-name="' + variant.name + '"><span style="color: ' + SecurityStanding.paint(variant.security) + '" class="ssVariantSS">' + SecurityStanding.format(variant.security) + '</span><span class="ssVariantStar">' + variant.name + '</span><span class="ssVariantReg">' + variant.regionName + '</span></div>');
+							$('#systemSearchVariants').append('<div class="ssVariantInactive" data-regid="' + variant.regionID + '" data-id="' + variant.id + '" data-name="' + variant.name + '"><span style="color: ' + SecurityStanding.paint(variant.security) + '" class="ssVariantSS">' + SecurityStanding.format(variant.security) + '</span><span class="ssVariantSystem">' + variant.name + '</span><span class="ssVariantReg">' + variant.regionName + '</span></div>');
 					}
 				}
 			, complete: function(data) {
@@ -84,7 +84,7 @@ $(document).ready(function() {
 		var regname = $(this).children('.ssVariantReg').text();
 		var ss = $(this).children('.ssVariantSS').text();
 		
-		$('.fromSearch').append('<div class="selectedStar" data-regid="' + regid + '" data-id="' + id + '" data-name="' + name + '"><div class="ss" style="color:' + SecurityStanding.paint(ss) + '">' + ss + '</div>' + name + '<img class="deselectStar" src="/source/img/delete.png"><div class="sysRegHolder"><div class="sysRegion">' + regname + '</div></div></div>');
+		$('.fromSearch').append('<div class="selectedSystem" data-regid="' + regid + '" data-id="' + id + '" data-name="' + name + '"><div class="ss" style="color:' + SecurityStanding.paint(ss) + '">' + ss + '</div>' + name + '<img class="deselectSystem" src="/source/img/delete.png"><div class="sysRegHolder"><div class="sysRegion">' + regname + '</div></div></div>');
 		
 		$('#systemSearchVariants').hide();
 		$(this).attr('class', 'ssVariantInactive');
@@ -94,27 +94,27 @@ $(document).ready(function() {
 /* Скрываем список найденных систем при клике в другое место */
 	$(document).click(function(t) {
 		if ($(t.target).attr('class') != 'ssVariant'
-			&& $(t.target).attr('class') != 'ssVariantStar'
+			&& $(t.target).attr('class') != 'ssVariantSystem'
 			&& $(t.target).attr('class') != 'ssVariantSS'
 			&& $(t.target).attr('class') != 'ssVariantReg'
 			&& $(t.target).attr('class') != 'systemSearch'
 			&& $(t.target).attr('id') != 'systemSearch'
-			&& $(t.target).attr('id') != 'fromStar'
-			&& $(t.target).attr('id') != 'toStar'
+			&& $(t.target).attr('id') != 'fromSystem'
+			&& $(t.target).attr('id') != 'toSystem'
 			&& $(t.target).attr('id') != 'systemSearchVariants'
 			)
 				$('#systemSearchVariants').hide();
 		if ($(t.target).attr('class') == 'systemSearch' && $('.ssVariant').length > 0) $('#systemSearchVariants').show();
-		if ($(t.target).attr('class') != 'starMenuButton' && $(t.target).attr('id') != 'starMenu' && $(t.target).parent().attr('id') != 'starMenu')
-			$('#starMenu').hide();
+		if ($(t.target).attr('class') != 'systemMenuButton' && $(t.target).attr('id') != 'systemMenu' && $(t.target).parent().attr('id') != 'systemMenu')
+			$('#systemMenu').hide();
 	});
 
-	$(document).on('click', '.starMenuButton', function () {
+	$(document).on('click', '.systemMenuButton', function () {
 		var id = $(this).attr('data-id');
 		var name = $(this).attr('data-name');
 		var ss = $(this).attr('data-ss');
 		var regname = $(this).attr('data-regname');
-		var elem = $('#starMenu');
+		var elem = $('#systemMenu');
 		var elemW = elem.width();
 		var left = $(this).offset().left;
 		var top = $(this).offset().top;

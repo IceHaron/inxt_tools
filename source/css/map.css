@@ -21,11 +21,11 @@
 	height: 630px;
 	overflow-y: scroll;
 }
-#fromStar, #toStar {
+#fromSystem, #toSystem {
 	background-color: lightpink;
 }
 .mapSSV { margin-left: 30px; }
-.pathStar {
+.pathSystem {
 	margin: 5px;
 	padding: 5px;
 	color: white;
@@ -41,21 +41,21 @@
 	color: #aaa;
 	font-size: 10px;
 }
-.starMenuButton {
+.systemMenuButton {
 	float: right;
 }
 .interaction {
 	position: absolute;
 }
-.star {
+.system {
 	position: absolute;
 	opacity: 0;
 	cursor: pointer;
 }
-.star:hover {
+.system:hover {
 	opacity: 1;
 }
-.starName {
+.systemName {
 	color: red;
 	background-color: black;
 	position: absolute;
