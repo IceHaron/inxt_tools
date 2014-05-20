@@ -102,8 +102,6 @@ $(document).ready(function() {
 			var newLoc = window.location.pathname + '?reg=' + escape($(this).attr('data-name')) + search;
 			window.location = newLoc;
 		} else {
-			$(this).children('.makePath').remove();
-			$(this).children('.hereMenuWrapper').remove();
 			var name = $(this).attr('data-name');
 			var id = skeleton[name]['id'];
 			var regname = skeleton[name]['regName'];
@@ -113,36 +111,11 @@ $(document).ready(function() {
 			var toPrefix = '';
 			if ($('#fromSystem').val() == name && $('#fromSystem').attr('data-id') !== undefined) toPrefix = 'not_';
 			if ($('#toSystem').val() == name && $('#toSystem').attr('data-id') !== undefined) fromPrefix = 'not_';
-			$(this).append('<div class="makePath"><div class="' + fromPrefix + 'fromHere">Отсюда</div><div class="' + toPrefix + 'toHere">Сюда</div></div><div class="hereMenuWrapper"<div class="hereMenu" data-id="' + id + '" data-name="' + name + '" data-ss="' + ss + '" data-regname="' + regname + '"><img class="mark" src="/source/img/aimCrossGreen_th.png" title="Пометить на карте"><img class="dismark" src="/source/img/delete_th.png" title="Снять метку на карте"><img class="showInfo" src="/source/img/info_th.png" title="Посмотреть информацию"></div></div>');
-			if (localStorage.getItem('mark_' + id)) {
-				$('.mark').hide();
-				$('.dismark').show();
-			} else {
-				$('.mark').show();
-				$('.dismark').hide();
-			}
+			$(this).append('<div class="makePath"><div class="' + fromPrefix + 'fromHere">Отсюда</div><div class="' + toPrefix + 'toHere">Сюда</div></div><div class="systemMenu"></div>');
 			testRouter();
-			draw();
 		}
 	});
 
-	$(document).on('click', '.mark', function() {
-		var parent = $(this).parent();
-		var id = parent.attr('data-id');
-		var name = parent.attr('data-name');
-		var ss = parent.attr('data-ss');
-		var regname = parent.attr('data-regname');
-		localStorage.setItem('mark_' + id, JSON.stringify({'id':id,'name':name,'ss':ss,'regname':regname}));
-		// $('#markOnMap').hide();
-		// $('#dismarkOnMap').show();
-	});
-	
-	$(document).on('click', '.dismark', function() {
-		var id = $(this).parent().attr('data-id');
-		localStorage.removeItem('mark_' + id);
-		// $('#markOnMap').show();
-		// $('#dismarkOnMap').hide();
-	});
 	$('#drawMap').click(function() {
 		var search = '';
 		for (i in get) if (i != 'reg') search += '&' + i + '=' + get[i];
@@ -164,7 +137,6 @@ $(document).ready(function() {
 	$(document).on('mouseleave', '.system', function() {
 		$(this).children('.systemName').remove();
 		$(this).children('.makePath').remove();
-		$(this).children('.hereMenuWrapper').remove();
 		$('.system').show();
 	});
 
