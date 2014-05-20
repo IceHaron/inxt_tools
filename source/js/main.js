@@ -119,12 +119,10 @@ $(document).ready(function() {
 		var left = $(this).offset().left;
 		var top = $(this).offset().top;
 		elem.css({'left':left - elemW + 16,'top':top - 4}).show();
-		elem.children().each(function () {
-			$(this).attr('data-id', id);
-			$(this).attr('data-name', name);
-			$(this).attr('data-ss', ss);
-			$(this).attr('data-regname', regname);
-		});
+		elem.attr('data-id', id);
+		elem.attr('data-name', name);
+		elem.attr('data-ss', ss);
+		elem.attr('data-regname', regname);
 		if (localStorage.getItem('mark_' + id)) {
 			$('#markOnMap').hide();
 			$('#dismarkOnMap').show();
@@ -135,17 +133,18 @@ $(document).ready(function() {
 	});
 
 	$('#markOnMap').click(function() {
-		var id = $(this).attr('data-id');
-		var name = $(this).attr('data-name');
-		var ss = $(this).attr('data-ss');
-		var regname = $(this).attr('data-regname');
+		var parent = $(this).parent();
+		var id = parent.attr('data-id');
+		var name = parent.attr('data-name');
+		var ss = parent.attr('data-ss');
+		var regname = parent.attr('data-regname');
 		localStorage.setItem('mark_' + id, JSON.stringify({'id':id,'name':name,'ss':ss,'regname':regname}));
 		$('#markOnMap').hide();
 		$('#dismarkOnMap').show();
 	});
 	
 	$('#dismarkOnMap').click(function() {
-		var id = $(this).attr('data-id');
+		var id = $(this).parent().attr('data-id');
 		localStorage.removeItem('mark_' + id);
 		$('#markOnMap').show();
 		$('#dismarkOnMap').hide();
