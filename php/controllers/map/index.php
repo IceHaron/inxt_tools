@@ -69,10 +69,10 @@ class map_index {
 				<input type="text" id="fromSystem" name="from" placeholder="Отправная точка" autocomplete="off">
 				<input type="text" id="toSystem" name="to" placeholder="Пункт назначения" autocomplete="off">
 				' . (isset($_GET['reg']) ? '<input type="hidden" name="reg" value="' . $_GET['reg'] . '">' : '') . '
-				<input type="submit" id="submitPath" disabled>
+				<input type="submit" id="submitPath" disabled value="Проложить путь">
 				<div id="systemSearchVariants" class="mapSSV">ololo</div>
 			</form>';
-		$maincontent = '<div id="path"></div>';
+		$maincontent = '';
 		
 		root::$_ALL['maincaption'] = 'EVE Universe Map';
 		root::$_ALL['mainsupport'] = $mainsupport;

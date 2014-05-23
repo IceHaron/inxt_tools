@@ -138,16 +138,24 @@ $(document).ready(function() {
 		var name = parent.attr('data-name');
 		var ss = parent.attr('data-ss');
 		var regname = parent.attr('data-regname');
+		var color = SecurityStanding.paint(ss);
 		localStorage.setItem('mark_' + id, JSON.stringify({'id':id,'name':name,'ss':ss,'regname':regname}));
+		$('#markedSystems').append('<div class="pathSystem" data-id="' + id + '" data-name="' + name + '"><div class="ss" style="color:' + color + '">' + ss + '</div>' + name + '<div class="systemMenuButton" data-id="' + id + '" data-name="' + name + '" data-ss="' + ss + '" data-regname="' + regname + '"></div><div class="sysRegHolder"><div class="sysPathRegion">' + regname + '</div></div></div>');
+		$('#markedSystems p').show();
 		$('#markOnMap').hide();
 		$('#dismarkOnMap').show();
+		parent.hide();
 	});
 	
 	$('#dismarkOnMap').click(function() {
+		var parent = $(this).parent();
 		var id = $(this).parent().attr('data-id');
 		localStorage.removeItem('mark_' + id);
+		$('#markedSystems .pathSystem[data-id="' + id + '"]').remove();
+		if ($('#markedSystems .pathSystem').length == 0) $('#markedSystems p').hide();
 		$('#markOnMap').show();
 		$('#dismarkOnMap').hide();
+		parent.hide();
 	});
 	
 /* End of READY() */

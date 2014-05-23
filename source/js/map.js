@@ -1,4 +1,11 @@
 $(document).ready(function() {
+
+/**
+* 
+* Карта
+* 
+**/
+if (document.getElementById("map")) {
 	var canvas=document.getElementById("map");
 	var cxt=canvas.getContext("2d");
 	var width = canvas.width;
@@ -78,6 +85,31 @@ $(document).ready(function() {
 		draw();
 		allowSelect();
 	}
+	var len = 0;
+	for (var i = 0; i < localStorage.length; i++) {
+		key = localStorage.key(i);
+		if (key.search('mark_') !== -1) {
+			len++;
+			var system = JSON.parse(localStorage.getItem(key));
+			var color = SecurityStanding.paint(system.ss);
+			$('#markedSystems').append('<div class="pathSystem" data-id="' + system.id + '" data-name="' + system.name + '"><div class="ss" style="color:' + color + '">' + system.ss + '</div>' + system.name + '<div class="systemMenuButton" data-id="' + system.id + '" data-name="' + system.name + '" data-ss="' + system.ss + '" data-regname="' + system.regname + '"></div><div class="sysRegHolder"><div class="sysPathRegion">' + system.regname + '</div></div></div>');
+		}
+	}
+	if (len == 0) $('#markedSystems p').hide();
+
+
+	$(document).on('click', '#wipeMarks', function() {
+		var keyToDelete = new Array();
+		for (var i = 0; i < localStorage.length; i++) {
+			keyToDelete[i] = localStorage.key(i);
+		}
+		for (i in keyToDelete)
+			if (keyToDelete[i].search('mark_') !== -1)
+				localStorage.removeItem(keyToDelete[i]);
+		$('#markedSystems .pathSystem').remove();
+		$('#markedSystems p').hide();
+		draw();
+	});
 
 	$(canvas).mousedown(function(e) {
 		$('.system').remove();
@@ -96,14 +128,12 @@ $(document).ready(function() {
 	});
 
 	$(document).on('click', '.system', function() {
+		$(this).children('.makePath').remove();
+		$(this).children('.hereMenuWrapper').remove();
 		if (!get.hasOwnProperty('reg')) {
-			var search = '';
-			for (i in get) search += '&'+i+'='+get[i];
-			var newLoc = window.location.pathname + '?reg=' + escape($(this).attr('data-name')) + search;
-			window.location = newLoc;
+			var name = $(this).attr('data-name');
+			$(this).append('<div class="hereMenuWrapper"><div class="hereMenu" data-name="' + name + '"><img class="lookMap" src="/source/img/aimCrossGreen_th.png" title="Посмотреть карту региона"><img class="showInfo" data-mode="region" src="/source/img/info_th.png" title="Посмотреть информацию"></div></div>');
 		} else {
-			$(this).children('.makePath').remove();
-			$(this).children('.hereMenuWrapper').remove();
 			var name = $(this).attr('data-name');
 			var id = skeleton[name]['id'];
 			var regname = skeleton[name]['regName'];
@@ -113,7 +143,7 @@ $(document).ready(function() {
 			var toPrefix = '';
 			if ($('#fromSystem').val() == name && $('#fromSystem').attr('data-id') !== undefined) toPrefix = 'not_';
 			if ($('#toSystem').val() == name && $('#toSystem').attr('data-id') !== undefined) fromPrefix = 'not_';
-			$(this).append('<div class="makePath"><div class="' + fromPrefix + 'fromHere">Отсюда</div><div class="' + toPrefix + 'toHere">Сюда</div></div><div class="hereMenuWrapper"<div class="hereMenu" data-id="' + id + '" data-name="' + name + '" data-ss="' + ss + '" data-regname="' + regname + '"><img class="mark" src="/source/img/aimCrossGreen_th.png" title="Пометить на карте"><img class="dismark" src="/source/img/delete_th.png" title="Снять метку на карте"><img class="showInfo" src="/source/img/info_th.png" title="Посмотреть информацию"></div></div>');
+			$(this).append('<div class="makePath"><div class="' + fromPrefix + 'fromHere">Отсюда</div><div class="' + toPrefix + 'toHere">Сюда</div></div><div class="hereMenuWrapper"><div class="hereMenu" data-id="' + id + '" data-name="' + name + '" data-ss="' + ss + '" data-regname="' + regname + '"><img class="mark" src="/source/img/aimCrossGreen_th.png" title="Пометить на карте"><img class="dismark" src="/source/img/delete_th.png" title="Снять метку на карте"><img class="showInfo" data-mode="system" src="/source/img/info_th.png" title="Посмотреть информацию"></div></div>');
 			if (localStorage.getItem('mark_' + id)) {
 				$('.mark').hide();
 				$('.dismark').show();
@@ -126,23 +156,27 @@ $(document).ready(function() {
 		}
 	});
 
+	$(document).on('click', '#systemMenu', function() {draw();});
+
 	$(document).on('click', '.mark', function() {
 		var parent = $(this).parent();
 		var id = parent.attr('data-id');
 		var name = parent.attr('data-name');
 		var ss = parent.attr('data-ss');
 		var regname = parent.attr('data-regname');
+		var color = SecurityStanding.paint(ss);
 		localStorage.setItem('mark_' + id, JSON.stringify({'id':id,'name':name,'ss':ss,'regname':regname}));
-		// $('#markOnMap').hide();
-		// $('#dismarkOnMap').show();
+		$('#markedSystems').append('<div class="pathSystem" data-id="' + id + '" data-name="' + name + '"><div class="ss" style="color:' + color + '">' + ss + '</div>' + name + '<div class="systemMenuButton" data-id="' + id + '" data-name="' + name + '" data-ss="' + ss + '" data-regname="' + regname + '"></div><div class="sysRegHolder"><div class="sysPathRegion">' + regname + '</div></div></div>');
+		$('#markedSystems p').show();
 	});
 	
 	$(document).on('click', '.dismark', function() {
 		var id = $(this).parent().attr('data-id');
 		localStorage.removeItem('mark_' + id);
-		// $('#markOnMap').show();
-		// $('#dismarkOnMap').hide();
+		$('#markedSystems .pathSystem[data-id="' + id + '"]').remove();
+		if ($('#markedSystems .pathSystem').length == 0) $('#markedSystems p').hide();
 	});
+
 	$('#drawMap').click(function() {
 		var search = '';
 		for (i in get) if (i != 'reg') search += '&' + i + '=' + get[i];
@@ -157,7 +191,7 @@ $(document).ready(function() {
 	})
 
 	$(document).on('mouseenter', '.system', function() {
-		var systemName = $(this).attr('data-name');
+		var systemName = $(this).attr('data-name').replace(/\s+/g, '&nbsp;');
 		$(this).append('<span class="systemName">' + systemName + '</span>');
 	});
 
@@ -249,6 +283,41 @@ $(document).ready(function() {
 		testRouter();
 	});
 
+	$(document).on('click', '#clearPath', function() {
+		var search = '';
+		for (i in get) if (i != 'from' && i != 'to') search += '&' + i + '=' + get[i];
+			window.location = window.location.pathname + (search != '' ? '?' + search.substr(1) : '');
+	});
+
+}
+
+/**
+*
+* Все остальное
+*
+**/
+
+	$(document).on('click', '#showSystemInfo', function() {
+		var name = escape($(this).parent().attr('data-name'));
+		var newLoc = '/map/info/system/' + name
+		window.location = newLoc;
+	});
+
+	$(document).on('click', '.showInfo', function() {
+		var mode = $(this).attr('data-mode');
+		var name = escape($(this).parent().attr('data-name'));
+		var newLoc = '/map/info/' + mode + '/' + name;
+		window.location = newLoc;
+	});
+
+	$(document).on('click', '.lookMap', function() {
+		var search = '';
+		for (i in get) search += '&'+i+'='+get[i];
+		var newLoc = '/map?reg=' + escape($(this).parent().attr('data-name')) + search;
+		window.location = newLoc;
+	});
+
+
 	function route(from, to) {
 		from = from ? from : 'Amarr';
 		to = to ? to : 'Jita';
@@ -276,99 +345,90 @@ $(document).ready(function() {
 					skeleton[dot.name] = {'regName' : dot.regName, 'security' : SecurityStanding.format(dot.security), 'id' : dot.id};
 				}
 				if (fromTrigger === true && toTrigger === true) {
-						var d = {}; // Длина пути
-						var p = {}; // Кратчайший путь
-						var r = {}; // Кратчайший путь по регионам
-						var u = {}; // Посещенные вершины
-						var n = {}; // Вершины для посещения
-						var now = '';
-						var counter = 0;
-						var min = 0;
-						var mindot = '';
-						d[from] = 0;
-						u[from] = d[from];
-						now = from;
-						for (i in dots) {
-							if (dots[i]['name'] != from) {
-								d[dots[i]['name']] = 10000;
+					var d = {}; // Длина пути
+					var p = {}; // Кратчайший путь
+					var r = {}; // Кратчайший путь по регионам
+					var u = {}; // Посещенные вершины
+					var n = {}; // Вершины для посещения
+					var now = '';
+					var counter = 0;
+					var min = 0;
+					var mindot = '';
+					d[from] = 0;
+					u[from] = d[from];
+					now = from;
+					for (i in dots) {
+						if (dots[i]['name'] != from) {
+							d[dots[i]['name']] = 10000;
+						}
+					}
+					while (now != to && counter < 10000) {
+						var trigger = false;
+						// console.log("Entering to " + now, d[now]);
+						delete n[now];
+						u[now] = d[now];
+						for (i in routeDots[now]) {
+							if (d[i] > d[now] + routeDots[now][i] && !u.hasOwnProperty(i)) {
+								d[i] = d[now] + routeDots[now][i];
+							}
+						// console.log("Looking " + i, d[i]);
+							if (!u.hasOwnProperty(i)) {
+								trigger = true;
+								n[i] = d[i];
+								min = d[i];
+								mindot = i;
+								// console.log("Setting to minimum: " + i, d[i]);
 							}
 						}
-						while (now != to && counter < 10000) {
-							var trigger = false;
-							// console.log("Entering to " + now, d[now]);
-							delete n[now];
-							u[now] = d[now];
-							for (i in routeDots[now]) {
-								if (d[i] > d[now] + routeDots[now][i] && !u.hasOwnProperty(i)) {
-									d[i] = d[now] + routeDots[now][i];
-								}
-							// console.log("Looking " + i, d[i]);
-								if (!u.hasOwnProperty(i)) {
-									trigger = true;
-									n[i] = d[i];
-									min = d[i];
-									mindot = i;
-									// console.log("Setting to minimum: " + i, d[i]);
-								}
-							}
-							for (i in n) {
-								// console.log("Calculating minimum for " + i, d[i], (d[i] <= min && !u.hasOwnProperty(i)) || trigger == false);
-								if ((d[i] <= min && !u.hasOwnProperty(i)) || trigger == false) {
-									min = d[i];
-									mindot = i;
-								}
-							}
-							// console.log("Minimum: " + mindot, min);
-							delete n[mindot];
-							u[mindot] = min;
-							now = mindot;
-							counter++;
-						}
-						console.log(now == to ? 'Found path to destination in ' + counter + ' steps' : counter + ' steps was not enough to find the path');
-						now = to;
-						p[ now ] = d[now];
-						counter = 0;
-						var id = skeleton[now]['id'];
-						var regname = skeleton[now]['regName'];
-						var ss =  skeleton[now]['security'];
-						var color = SecurityStanding.paint(ss);
-						var graphLink = ',' + now + '_' + ss.replace('.','');
-						$('#path').prepend('<div class="pathSystem" data-id="' + id + '" data-name="' + now + '"><div class="ss" style="color:' + color + '">' + ss + '</div>' + now + '<div class="systemMenuButton" data-id="' + id + '" data-name="' + now + '" data-ss="' + ss + '" data-regname="' + regname + '"></div><div class="sysRegHolder"><div class="sysPathRegion">' + regname + '</div></div></div>');
-						while (now != from && counter < 10000) {
-							for (i in routeDots[now]) {
-								if (d[i] < d[now]) {
-									p[ i ] = d[i];
-									r[skeleton[i]['regName']] = d[i];
-									var id = skeleton[i]['id'];
-									var regname = skeleton[i]['regName'];
-									var ss =  skeleton[i]['security'];
-									var color = SecurityStanding.paint(ss);
-									graphLink = ',' + i + '_' + ss.replace('.','') + graphLink;
-									$('#path').prepend('<div class="pathSystem" data-id="' + id + '" data-name="' + i + '"><div class="ss" style="color:' + color + '">' + ss + '</div>' + i + '<div class="systemMenuButton" data-id="' + id + '" data-name="' + i + '" data-ss="' + ss + '" data-regname="' + regname + '"></div><div class="sysRegHolder"><div class="sysPathRegion">' + regname + '</div></div></div>');
-									now = i;
-								}
-							}
-							counter++;
-						}
-						$('#path').prepend('<p>Проложенный путь:</p><a target="blank" href="/systemstats/show?subject=' + graphLink.substr(1) + '"><button>Посмотреть график активности всех систем пути (новое окно)</button></a>');
-						console.log('Path is ' + counter + ' jumps long:', p);
-						console.timeStamp('Finish');
-						for (var i = 0; i < localStorage.length; i++) {
-							key = localStorage.key(i);
-							if (key.search('mark_') !== -1) {
-								var system = JSON.parse(localStorage.getItem(key));
-								var color = SecurityStanding.paint(system.ss);
-								$('#path').prepend('<div class="pathSystem" data-id="' + system.id + '" data-name="' + system.name + '"><div class="ss" style="color:' + color + '">' + system.ss + '</div>' + system.name + '<div class="systemMenuButton" data-id="' + system.id + '" data-name="' + system.name + '" data-ss="' + system.ss + '" data-regname="' + system.regname + '"></div><div class="sysRegHolder"><div class="sysPathRegion">' + system.regname + '</div></div></div>');
+						for (i in n) {
+							// console.log("Calculating minimum for " + i, d[i], (d[i] <= min && !u.hasOwnProperty(i)) || trigger == false);
+							if ((d[i] <= min && !u.hasOwnProperty(i)) || trigger == false) {
+								min = d[i];
+								mindot = i;
 							}
 						}
-						$('#path').prepend('<p>Отмеченные системы:</p>');
-						// console.log(d,p,u,n,r);
-						if (window.location.search.search('reg') == -1) savePath(r)
-						else savePath(p);
-				} else return false;
+						// console.log("Minimum: " + mindot, min);
+						delete n[mindot];
+						u[mindot] = min;
+						now = mindot;
+						counter++;
+					}
+					console.log(now == to ? 'Found path to destination in ' + counter + ' steps' : counter + ' steps was not enough to find the path');
+					now = to;
+					p[ now ] = d[now];
+					counter = 0;
+					var id = skeleton[now]['id'];
+					var regname = skeleton[now]['regName'];
+					var ss =  skeleton[now]['security'];
+					var color = SecurityStanding.paint(ss);
+					var graphLink = ',' + now + '_' + ss.replace('.','');
+					$('#path').prepend('<div class="pathSystem" data-id="' + id + '" data-name="' + now + '"><div class="ss" style="color:' + color + '">' + ss + '</div>' + now + '<div class="systemMenuButton" data-id="' + id + '" data-name="' + now + '" data-ss="' + ss + '" data-regname="' + regname + '"></div><div class="sysRegHolder"><div class="sysPathRegion">' + regname + '</div></div></div>');
+					while (now != from && counter < 10000) {
+						for (i in routeDots[now]) {
+							if (d[i] < d[now]) {
+								p[ i ] = d[i];
+								r[skeleton[i]['regName']] = d[i];
+								var id = skeleton[i]['id'];
+								var regname = skeleton[i]['regName'];
+								var ss =  skeleton[i]['security'];
+								var color = SecurityStanding.paint(ss);
+								graphLink = ',' + i + '_' + ss.replace('.','') + graphLink;
+								$('#path').prepend('<div class="pathSystem" data-id="' + id + '" data-name="' + i + '"><div class="ss" style="color:' + color + '">' + ss + '</div>' + i + '<div class="systemMenuButton" data-id="' + id + '" data-name="' + i + '" data-ss="' + ss + '" data-regname="' + regname + '"></div><div class="sysRegHolder"><div class="sysPathRegion">' + regname + '</div></div></div>');
+								now = i;
+							}
+						}
+						counter++;
+					}
+					$('#path').prepend('<p>Проложенный путь <button id="clearPath">Очистить</button></p><a target="blank" href="/systemstats/show?subject=' + graphLink.substr(1) + '"><button>Посмотреть график активности всех систем пути (новое окно)</button></a>');
+					console.log('Path is ' + counter + ' jumps long:', p);
+					console.timeStamp('Finish');
+					// console.log(d,p,u,n,r);
+					if (window.location.search.search('reg') == -1) savePath(r)
+					else savePath(p);
+				}
 			}
 		});
-	}
+	};
 
 	function allowSelect() {
 		for (i in visibleDots) {

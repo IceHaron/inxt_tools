@@ -189,7 +189,7 @@ if (!root::$_ALL['isfile']) {																											// Если обраща
 		INCLUDE_ONCE('php/controllers/' . root::$_ALL['folder'] . '/' . root::$_ALL['controller'] . '.php');
 		$controller::{root::$_ALL['action']}(root::$_ALL['params']);
 		// Здесь я забираю содержимое вида и управляющие конструкции меняю на содержимое переменных из root::$_ALL - подсмотрел этот способ реализации MVC
-		if (!isset(root::$_ALL['notemplate'])) $page = file_get_contents('html/views/' . root::$_ALL['folder'] . '/' . root::$_ALL['controller'] . '.html');
+		if (!isset(root::$_ALL['notemplate'])) $page = file_get_contents('html/views/' . root::$_ALL['folder'] . '/' . root::$_ALL['controller'] . '_' . root::$_ALL['action'] . '.html');
 		else $page = '';
 		preg_match_all('/\{(\w+)\}/', $page, $matches);
 		foreach ($matches[1] as $word) {

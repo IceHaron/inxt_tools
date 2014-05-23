@@ -13,13 +13,16 @@
 	margin-right: 50px;
 	float: right;
 }
-#path {
+#mapside {
 	width: calc(100% - 920px);
 	min-width: 250px;
 	padding: 10px;
 	float:right;
 	height: 630px;
 	overflow-y: scroll;
+}
+#mapside p {
+	text-align: center;
 }
 #fromSystem, #toSystem {
 	background-color: lightpink;
@@ -95,3 +98,10 @@
 }
 .startx {display:none;}
 .starty {display:none;}
+
+/*Инфо*/
+
+.regMenu {
+	display: inline-block;
+	cursor: pointer;
+}
