@@ -100,7 +100,6 @@ $(document).ready(function() {
 	
 /* Раз в пять секунд проверяем изменения сета систем и рисуем график */
 	setInterval(function() {
-		console.log(somethingChanged);
 		if (somethingChanged) drawGraph();
 		somethingChanged = false;
 	}, 5000);
