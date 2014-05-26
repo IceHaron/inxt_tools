@@ -1,4 +1,8 @@
-get = getGet();
+/* Определяем глобальные переменные */
+get = getGet();   // Получаем GET-запрос
+countdown = 500;  // Устанавливаем отсчет времени чтоб не флудить AJAX`ами
+searching = 0;    // Устаналиваем переключатель поискового слова
+somethingChanged = false;  // Устанавливаем переключатель изменения состояния
 
 /**
 *	
@@ -15,13 +19,13 @@ $(document).ready(function() {
 
 /* Клик на заголовке скрывает/раскрывает фильтр и что-то еще делает, пока не придумал */
 	$('#maincaption').click(function() {
-	  $('#mainsupport').toggle();																									// Фильтр пока существует только в библиотеке, в этот блок думаю напихать всяких разных удобных штук
+		$('#mainsupport').toggle();																									// Фильтр пока существует только в библиотеке, в этот блок думаю напихать всяких разных удобных штук
 	});
-  
+	
 /* Перехватчик клика на логофф, кнопка должна что-то делать хитрое, пока просто перенаправляет на страничку логоффа */
-  $('#logoff').click(function() {
-    window.location = '/auth/logoff';
-  });
+	$('#logoff').click(function() {
+		window.location = '/auth/logoff';
+	});
 	
 /* Работа с табличкой TODO */
 
@@ -52,27 +56,10 @@ $(document).ready(function() {
 		for (i in noAcceptKeys) {
 			if (noAcceptKeys[i] === key.keyCode) pass = false
 		}
-		if (pass && $(this).val().length > 2) {
-			$('#systemSearchVariants').html('<img width="30" src="/source/img/loading-dark.gif">').show();
-			$.ajax({
-				type: 'GET'
-			, url: 'searchsystems'
-			, data: {'search' : $(this).val()}
-			, dataType: 'json'
-			, success: function(data) {
-					$('#systemSearchVariants').html('').show();
-					for (i in data) {
-						var variant = data[i];
-						if ($('.selectedSystem[data-name="' + variant.name + '"]').length == 0)
-							$('#systemSearchVariants').append('<div class="ssVariant" data-regid="' + variant.regionID + '" data-id="' + variant.id + '" data-name="' + variant.name + '"><span style="color: ' + SecurityStanding.paint(variant.security) + '" class="ssVariantSS">' + SecurityStanding.format(variant.security) + '</span><span class="ssVariantSystem">' + variant.name + '</span><span class="ssVariantReg">' + variant.regionName + '</span></div>');
-						else
-							$('#systemSearchVariants').append('<div class="ssVariantInactive" data-regid="' + variant.regionID + '" data-id="' + variant.id + '" data-name="' + variant.name + '"><span style="color: ' + SecurityStanding.paint(variant.security) + '" class="ssVariantSS">' + SecurityStanding.format(variant.security) + '</span><span class="ssVariantSystem">' + variant.name + '</span><span class="ssVariantReg">' + variant.regionName + '</span></div>');
-					}
-				}
-			, complete: function(data) {
-					if (data.responseText == 'NULL') $('#systemSearchVariants').html('Nothing found').show();
-				}
-			});
+		if (pass) {
+			countdown = 500;
+			searching++;
+			if ($(this).val().length > 2) systemSearch($(this).val());
 		}
 	});
 	
@@ -161,6 +148,40 @@ $(document).ready(function() {
 /* End of READY() */
 });
 
+function systemSearch(what) {
+	var number = searching;
+	setTimeout(function() {
+		countdown -= 100;
+		if (number == searching) {
+			if (countdown <= 0) {
+				$('#systemSearchVariants').html('<img width="30" src="/source/img/loading-dark.gif">').show();
+				$.ajax({
+					type: 'GET'
+				, url: 'searchsystems'
+				, data: {'search' : what}
+				, dataType: 'json'
+				, success: function(data) {
+						$('#systemSearchVariants').html('').show();
+						for (i in data) {
+							var variant = data[i];
+							if ($('.selectedSystem[data-name="' + variant.name + '"]').length == 0)
+								$('#systemSearchVariants').append('<div class="ssVariant" data-regid="' + variant.regionID + '" data-id="' + variant.id + '" data-name="' + variant.name + '"><span style="color: ' + SecurityStanding.paint(variant.security) + '" class="ssVariantSS">' + SecurityStanding.format(variant.security) + '</span><span class="ssVariantSystem">' + variant.name + '</span><span class="ssVariantReg">' + variant.regionName + '</span></div>');
+							else
+								$('#systemSearchVariants').append('<div class="ssVariantInactive" data-regid="' + variant.regionID + '" data-id="' + variant.id + '" data-name="' + variant.name + '"><span style="color: ' + SecurityStanding.paint(variant.security) + '" class="ssVariantSS">' + SecurityStanding.format(variant.security) + '</span><span class="ssVariantSystem">' + variant.name + '</span><span class="ssVariantReg">' + variant.regionName + '</span></div>');
+						}
+						searching = 0;
+						countdown = 500;
+					}
+				, complete: function(data) {
+						if (data.responseText == 'NULL') $('#systemSearchVariants').html('Nothing found').show();
+					}
+				});
+			} else systemSearch(what);
+		}
+	}, 100);
+}
+
+
 /**
 *	
 *	Функция логина от uLogin
@@ -173,7 +194,7 @@ function login(token){
 		data=$.parseJSON(data.toString());
 		if(!data.error){
 			document.cookie = 'uid=' + data.uid;
-			window.location.reload(); 																								// Костыль
+			window.location.reload();                             // Костыль
 		}
 	});
 }

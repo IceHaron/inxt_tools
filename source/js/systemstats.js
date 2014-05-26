@@ -5,8 +5,6 @@
 **/
 $(document).ready(function() {
 
-var somethingChanged = false;
-
 /* Получаем из блока JSON-строку чтобы нарисовать по ней график */
 	if (document.getElementById('strForChart') !== null) {
 		eval("array = " + $('#strForChart').text());
@@ -102,6 +100,7 @@ var somethingChanged = false;
 	
 /* Раз в пять секунд проверяем изменения сета систем и рисуем график */
 	setInterval(function() {
+		console.log(somethingChanged);
 		if (somethingChanged) drawGraph();
 		somethingChanged = false;
 	}, 5000);

@@ -25,6 +25,8 @@ if (document.getElementById("map")) {
 	var maxx = minx = parseFloat(dots[0].pos_x);
 	var maxy = miny = parseFloat(dots[0].pos_y);
 	var maxz = minz = parseFloat(dots[0].pos_z);
+	countdown = 500;
+	searching = 0;
 	var coords = {
 		//   'a':{'x':-100,'y':100,'z':100}
 		// , 'b':{'x':100,'y':100,'z':100}
@@ -239,28 +241,12 @@ if (document.getElementById("map")) {
 		for (i in noAcceptKeys) {
 			if (noAcceptKeys[i] === key.keyCode) pass = false
 		}
-		if (pass) $(this).css('background-color', 'lightpink').removeAttr('data-id');
-		if (pass && $(this).val().length > 2) {
-			$('#systemSearchVariants').html('<img width="30" src="/source/img/loading-dark.gif">').show();
-			$.ajax({
-				type: 'GET'
-			, url: 'systemstats/searchsystems'
-			, data: {'search' : $(this).val()}
-			, dataType: 'json'
-			, success: function(data) {
-					$('#systemSearchVariants').html('').show().attr('data-referrer', referrer);
-					for (i in data) {
-						var variant = data[i];
-						if ($('.selectedSystem[data-name="' + variant.name + '"]').length == 0)
-							$('#systemSearchVariants').append('<div class="ssVariant" data-regid="' + variant.regionID + '" data-id="' + variant.id + '" data-name="' + variant.name + '"><span style="color: ' + SecurityStanding.paint(variant.security) + '" class="ssVariantSS">' + SecurityStanding.format(variant.security) + '</span><span class="ssVariantSystem">' + variant.name + '</span><span class="ssVariantReg">' + variant.regionName + '</span></div>');
-						else
-							$('#systemSearchVariants').append('<div class="ssVariantInactive" data-regid="' + variant.regionID + '" data-id="' + variant.id + '" data-name="' + variant.name + '"><span style="color: ' + SecurityStanding.paint(variant.security) + '" class="ssVariantSS">' + SecurityStanding.format(variant.security) + '</span><span class="ssVariantSystem">' + variant.name + '</span><span class="ssVariantReg">' + variant.regionName + '</span></div>');
-					}
-				}
-			, complete: function(data) {
-					if (data.responseText == 'NULL') $('#systemSearchVariants').html('Nothing found').show();
-				}
-			});
+
+		if (pass) {
+			countdown = 500;
+			searching++;
+			$(this).css('background-color', 'lightpink').removeAttr('data-id');
+			if ($(this).val().length > 2) mapSystemSearch($(this).val(), referrer);
 		}
 	});
 
@@ -317,6 +303,38 @@ if (document.getElementById("map")) {
 		window.location = newLoc;
 	});
 
+	function mapSystemSearch(what, referrer) {
+		var number = searching;
+		setTimeout(function() {
+			countdown -= 100;
+			if (number == searching) {
+				if (countdown <= 0) {
+					$('#systemSearchVariants').html('<img width="30" src="/source/img/loading-dark.gif">').show();
+					$.ajax({
+						type: 'GET'
+					, url: 'systemstats/searchsystems'
+					, data: {'search' : what}
+					, dataType: 'json'
+					, success: function(data) {
+							$('#systemSearchVariants').html('').show().attr('data-referrer', referrer);
+							for (i in data) {
+								var variant = data[i];
+								if ($('.selectedSystem[data-name="' + variant.name + '"]').length == 0)
+									$('#systemSearchVariants').append('<div class="ssVariant" data-regid="' + variant.regionID + '" data-id="' + variant.id + '" data-name="' + variant.name + '"><span style="color: ' + SecurityStanding.paint(variant.security) + '" class="ssVariantSS">' + SecurityStanding.format(variant.security) + '</span><span class="ssVariantSystem">' + variant.name + '</span><span class="ssVariantReg">' + variant.regionName + '</span></div>');
+								else
+									$('#systemSearchVariants').append('<div class="ssVariantInactive" data-regid="' + variant.regionID + '" data-id="' + variant.id + '" data-name="' + variant.name + '"><span style="color: ' + SecurityStanding.paint(variant.security) + '" class="ssVariantSS">' + SecurityStanding.format(variant.security) + '</span><span class="ssVariantSystem">' + variant.name + '</span><span class="ssVariantReg">' + variant.regionName + '</span></div>');
+							}
+							searching = 0;
+							countdown = 500;
+						}
+					, complete: function(data) {
+							if (data.responseText == 'NULL') $('#systemSearchVariants').html('Nothing found').show();
+						}
+					});
+				} else systemSearch(what, referrer);
+			}
+		}, 100);
+	}
 
 	function route(from, to) {
 		from = from ? from : 'Amarr';
