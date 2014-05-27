@@ -9,8 +9,12 @@
 #control {
 	float: left;
 }
-#pathfinder {
+#systemInfo {
 	margin-right: 50px;
+	float: right;
+}
+#pathfinder {
+	margin: 0 5px 20px;
 	float: right;
 }
 #mapside {

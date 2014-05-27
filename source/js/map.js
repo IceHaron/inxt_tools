@@ -223,49 +223,9 @@ if (document.getElementById("map")) {
 		$('#toSystem').val(name).attr('data-id', skeleton[name]['id']).css('background-color', 'lime');
 	});
 
-/* Поиск систем */
-	$('#fromSystem, #toSystem').keyup(function(key) {
-		var noAcceptKeys = new Array(
-			9		// Tab
-		, 16	// Shift
-		, 17	// Ctrl
-		, 18	// Alt
-		, 37	// Left
-		, 38	// Up
-		, 39	// Right
-		, 40	// Down
-		, 116	// F5
-		);
-		var referrer = $(this).attr('id');
-		var pass = true;
-		for (i in noAcceptKeys) {
-			if (noAcceptKeys[i] === key.keyCode) pass = false
-		}
-
-		if (pass) {
-			countdown = 500;
-			searching++;
-			$(this).css('background-color', 'lightpink').removeAttr('data-id');
-			if ($(this).val().length > 2) mapSystemSearch($(this).val(), referrer);
-		}
-	});
-
-	$('#fromSystem, #toSystem').click(function() {
-		$('#systemSearchVariants').hide();
-		if ($('.ssVariant').length > 0) $('#systemSearchVariants[data-referrer="' + $(this).attr('id') + '"]').show();
-	});
-
 	$('#fromSystem, #toSystem').change(function() {
 		var id = $(this).attr('data-id');
 		var name = $(this).val();
-		testRouter();
-	});
-
-	$(document).on('click', '.ssVariant', function() {
-		var name = $(this).attr('data-name');
-		var id = $(this).attr('data-id');
-		var referrer = $(this).parent().attr('data-referrer');
-		$('#' + referrer).val(name).attr('data-id', id).css('background-color', 'lime');
 		testRouter();
 	});
 
@@ -302,39 +262,6 @@ if (document.getElementById("map")) {
 		var newLoc = '/map?reg=' + escape($(this).parent().attr('data-name')) + search;
 		window.location = newLoc;
 	});
-
-	function mapSystemSearch(what, referrer) {
-		var number = searching;
-		setTimeout(function() {
-			countdown -= 100;
-			if (number == searching) {
-				if (countdown <= 0) {
-					$('#systemSearchVariants').html('<img width="30" src="/source/img/loading-dark.gif">').show();
-					$.ajax({
-						type: 'GET'
-					, url: 'systemstats/searchsystems'
-					, data: {'search' : what}
-					, dataType: 'json'
-					, success: function(data) {
-							$('#systemSearchVariants').html('').show().attr('data-referrer', referrer);
-							for (i in data) {
-								var variant = data[i];
-								if ($('.selectedSystem[data-name="' + variant.name + '"]').length == 0)
-									$('#systemSearchVariants').append('<div class="ssVariant" data-regid="' + variant.regionID + '" data-id="' + variant.id + '" data-name="' + variant.name + '"><span style="color: ' + SecurityStanding.paint(variant.security) + '" class="ssVariantSS">' + SecurityStanding.format(variant.security) + '</span><span class="ssVariantSystem">' + variant.name + '</span><span class="ssVariantReg">' + variant.regionName + '</span></div>');
-								else
-									$('#systemSearchVariants').append('<div class="ssVariantInactive" data-regid="' + variant.regionID + '" data-id="' + variant.id + '" data-name="' + variant.name + '"><span style="color: ' + SecurityStanding.paint(variant.security) + '" class="ssVariantSS">' + SecurityStanding.format(variant.security) + '</span><span class="ssVariantSystem">' + variant.name + '</span><span class="ssVariantReg">' + variant.regionName + '</span></div>');
-							}
-							searching = 0;
-							countdown = 500;
-						}
-					, complete: function(data) {
-							if (data.responseText == 'NULL') $('#systemSearchVariants').html('Nothing found').show();
-						}
-					});
-				} else systemSearch(what, referrer);
-			}
-		}, 100);
-	}
 
 	function route(from, to) {
 		from = from ? from : 'Amarr';
@@ -556,16 +483,6 @@ if (document.getElementById("map")) {
 		console.log(path = p);
 		draw();
 		allowSelect();
-	}
-
-	function testRouter() {
-		if ($('#fromSystem').val() != '' && $('#fromSystem').attr('data-id') !== undefined) localStorage.setItem('from', $('#fromSystem').val());
-			else localStorage.removeItem('from', null);
-		if ($('#toSystem').val() != '' && $('#toSystem').attr('data-id') !== undefined) localStorage.setItem('to', $('#toSystem').val());
-			else localStorage.removeItem('to', null);
-		if($('#fromSystem').val() != '' && $('#fromSystem').attr('data-id') !== undefined && $('#toSystem').val() != '' && $('#toSystem').attr('data-id') !== undefined)
-			$('#submitPath').removeAttr('disabled');
-		else $('#submitPath').attr('disabled', true);
 	}
 
 	function drawSystemMenuButton(name) {

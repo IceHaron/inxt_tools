@@ -33,17 +33,7 @@ class map_index {
 		} else {
 			$map = universe::getRegionMap($_GET['reg']);
 		}
-/*    for ($i = 0; $i < count($jumps); $i++) {
-			if (isset($jumps[$i])) {
-				$jump = $jumps[$i];
-				for ($j = 0; $j < count($jumps); $j++) {
-					if (isset($jumps[$j])) {
-						$subj = $jumps[$j];
-						if ($subj['fromName'] == $jump['toName']) unset($jumps[$j]);
-					}
-				}
-			}
-		}*/
+		
 		$regionList = db::query("SELECT `id`, `name` FROM `regions` WHERE `id` < 11000000 ORDER BY `name`;");
 		$regstr = '<select name="region" id="mapRegion"><option value="0">&mdash;&mdash;&mdash;Выберите регион&mdash;&mdash;&mdash;</option>';
 		foreach ($regionList as $region) {
@@ -62,17 +52,17 @@ class map_index {
 				<input type="button" value="Отрисовать" id="drawMap">
 				<input type="button" value="К карте вселенной" id="resetMap">
 			</div>
+			<input type="text" class="systemSearch" data-searchmod="info" id="systemInfo" placeholder="Информация о системе" size="25">
 			<div id="strForMap">' . json_encode($map) . '</div>
 			';
-		$mainsupport .= '
+		$maincontent = '
 			<form id="pathfinder" method="GET">
-				<input type="text" id="fromSystem" name="from" placeholder="Отправная точка" autocomplete="off">
-				<input type="text" id="toSystem" name="to" placeholder="Пункт назначения" autocomplete="off">
+				<input type="text" class="systemSearch" data-searchmod="path" id="fromSystem" name="from" placeholder="Отправная точка" autocomplete="off">
+				<input type="text" class="systemSearch" data-searchmod="path" id="toSystem" name="to" placeholder="Пункт назначения" autocomplete="off">
 				' . (isset($_GET['reg']) ? '<input type="hidden" name="reg" value="' . $_GET['reg'] . '">' : '') . '
 				<input type="submit" id="submitPath" disabled value="Проложить путь">
 				<div id="systemSearchVariants" class="mapSSV">ololo</div>
 			</form>';
-		$maincontent = '';
 		
 		root::$_ALL['maincaption'] = 'EVE Universe Map';
 		root::$_ALL['mainsupport'] = $mainsupport;

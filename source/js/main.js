@@ -3,6 +3,7 @@ get = getGet();   // Получаем GET-запрос
 countdown = 500;  // Устанавливаем отсчет времени чтоб не флудить AJAX`ами
 searching = 0;    // Устаналиваем переключатель поискового слова
 somethingChanged = false;  // Устанавливаем переключатель изменения состояния
+searchMod = 'info';  // Определяем мод поиска системы: для пути, для графика или для информации
 
 /**
 *	
@@ -59,25 +60,48 @@ $(document).ready(function() {
 		if (pass) {
 			countdown = 500;
 			searching++;
-			if ($(this).val().length > 2) systemSearch($(this).val());
+			var what = $(this).val();
+			var referrer = $(this);
+			searchMod = $(this).attr('data-searchmod');
+			if ($(this).val().length > 2) systemSearch(what, referrer);
 		}
 	});
 	
 /* При выборе варианта в поиске скрываем список вариантов и добавляем выбранную систему в список */
 	$(document).on('click', '.ssVariant', function() {
-		var name = $(this).attr('data-name');
-		var id = $(this).attr('data-id');
-		var regid = $(this).attr('data-regid');
-		var regname = $(this).children('.ssVariantReg').text();
-		var ss = $(this).children('.ssVariantSS').text();
-		
-		$('.fromSearch').append('<div class="selectedSystem" data-regid="' + regid + '" data-id="' + id + '" data-name="' + name + '"><div class="ss" style="color:' + SecurityStanding.paint(ss) + '">' + ss + '</div>' + name + '<img class="deselectSystem" src="/source/img/delete.png"><div class="sysRegHolder"><div class="sysRegion">' + regname + '</div></div></div>');
-		
+		switch (searchMod) {
+			case 'graph':
+				var name = $(this).attr('data-name');
+				var id = $(this).attr('data-id');
+				var regid = $(this).attr('data-regid');
+				var regname = $(this).children('.ssVariantReg').text();
+				var ss = $(this).children('.ssVariantSS').text();
+				$('.fromSearch').append('<div class="selectedSystem" data-regid="' + regid + '" data-id="' + id + '" data-name="' + name + '"><div class="ss" style="color:' + SecurityStanding.paint(ss) + '">' + ss + '</div>' + name + '<img class="deselectSystem" src="/source/img/delete.png"><div class="sysRegHolder"><div class="sysRegion">' + regname + '</div></div></div>');
+				$(this).attr('class', 'ssVariantInactive');
+			break;
+
+			case 'path':
+				var name = $(this).attr('data-name');
+				var id = $(this).attr('data-id');
+				var referrer = $(this).parent().attr('data-referrer');
+				$('#' + referrer).val(name).attr('data-id', id).css('background-color', 'lime');
+				testRouter();
+			break;
+
+			case 'info':
+				var newLoc = '/map/info/system/' + escape($(this).attr('data-name'));
+				window.location = newLoc;
+			break;
+		}
 		$('#systemSearchVariants').hide();
-		$(this).attr('class', 'ssVariantInactive');
 		somethingChanged = true;
 	});
 	
+	$('.systemSearch').click(function() {
+		$('#systemSearchVariants').hide();
+		if ($('.ssVariant').length > 0) $('#systemSearchVariants[data-referrer="' + $(this).attr('id') + '"]').show();
+	});
+
 /* Скрываем список найденных систем при клике в другое место */
 	$(document).click(function(t) {
 		if ($(t.target).attr('class') != 'ssVariant'
@@ -91,7 +115,6 @@ $(document).ready(function() {
 			&& $(t.target).attr('id') != 'systemSearchVariants'
 			)
 				$('#systemSearchVariants').hide();
-		if ($(t.target).attr('class') == 'systemSearch' && $('.ssVariant').length > 0) $('#systemSearchVariants').show();
 		if ($(t.target).attr('class') != 'systemMenuButton' && $(t.target).attr('id') != 'systemMenu' && $(t.target).parent().attr('id') != 'systemMenu')
 			$('#systemMenu').hide();
 	});
@@ -148,20 +171,23 @@ $(document).ready(function() {
 /* End of READY() */
 });
 
-function systemSearch(what) {
+function systemSearch(what, referrer) {
+	var position = $(referrer).offset();
+	var width = $(referrer).width();
+	var height = $(referrer).height();
 	var number = searching;
 	setTimeout(function() {
 		countdown -= 100;
 		if (number == searching) {
 			if (countdown <= 0) {
-				$('#systemSearchVariants').html('<img width="30" src="/source/img/loading-dark.gif">').show();
+				$('#systemSearchVariants').css({'left':position.left-width/2, 'top':position.top+height*1.5}).html('<img width="30" src="/source/img/loading-dark.gif">').show();
 				$.ajax({
 					type: 'GET'
-				, url: 'searchsystems'
+				, url: '/systemstats/searchsystems'
 				, data: {'search' : what}
 				, dataType: 'json'
 				, success: function(data) {
-						$('#systemSearchVariants').html('').show();
+						$('#systemSearchVariants').html('').show().attr('data-referrer', referrer.attr('id'));
 						for (i in data) {
 							var variant = data[i];
 							if ($('.selectedSystem[data-name="' + variant.name + '"]').length == 0)
@@ -176,11 +202,22 @@ function systemSearch(what) {
 						if (data.responseText == 'NULL') $('#systemSearchVariants').html('Nothing found').show();
 					}
 				});
-			} else systemSearch(what);
+			} else systemSearch(what, referrer);
 		}
 	}, 100);
 }
 
+
+
+function testRouter() {
+	if ($('#fromSystem').val() != '' && $('#fromSystem').attr('data-id') !== undefined) localStorage.setItem('from', $('#fromSystem').val());
+		else localStorage.removeItem('from', null);
+	if ($('#toSystem').val() != '' && $('#toSystem').attr('data-id') !== undefined) localStorage.setItem('to', $('#toSystem').val());
+		else localStorage.removeItem('to', null);
+	if($('#fromSystem').val() != '' && $('#fromSystem').attr('data-id') !== undefined && $('#toSystem').val() != '' && $('#toSystem').attr('data-id') !== undefined)
+		$('#submitPath').removeAttr('disabled');
+	else $('#submitPath').attr('disabled', true);
+}
 
 /**
 *	

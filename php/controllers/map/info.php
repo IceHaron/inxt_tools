@@ -24,7 +24,7 @@ class map_info {
 	
 	public static function system($params) {
 		if (!$params) $params = array('Amarr');
-		$system = $params[0];
+		$system = urldecode($params[0]);
 
 		$sysInfo = db::query("SELECT `s`.`id`, `s`.`name` AS `sysName`, `s`.`security`, `r`.`name` AS `regName`
 														FROM `systems` AS `s`
