@@ -1,4 +1,5 @@
 <?
+$rootfolder = isset($_SERVER['HOME']) ? $_SERVER['HOME'].'/inxt_tools' : $_SERVER['DOCUMENT_ROOT'];
 $host = 'localhost';
 $user = 'srv44030_tools';
 $pw = '230105';
@@ -8,7 +9,7 @@ $base = 'srv44030_tools';
 $link = mysqli_connect($host, $user, $pw, $base);
 mysqli_set_charset($link, "utf8");
 
-$log = file($_SERVER['DOCUMENT_ROOT'].'/source/txt/git_log.txt');
+$log = file($rootfolder.'/source/txt/git_log.txt');
 $arr = array();
 foreach ($log as $s) {
 	$string = trim($s);
