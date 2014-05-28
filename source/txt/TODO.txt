@@ -1,3 +1,4 @@
+TODO -- Выделенные системы писать не только в localStorage, но и в GET -- UNDONE
 TODO -- MAP: Выделенные системы -- DONE
 TODO -- SSF: Система -- DONE
 TODO -- SSF: Информация о системе подстать дотлану: http://evemaps.dotlan.net/system/Amarr -- DONE
