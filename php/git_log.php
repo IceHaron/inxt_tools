@@ -46,7 +46,7 @@ foreach ($log as $s) {
 if (isset($name)) $arr[$number]['name'] = $name;
 if (isset($desc)) $arr[$number]['desc'] = $desc;
 foreach ($arr as $commit => $info) {
-	$query = "INSERT INTO `git_log` VALUES ('$commit','{$info['date']}','{$info['name']}','{$info['author']}','{$info['desc']}','','','0') ON DUPLICATE KEY UPDATE `commit` = '$commit'";
+	$query = "INSERT INTO `git_log` VALUES ('$commit','{$info['date']}','{$info['name']}','{$info['author']}','{$info['desc']}','{$info['name']}','{$info['desc']}','0') ON DUPLICATE KEY UPDATE `commit` = '$commit'";
 	mysqli_query($link, $query);
 	echo mysqli_error($link);
 }

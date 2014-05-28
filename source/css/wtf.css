@@ -1,0 +1,16 @@
+.patchlog {
+	padding: 20px;
+}
+.patchDate {
+	font-size: 14px;
+	font-style: italic;
+}
+.patchName {
+	padding-bottom: 5px;
+	font-size: 18px;
+	font-weight: bold;
+	border-bottom: 2px solid;
+}
+.patchDesc {
+	margin: 10px;
+}
