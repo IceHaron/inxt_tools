@@ -61,7 +61,7 @@ class universe {
 		foreach ($regionset as $regID) {
 			foreach (self::$systems as $systemid => $systeminfo) {
 				if ($systeminfo['regionID'] == $regID) {
-					$sort[] = $susteminfo['name'];
+					$sort[] = $systeminfo['name'];
 					$system[ $systeminfo['name'] ] = $systeminfo;
 					$system[ $systeminfo['name'] ]['regionName'] = self::$regions[ $regID ];
 				}
