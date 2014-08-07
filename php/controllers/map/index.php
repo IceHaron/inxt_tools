@@ -82,4 +82,12 @@ class map_index {
 		
 	}
 
+	public static function calcTime() {
+		$etuor = json_decode($_POST['route'], TRUE);
+		root::$_ALL['notemplate'] = TRUE;
+		array_multisort($etuor);
+		foreach ($etuor as $name => $range) $route[$range] = $name;
+		echo universe::calcRouteTime($route, 'Punisher');
+	}
+
 }

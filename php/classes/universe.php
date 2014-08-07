@@ -53,7 +53,7 @@ class universe {
 *	
 *	Отбор систем для определенных регионов (AJAX)
 *	@param	regions - строка, где записаны ID нужных регионов через запятую
-*	@return JSON-строка с информацией о системах
+*	@return string - JSON-строка с информацией о системах
 *	
 **/
 	public static function getSystems($regions) {
@@ -78,7 +78,7 @@ class universe {
 *	
 *	Получение карты региона
 *	@param	region - название региона
-*	@return карта региона (системы, прыжки, длины путей)
+*	@return array - карта региона (системы, прыжки, длины путей)
 *	
 **/
 	public static function getRegionMap($region) {
@@ -112,7 +112,7 @@ class universe {
 *	Выделение куска карты, причастного к пути от системы до системы (AJAX)
 *	@param	from - начало пути
 *	@param	to - окончание пути
-*	@return закодированные в JSON системы
+*	@return string - закодированные в JSON системы
 *	
 **/
 	public static function getSystemsForRouter($from, $to) {
@@ -216,8 +216,8 @@ class universe {
 /**
 *	
 *	Поиск систем по части названия (AJAX)
-*	@param	search - часть названия системы
-*	@return закодированные в JSON системы
+*	@param  search - часть названия системы
+*	@return string - закодированные в JSON системы
 *	
 **/
 	public static function searchSystems() {
@@ -233,6 +233,90 @@ class universe {
 			}
 			return json_encode($arr);
 		} else return 'NULL';
+	}
+
+/**
+*	
+*	Расчет времени полета (AJAX)
+*	@param  route - путь, который нужно просчитать
+*	@return float - время полета
+*	
+**/
+	public static function calcRouteTime($route, $ship) {
+		$count = count($route);
+		$agilAcc = array('Frigate' => 5);
+		$agilDec = array('Frigate' => 1.7);
+		$warpVel = array('Frigate' => 7.48e+11);
+		$q = "
+			SELECT `groups`.`name`, `types`.`mass`
+			FROM `types`
+			JOIN `groups` ON (`groups`.`id` = `types`.`group`)
+			WHERE `types`.`name` = '$ship';";
+		$r = db::query($q);
+		$ship = array(
+			  'inertia' => 3.35
+			, 'mass' => $r[0]['mass']
+			, 'accel' => $agilAcc[ $r[0]['name'] ]
+			, 'decel' => $agilDec[ $r[0]['name'] ]
+			, 'warpVel' => $warpVel[ $r[0]['name'] ]
+		);
+		$q = "
+			SELECT `from`.`name` AS `fromname`, `to`.`name` AS `toname`, `gates`.`pos_x`, `gates`.`pos_y`, `gates`.`pos_z`
+			FROM `gates`
+			JOIN `systems` AS `from` ON (`from`.`id` = `gates`.`from`)
+			JOIN `systems` AS `to` ON (`to`.`id` = `gates`.`to`)
+			WHERE `from`.`name` IN ('" . implode("','", $route) . "');";
+		$r = db::query($q);
+
+		foreach ($r as $gate) {
+			$gates[ $gate['fromname'] ][ $gate['toname'] ] = array((float)$gate['pos_x'], (float)$gate['pos_y'], (float)$gate['pos_z']);
+		}
+
+		$jumps[0] = array('from' => array(0,0,0), 'to' => $gates[ $route[0] ][ $route[1] ]);
+		$time[0] = self::calcJumpTime($jumps[0], $ship);
+
+		for ($i=1; $i < $count-1; $i++) { 
+			$jumps[$i] = array('from' => $gates[ $route[$i] ][ $route[$i-1] ], 'to' => $gates[ $route[$i] ][ $route[$i+1] ]);
+			$time[$i] = self::calcJumpTime($jumps[$i], $ship);
+		}
+
+		$jumps[$i] = array('from' => $gates[ $route[$i] ][ $route[$i-1] ], 'to' => array(0,0,0));
+		$time[$i] = self::calcJumpTime($jumps[$i], $ship);
+		$output = 0;
+
+		foreach ($time as $sec) {
+			$output += 10 + $sec;
+		}
+
+		return $output;
+	}
+
+/**
+*	
+*	Расчет времени прыжка
+*	@param  jump - массив с координатами начала и конца
+*	@param  ship - массив с параметрами корабля
+*	@return float - время полета
+*	
+**/
+	private static function calcJumpTime($jump, $ship) {
+		$range = sqrt(pow($jump['from'][0] - $jump['to'][0],2) + pow($jump['from'][1] - $jump['to'][1],2) + pow($jump['from'][2] - $jump['to'][2],2));
+		$alignTime = $ship['inertia'] * $ship['mass'] * 1e-6 * (-log(0.25));
+		$peakVel = $ship['warpVel'];
+
+		do {
+			$accelTime = log($ship['accel']*$peakVel)/$ship['accel'];
+			$accelRange = exp($ship['accel']*$accelTime);
+			$decelTime = log($ship['decel']*$peakVel)/$ship['decel'];
+			$decelRange = exp($ship['decel']*$decelTime);
+			$cruiserRange = $range - $accelRange - $decelRange;
+			$cruiserTime = $cruiserRange / $peakVel;
+			$peakVel -= 1e+10;
+		} while ($cruiserRange < 0);
+
+		$time = $alignTime + $accelTime + $cruiserTime + $decelTime;
+
+		return $time;
 	}
 
 }

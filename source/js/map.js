@@ -481,8 +481,21 @@ if (document.getElementById("map")) {
 
 	function savePath(p) {
 		console.log(path = p);
+		calcTime();
 		draw();
 		allowSelect();
+	}
+
+	function calcTime() {
+		$.ajax({
+			  type: 'POST'
+			, url: 'map/calcTime'
+			, data: {'route' : JSON.stringify(path)}
+			, success: function(data) {
+					console.log(data);
+			}
+		});
+
 	}
 
 	function drawSystemMenuButton(name) {
