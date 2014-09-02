@@ -59,7 +59,7 @@
 	display: inline-block;
 	margin: 5px;
 }
-#lowSlots, #shipAccel, #shipDecel, #rigSize, #rigSlots, #rigs, #modules { display: none; }
+#lowSlots, #shipAccel, #shipDecel, #rigSize, #rigSlots, #rigs, #modules, #group { display: none; }
 #ship, #imps, #skills, #timeBlock {
 	width: calc(100% / 4);
 	/*display: inline-block;*/

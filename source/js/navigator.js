@@ -251,7 +251,7 @@ function calcTime(mass, agil, warp, acc, dec) {
 					var jump = data.detailed[i];
 					str += '<tr><td>' + jump.jump + '</td><th>' + jump.time.toPrecision(4) + '</th></tr>';
 				}
-				str += '<tr style="color: yellow"><td>Summary</td><th>' + data.summary.toPrecision(5) + '</th></tr></table><span class="tip">I added 10s to every jump to compensate interstellar flight</span>';
+				str += '<tr style="color: yellow"><td>Summary</td><th>' + data.summary.toPrecision(5) + '</th></tr></table><span class="tip">10s added for each jump to compensate interstellar flight</span>';
 				$('#timeBlock').html(str);
 		}
 	});
@@ -354,7 +354,6 @@ function calcAttrs() {
 		,dataType: 'JSON'
 		, success: function(data) {
 				newWarp = (warp + data.warpadd) * data.warpmult;
-				console.log(group, ssc, assc, em);
 				newAgil = agil*(1-0.05*em)*(1-0.02*ssc)*(1-0.05*assc)*data.agilmult;
 		}
 		, complete: function() {
@@ -376,6 +375,7 @@ function calcAttrs() {
 	// 		}
 	// 		// i++;
 	// 		// var reductor = Math.pow(0.5,Math.pow((i-1)/2.22292081,2));
+	// 	}
 	// 	}
 	// 	if (group == 624) warpMult *= 1 + 0.01 * parseFloat($(this).val());
 	// });
