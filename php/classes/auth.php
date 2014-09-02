@@ -18,17 +18,16 @@ class auth {
 *	
 */
 	private function auth() {
-		
 // Логинизация от uLogin, оставлю пока здесь, мало ли пригодится
 		
 		if (isset($_POST['token'])) {
-		$s = file_get_contents('http://ulogin.ru/token.php?token=' . $_POST['token'] . '&host=' . $_SERVER['HTTP_HOST']);
-		$user = json_decode($s, true);
-		//$user['network'] - соц. сеть, через которую авторизовался пользователь
-		//$user['identity'] - уникальная строка определяющая конкретного пользователя соц. сети
-		//$user['first_name'] - имя пользователя
-		//$user['last_name'] - фамилия пользователя
-		// var_dump($user);
+			$s = file_get_contents('http://ulogin.ru/token.php?token=' . $_POST['token'] . '&host=' . $_SERVER['HTTP_HOST']);
+			$user = json_decode($s, true);
+			//$user['network'] - соц. сеть, через которую авторизовался пользователь
+			//$user['identity'] - уникальная строка определяющая конкретного пользователя соц. сети
+			//$user['first_name'] - имя пользователя
+			//$user['last_name'] - фамилия пользователя
+			// var_dump($user);
 		}
 		
 // Конец логинизации через uLogin, теперь все по хардкору
@@ -36,40 +35,42 @@ class auth {
 			// Проверяем, может, в сессии лежит айдишник? это значит, что мы уже авторизованы
 			root::$_ALL['uid'] = $_SESSION['uid'];
 			root::$_ALL['backtrace'][] = 'Logged in through session';
-		} else if (isset($_COOKIE['uid']) && $_COOKIE['uid'] !== '' && $_COOKIE['uid'] !== NULL) {
+
+		// } else if (isset($_COOKIE['uid']) && $_COOKIE['uid'] !== '' && $_COOKIE['uid'] !== NULL) {
 			// Не в сессии, так в печеньках
-			root::$_ALL['uid'] = $_COOKIE['uid'];
-			$_SESSION['uid'] = root::$_ALL['uid'];
-			root::$_ALL['backtrace'][] = 'Logged in through cookie';
+			// root::$_ALL['uid'] = $_COOKIE['uid'];
+			// $_SESSION['uid'] = root::$_ALL['uid'];
+			// root::$_ALL['backtrace'][] = 'Logged in through cookie';
+
 		} else root::$_ALL['uid'] = 0;																									// Ну если даже в печеньках нет нашего юида, то все-таки мы не логинились
 		
 		$uid = root::$_ALL['uid'] ? root::$_ALL['uid'] : 0;																// Делалось для сокращения кода, после модификаций можно будет это убрать и лишний раз не переобъявлять переменную
 		
 		if ($uid !== 0) {																														// Если мы авторизованы, надо подгрузить из стима наши данные
-			$str = '';
+			// $str = '';
 
 			// Profile
-			$profile_str = file_get_contents('http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=0BE85074D210A01F70B48205C44D1D56&steamids=' . $uid);
+			// $profile_str = file_get_contents('http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=0BE85074D210A01F70B48205C44D1D56&steamids=' . $uid);
 // Вот эта строка - и есть заглушка на случай если стим недоступен
 			// $profile_str = '{"response":{"players":[{"personaname":"Dummy","profileurl":"gaminas.ice","avatar":"http://placehold.it/32x32"}]}}';
-			$str .= '{"profile":' . $profile_str . '';
+			// $str .= '{"profile":' . $profile_str . '';
 
 			// Inventory
-			$inv_str = file_get_contents('http://steamcommunity.com/profiles/' . $uid . '/inventory/json/753/1');
+			// $inv_str = file_get_contents('http://steamcommunity.com/profiles/' . $uid . '/inventory/json/753/1');
 // И это - тоже заглушка
 			// $inv_str = '{}';
-			$str .= '}';
+			// $str .= '}';
 
 			// echo '<pre>';
 			// echo $str;
 			// echo '</pre>';
-			$json = json_decode($str);																								// Собираем из строки массив...
+			// $json = json_decode($str);																								// Собираем из строки массив...
 			// echo '<pre>';
 			// var_dump($json);
 			// echo '</pre>';
-			root::$_ALL['username'] = $json->profile->response->players[0]->personaname;	// ...и парсим...
-			root::$_ALL['profurl'] = $json->profile->response->players[0]->profileurl;		// ...парсим...
-			root::$_ALL['avatar'] = $json->profile->response->players[0]->avatar;				// ...и еще раз парсим...
+			// root::$_ALL['username'] = $json->profile->response->players[0]->personaname;	// ...и парсим...
+			// root::$_ALL['profurl'] = $json->profile->response->players[0]->profileurl;		// ...парсим...
+			// root::$_ALL['avatar'] = $json->profile->response->players[0]->avatar;				// ...и еще раз парсим...
 		} else {
 			// Ну и если все-таки мы не авторизованы, выводим сообщение, не знаю пока, зачем.
 			root::$_ALL['nologin'] = 'You are not logged in!';

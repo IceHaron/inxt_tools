@@ -14,6 +14,7 @@ class map_index {
 	
 	private function map_index() {
 
+		// root::$_ALL['checkpoints'][] = array('Map Init', microtime(1));
 		// self::getRoute('Amarr','Jita');
 		if (!isset($_GET['reg'])) {
 			$jumps = db::query("SELECT DISTINCT `rfrom`.`name` as `fromName`, `rto`.`name` as `toName`
@@ -74,20 +75,13 @@ class map_index {
 		$from = db::escape($_GET['from']);
 		$to = db::escape($_GET['to']);
 		root::$_ALL['notemplate'] = TRUE;
+		root::$_ALL['checkpoints'][] = array('Map Init', microtime(1));
 		echo universe::getSystemsForRouter($from, $to);
 	}
 
 	public function getRoute($from, $to) {
 		echo file_get_contents("http://api.eve-central.com/api/route/from/$from/to/$to");
 		
-	}
-
-	public static function calcTime() {
-		$etuor = json_decode($_POST['route'], TRUE);
-		root::$_ALL['notemplate'] = TRUE;
-		array_multisort($etuor);
-		foreach ($etuor as $name => $range) $route[$range] = $name;
-		echo universe::calcRouteTime($route, 'Punisher');
 	}
 
 }

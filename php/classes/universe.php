@@ -242,23 +242,15 @@ class universe {
 *	@return float - время полета
 *	
 **/
-	public static function calcRouteTime($route, $ship) {
+	public static function calcRouteTime($route, $mass, $agil, $warp, $accel, $decel) {
 		$count = count($route);
-		$agilAcc = array('Frigate' => 5);
-		$agilDec = array('Frigate' => 1.7);
-		$warpVel = array('Frigate' => 7.48e+11);
-		$q = "
-			SELECT `groups`.`name`, `types`.`mass`
-			FROM `types`
-			JOIN `groups` ON (`groups`.`id` = `types`.`group`)
-			WHERE `types`.`name` = '$ship';";
-		$r = db::query($q);
+		$au = 149597870700;
 		$ship = array(
-			  'inertia' => 3.35
-			, 'mass' => $r[0]['mass']
-			, 'accel' => $agilAcc[ $r[0]['name'] ]
-			, 'decel' => $agilDec[ $r[0]['name'] ]
-			, 'warpVel' => $warpVel[ $r[0]['name'] ]
+			  'inertia' => $agil
+			, 'mass' => $mass
+			, 'accel' => $accel
+			, 'decel' => $decel
+			, 'warpSpeed' => $warp * $au
 		);
 		$q = "
 			SELECT `from`.`name` AS `fromname`, `to`.`name` AS `toname`, `gates`.`pos_x`, `gates`.`pos_y`, `gates`.`pos_z`
@@ -271,22 +263,33 @@ class universe {
 		foreach ($r as $gate) {
 			$gates[ $gate['fromname'] ][ $gate['toname'] ] = array((float)$gate['pos_x'], (float)$gate['pos_y'], (float)$gate['pos_z']);
 		}
+		// var_dump(self::calcJump(array('from' => array(4313123512320,569596846080,-1874440642560), 'to' => array(4313106063360,569600532480,-1874452439040)), $ship));
 
 		$jumps[0] = array('from' => array(0,0,0), 'to' => $gates[ $route[0] ][ $route[1] ]);
-		$time[0] = self::calcJumpTime($jumps[0], $ship);
+		$details[0]['jump'] = 'Jump from ' . $route[0] . ' star to ' . $route[1] . ' gate';
 
-		for ($i=1; $i < $count-1; $i++) { 
+		for ($i=1; $i < $count-1; $i++) {
 			$jumps[$i] = array('from' => $gates[ $route[$i] ][ $route[$i-1] ], 'to' => $gates[ $route[$i] ][ $route[$i+1] ]);
-			$time[$i] = self::calcJumpTime($jumps[$i], $ship);
+			$details[$i]['jump'] = 'Jump in ' . $route[$i] . ' from ' . $route[$i-1] . ' gate to ' . $route[$i+1] . ' gate';
 		}
 
 		$jumps[$i] = array('from' => $gates[ $route[$i] ][ $route[$i-1] ], 'to' => array(0,0,0));
-		$time[$i] = self::calcJumpTime($jumps[$i], $ship);
-		$output = 0;
+		$details[$i]['jump'] = 'Jump from ' . $route[$i-1] . ' gate to ' . $route[$i] . ' star';
 
-		foreach ($time as $sec) {
-			$output += 10 + $sec;
+		foreach ($jumps as $i => $jump) {
+			$jumpinfo = self::calcJump($jumps[$i], $ship);
+			if ($jumpinfo['range'] > 1000000000) $details[$i]['range'] = ' (' . round($jumpinfo['range'] / $au, 2) . ' AU long)';
+			else $details[$i]['range'] = ' (' . round($jumpinfo['range']) . ' km long)';
+			$time[$i] = $jumpinfo['time'];
+			$details[$i]['time'] = $time[$i];
 		}
+		$summary = 0;
+
+		foreach ($time as $i => $sec) {
+			$summary += 10 + $sec;
+		}
+
+		$output = json_encode(array('summary' => round($summary, 1), 'detailed' => $details));
 
 		return $output;
 	}
@@ -299,10 +302,11 @@ class universe {
 *	@return float - время полета
 *	
 **/
-	private static function calcJumpTime($jump, $ship) {
+	private static function calcJump($jump, $ship) {
 		$range = sqrt(pow($jump['from'][0] - $jump['to'][0],2) + pow($jump['from'][1] - $jump['to'][1],2) + pow($jump['from'][2] - $jump['to'][2],2));
 		$alignTime = $ship['inertia'] * $ship['mass'] * 1e-6 * (-log(0.25));
-		$peakVel = $ship['warpVel'];
+		$peakVel = $ship['warpSpeed'];
+		$precision = strlen(round($range)) - 2;
 
 		do {
 			$accelTime = log($ship['accel']*$peakVel)/$ship['accel'];
@@ -311,12 +315,14 @@ class universe {
 			$decelRange = exp($ship['decel']*$decelTime);
 			$cruiserRange = $range - $accelRange - $decelRange;
 			$cruiserTime = $cruiserRange / $peakVel;
-			$peakVel -= 1e+10;
+			$peakVel -= 1 * pow(10, $precision);
 		} while ($cruiserRange < 0);
 
 		$time = $alignTime + $accelTime + $cruiserTime + $decelTime;
 
-		return $time;
+		$output = array('range' => $range, 'time' => $time);
+
+		return $output;
 	}
 
 }

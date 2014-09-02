@@ -1,0 +1,72 @@
+#regionCloud {
+	width: calc(100% - 360px);
+	float: left;
+	padding: 10px 0;
+}
+#pathSide {
+	width: 360px;
+	height: 500px;
+	float: right;
+	padding: 10px 0;
+	overflow-y: scroll;
+}
+.hideRegs {
+	padding: 5px;
+	background-color: grey;
+	color: white;
+	text-align: center;
+	cursor: pointer;
+}
+.regButton {
+	display: inline-block;
+	width: 163px; /* Подогнал под ширину The Kalevala Expanse */
+	margin: 3px;
+	padding: 2px;
+	color: white;
+	text-align: center;
+	cursor: pointer;
+}
+.regButton.wh { color: #aaa;}
+.regButton:hover {
+	margin: 2px;
+	border: 1px solid white;
+}
+.mapSSV { margin-left: 30px; }
+.pathSystem {
+	margin: 5px;
+	padding: 5px;
+	color: white;
+	background-color: #555;
+	border-radius: 3px;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+}
+.sysPathRegion {
+	margin-top: -15px;
+	margin-right: 20px;
+	float: right;
+	color: #aaa;
+	font-size: 10px;
+}
+.systemMenuButton { float: right; }
+#systemSetHolder {
+	width: 75%;
+	color: white;
+	background-color: #555;
+}
+.systemHolder {
+	width: 190px; /* Подогнал под Tash-Murkon Prime */
+	display: inline-block;
+	margin: 5px;
+}
+#lowSlots, #shipAccel, #shipDecel, #rigSize, #rigSlots, #rigs, #modules { display: none; }
+#ship, #imps, #skills, #timeBlock {
+	width: calc(100% / 4);
+	/*display: inline-block;*/
+	float: left;
+}
+select[name="ship"], select[id*="module_"], select[id*="rig_"], select[id*="implant_"] {
+	width: 80%;
+	margin: 2px;
+	padding: 2px;
+}

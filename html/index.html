@@ -56,15 +56,7 @@ screen.colorDepth:screen.pixelDepth))+";u"+escape(document.URL)+
 				<div id="uLogin" data-ulogin="display=panel;fields=uid;providers=steam;hidden=;redirect_uri=;receiver=http%3A%2F%2Fgaminas.ice%2Fxd_custom.htm;callback=login">
 					<img src="<?=root::$_ALL['source']?>/img/steam.png" data-uloginbutton="steam"/>
 				</div>
-				<? } else { ?>																													<!-- Если мы уже залогинились -->
-				<a target="blank" href="<?=root::$_ALL['profurl']?>">
-					<div id="loginholder">
-						<div id="login"><?=root::$_ALL['username']?></div>
-						<img id="head_ava" src="<?=root::$_ALL['avatar']?>"/>
-					</div>
-				</a>
-				<button id="logoff">Logoff</button>
-				<? } ?>
+				<? } else echo '<span id="uid">' . root::$_ALL['uid'] . '</span>'; ?>
 			</div>
 <!-- / Аватарка, логинизация и прочее -->
 
@@ -85,8 +77,8 @@ screen.colorDepth:screen.pixelDepth))+";u"+escape(document.URL)+
 					<a href="/map"><div class="topmenunode">Карта</div></a>
 					<a href="/feedback"><div class="topmenunode">Обсуждение</div></a>
 					<a href="/wtf/version"><div class="topmenunode" style="float:right;">Patch log</div></a>
-					<? if (isset(root::$_ALL['username']) && root::$_ALL['username'] == 'Ice_Haron') { ?>
-						<a href="/ssf"><div class="topmenunode">EVESSF</div></a>
+					<a href="/navigator"><div class="topmenunode">Навигатор</div></a>
+					<? if (isset(root::$_ALL['uid']) && root::$_ALL['uid'] == '76561197991665605') { ?>
 						<a href="/wtf/four/level/addr"><div class="topmenunode" style="float:right;">WTF</div></a>
 					<? } ?>
 					<div class="clear"></div>

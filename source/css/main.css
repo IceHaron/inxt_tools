@@ -21,6 +21,7 @@ body {
 	margin: 0;
 	color: #ccc;
 	font-family: sans-serif;
+	font-size: 12px;
 	background: url(/source/img/bg_apocrypha.jpg) no-repeat black;
 }
 a.nodeco {
@@ -75,7 +76,11 @@ a.nodeco {
 .modal.fixed {
 	position: fixed;
 }
-.ss { display: inline-block; width: 30px; }
+.ss {
+	display: inline-block;
+	width: 30px;
+}
+.tip {font-size: 0.8em;}
 #systemSearchVariants {
 	min-height: 30px;
 	max-height: 500px;
@@ -87,26 +92,18 @@ a.nodeco {
 	overflow-y: scroll;
 	display: none;
 }
-.ssVariant {
-	padding: 3px;
-}
+.ssVariant {padding: 3px;}
 .ssVariant:hover {
 	background-color: #555;
 	cursor: pointer;
 }
-.ssVariantInactive {
-	background-color: #999;
-}
-.ssVariantSS {
-	font-weight: bold;
-}
+.ssVariantInactive {background-color: #999;}
+.ssVariantSS {font-weight: bold;}
 .ssVariantSystem {
 	color: white;
 	font-weight: bold;
 }
-.ssVariantReg {
-	float:right;
-}
+.ssVariantReg {float:right;}
 .systemMenuButton {
 	width: 16px;
 	height: 16px;
@@ -118,7 +115,7 @@ a.nodeco {
 /* Основная разметка, макет ================================================= */
 
 #main {
-	width: 90%;
+	width: 95%;
 	min-width: 900px;
 	margin: auto;
 }
@@ -140,6 +137,7 @@ a.nodeco {
 	float: right;
 	padding: 10px;
 }
+#uid { display: none; }
 #loginholder {
 	max-width: 200px;
 	height: 36px;
@@ -157,9 +155,7 @@ a.nodeco {
 
 /* Тело */
 
-#body {
-	padding: 5px;
-}
+#body {padding: 5px;}
 #topmenu {
 	width: 90%;
 	padding: 5px;
@@ -173,9 +169,7 @@ a.nodeco {
 	text-decoration: none;
 	color: white;
 }
-.topmenunode:hover {
-	color: yellow;
-}
+.topmenunode:hover {color: yellow;}
 #maincaption {
 	height: 30px;
 	margin: 5px;

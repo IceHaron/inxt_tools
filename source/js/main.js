@@ -12,6 +12,33 @@ searchMod = 'info';  // Определяем мод поиска системы:
 **/
 $(document).ready(function() {
 
+/* Подцепляем инфу из стима */
+	$('#uid').each(function() {
+		var uid = $(this).text();
+		$.ajax({
+			type: 'GET'
+		, url: '/ajax/steam'
+		, data: {'uid': uid}
+		, dataType: 'json'
+		, success: function(data) {
+
+				if (data.profile.response.hasOwnProperty('players')) {
+					var profurl = data.profile.response.players[0].profileurl;
+					var username = data.profile.response.players[0].personaname;
+					var avatar = data.profile.response.players[0].avatar;
+					$('#righthead').append('<a target="blank" href="' + profurl + '"><div id="loginholder"><div id="login">' + username + '</div><img id="head_ava" src="' + avatar + '"/></div></a><button id="logoff">Logoff</button>');
+				}
+
+				else
+					$('#righthead').append('<a target="blank" href="#"><div id="loginholder"><div id="login">Dummy</div><img id="head_ava" src="http://placehold.it/32x32"/></div></a><button id="logoff">Logoff</button>');
+
+			}
+		, error: function() {
+				$('#righthead').append('Steam not avaliable or error occured.<button id="logoff">Logoff</button>');
+			}
+		});
+	});
+
 /* При клике на тень скрываем ее и все модальные окна */
 	$('#shadow').click(function() {
 		$(this).hide();

@@ -51,6 +51,7 @@ $(document).ready(function() {
 	$('.hideRegs').click(function() {
 		$('#regionCloud').toggle();
 		$('#selectedSystems').toggle();
+		$('#presets').toggle();
 	});
 	
 	/* Формирование опций для селектора пресетов */
@@ -119,7 +120,7 @@ function getSystems(regions) {
 	/* Первым делом получаем список систем для указанных в параметре регионов */
 	$.ajax({
 		type: 'GET',
-		url: 'getsystems',
+		url: '/systemstats/getsystems',
 		data: {'regions' : regions},
 		dataType: 'json',
 		success: function(data) {
