@@ -76,6 +76,7 @@ class navigator_index {
 		}
 
 		$q = "
+			SET sql_big_selects = ON;
 			SELECT `invtypes`.`typeID`,`invtypes`.`groupID`,`invtypes`.`typeName`,`dgmtypeattributes`.`attributeID`,
 				COALESCE(`dgmtypeattributes`.`valueInt`,`dgmtypeattributes`.`valueFloat`) AS `value`
 			FROM `invtypes`
