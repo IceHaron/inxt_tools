@@ -40,6 +40,7 @@ class db {
 		} else {
 			root::$_ALL['backtrace'][] = "Current character set: " . mysqli_character_set_name($link);
 		}
+		self::query("SET sql_big_selects = ON;");
 		// root::$_ALL['checkpoints'][] = array('DB initialized', microtime(1));
 	}
 	
