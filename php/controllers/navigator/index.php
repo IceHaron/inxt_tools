@@ -85,6 +85,7 @@ class navigator_index {
 				AND `invtypes`.`groupID` IN (78,300,747,762,763,782,1289)
 			ORDER BY `dgmtypeattributes`.`attributeID` DESC, COALESCE(`dgmtypeattributes`.`valueInt`,`dgmtypeattributes`.`valueFloat`) DESC;";
 		$r = db::query($q);
+		var_dump($q, $r);
 
 		foreach ($r as $item) {
 
