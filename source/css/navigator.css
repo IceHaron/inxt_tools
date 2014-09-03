@@ -60,9 +60,13 @@
 	margin: 5px;
 }
 #lowSlots, #shipAccel, #shipDecel, #rigSize, #rigSlots, #rigs, #modules, #group { display: none; }
-#ship, #imps, #skills, #timeBlock {
-	width: calc(100% / 4);
+#ship, #imps, #skills {
+	width: 345px;
 	/*display: inline-block;*/
+	float: left;
+}
+#timeBlock {
+	width: 455px;
 	float: left;
 }
 select[name="ship"], select[id*="module_"], select[id*="rig_"], select[id*="implant_"] {

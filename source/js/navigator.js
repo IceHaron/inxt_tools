@@ -249,7 +249,7 @@ function calcTime(mass, agil, warp, acc, dec) {
 				var str = '<table class="timeTable">';
 				for (i in data.detailed) {
 					var jump = data.detailed[i];
-					str += '<tr><td>' + jump.jump + '</td><th>' + jump.time.toPrecision(4) + '</th></tr>';
+					str += '<tr><td>' + jump.jump + jump.range + '</td><th>' + jump.time.toPrecision(4) + '</th></tr>';
 				}
 				str += '<tr style="color: yellow"><td>Summary</td><th>' + data.summary.toPrecision(5) + '</th></tr></table><span class="tip">10s added for each jump to compensate interstellar flight</span>';
 				$('#timeBlock').html(str);

@@ -306,7 +306,7 @@ class universe {
 		$range = sqrt(pow($jump['from'][0] - $jump['to'][0],2) + pow($jump['from'][1] - $jump['to'][1],2) + pow($jump['from'][2] - $jump['to'][2],2));
 		$alignTime = $ship['inertia'] * $ship['mass'] * 1e-6 * (-log(0.25));
 		$peakVel = $ship['warpSpeed'];
-		$precision = strlen(round($range)) - 2;
+		$precision = min(strlen(round($range)), strlen(round($peakVel))) - 2;
 
 		do {
 			$accelTime = log($ship['accel']*$peakVel)/$ship['accel'];
